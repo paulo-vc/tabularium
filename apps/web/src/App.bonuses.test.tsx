@@ -52,46 +52,109 @@ function renderApp(services: Services, hash: string) {
 }
 
 describe('bônus de itens, maldições e bênçãos', () => {
+  /** Adiciona um bônus pela seção "Bônus e efeitos" (aba Combate do D&D). */
+  async function addBonus(
+    user: ReturnType<typeof userEvent.setup>,
+    name: string,
+    search: string,
+    field: string,
+    value: string,
+  ) {
+    await user.click(screen.getByRole('tab', { name: 'Combate' }));
+    const section = await screen.findByRole('group', { name: 'Bônus e efeitos' });
+    await user.click(within(section).getByRole('button', { name: 'Adicionar bônus' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Novo bônus' });
+    await user.type(within(dialog).getByLabelText('Nome'), name);
+    await user.click(within(dialog).getByRole('combobox', { name: 'Campo 1' }));
+    await user.type(within(dialog).getByLabelText('Buscar campo'), search);
+    await user.click(within(dialog).getByRole('option', { name: field }));
+    await user.clear(within(dialog).getByLabelText('Valor 1'));
+    await user.type(within(dialog).getByLabelText('Valor 1'), value);
+    await user.click(within(dialog).getByRole('button', { name: 'Salvar' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+    return section;
+  }
+
   it('a jogadora põe +2 de Força por um item; o modificador acompanha, e desligar volta', async () => {
     const sheet = await player.sheets.create({ name: 'Lia', templateId: 'dnd5e-srd' });
     const user = renderApp(player, `#/fichas/${sheet.id}`);
     // Força 10: modificador 0.
     expect(await screen.findByRole('status', { name: 'Mod. Força' })).toHaveTextContent(/^0$/);
+    // No D&D, os bônus ficam numa seção da aba Combate, não num botão no topo.
+    expect(screen.queryByRole('button', { name: 'Bônus' })).not.toBeInTheDocument();
 
-    await user.click(screen.getByRole('button', { name: 'Bônus' }));
-    const dialog = await screen.findByRole('dialog', { name: 'Bônus e efeitos' });
-    await user.click(within(dialog).getByRole('button', { name: 'Adicionar bônus' }));
-    await user.type(within(dialog).getByLabelText('Nome'), 'Cinto de Força');
-    await user.selectOptions(within(dialog).getByLabelText('Campo 1'), 'Força');
-    await user.clear(within(dialog).getByLabelText('Valor 1'));
-    await user.type(within(dialog).getByLabelText('Valor 1'), '2');
-    await user.click(within(dialog).getByRole('button', { name: 'Salvar bônus' }));
-
-    const list = await within(dialog).findByRole('list', { name: 'Bônus da ficha' });
-    expect(list).toHaveTextContent('Cinto de Força (item)');
+    const section = await addBonus(user, 'Cinto de Força', 'forca', 'Força', '2');
+    const list = await within(section).findByRole('list', { name: 'Bônus da ficha' });
+    expect(list).toHaveTextContent('Cinto de Força');
     expect(list).toHaveTextContent('Força +2');
-    await user.keyboard('{Escape}');
 
     // Força 12 com o cinto: modificador +1, e o campo mostra o valor com bônus.
+    await user.click(screen.getByRole('tab', { name: 'Principal' }));
     await waitFor(() =>
       expect(screen.getByRole('status', { name: 'Mod. Força' })).toHaveTextContent('+1'),
     );
     expect(screen.getByRole('button', { name: /^Força com bônus: 12/ })).toBeInTheDocument();
-    expect(screen.getByRole('button', { name: 'Bônus (1 ativo)' })).toBeInTheDocument();
 
     // Desligar o bônus volta ao valor de antes.
-    await user.click(screen.getByRole('button', { name: 'Bônus (1 ativo)' }));
+    await user.click(screen.getByRole('tab', { name: 'Combate' }));
     await user.click(await screen.findByRole('checkbox', { name: 'Cinto de Força ativo' }));
-    await waitFor(() =>
-      expect(screen.getByRole('checkbox', { name: 'Cinto de Força ativo' })).not.toBeChecked(),
-    );
-    await user.keyboard('{Escape}');
+    await user.click(screen.getByRole('tab', { name: 'Principal' }));
     await waitFor(() =>
       expect(screen.getByRole('status', { name: 'Mod. Força' })).toHaveTextContent(/^0$/),
     );
     expect((await player.sheetRepository.get(sheet.id))?.bonuses).toEqual([
       expect.objectContaining({ name: 'Cinto de Força', active: false }),
     ]);
+  });
+
+  it('um bônus numa perícia muda só aquela perícia', async () => {
+    const sheet = await player.sheets.create({ name: 'Lia', templateId: 'dnd5e-srd' });
+    const user = renderApp(player, `#/fichas/${sheet.id}`);
+    await screen.findByRole('status', { name: 'Mod. Força' });
+    await addBonus(user, 'Luvas do Ladrão', 'furt', 'Furtividade (Des)', '2');
+
+    await user.click(screen.getByRole('tab', { name: 'Principal' }));
+    await waitFor(() =>
+      expect(screen.getByRole('status', { name: 'Furtividade (Des)' })).toHaveTextContent('+2'),
+    );
+    expect(screen.getByRole('status', { name: 'Acrobacia (Des)' })).toHaveTextContent(/^0$/);
+    expect(screen.getByRole('status', { name: 'Prestidigitação (Des)' })).toHaveTextContent(/^0$/);
+  });
+
+  it('a busca de campo ignora acentos e agrupa pelas seções da ficha', async () => {
+    const sheet = await player.sheets.create({ name: 'Lia', templateId: 'dnd5e-srd' });
+    const user = renderApp(player, `#/fichas/${sheet.id}`);
+    await user.click(await screen.findByRole('tab', { name: 'Combate' }));
+    const section = await screen.findByRole('group', { name: 'Bônus e efeitos' });
+    await user.click(within(section).getByRole('button', { name: 'Adicionar bônus' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Novo bônus' });
+    await user.click(within(dialog).getByRole('combobox', { name: 'Campo 1' }));
+    await user.type(within(dialog).getByLabelText('Buscar campo'), 'percepcao');
+    const fields = within(dialog).getByRole('listbox', { name: 'Campos' });
+    expect(within(fields).getByRole('group', { name: 'Perícias' })).toHaveTextContent(
+      'Percepção (Sab)',
+    );
+    // Marcadores (testes contra a morte) não são alvo de bônus.
+    await user.clear(within(dialog).getByLabelText('Buscar campo'));
+    await user.type(within(dialog).getByLabelText('Buscar campo'), 'morte');
+    expect(within(dialog).getByText('Nenhum campo com esse nome.')).toBeInTheDocument();
+  });
+
+  it('num sistema sem aba de bônus, eles ficam num botão no topo da ficha', async () => {
+    await player.files.installTemplate({
+      id: 'simples',
+      version: '1.0.0',
+      name: 'Sistema Simples',
+      source: 'local',
+      fields: [{ id: 'forca', key: 'forca', label: 'Força', type: 'number', default: 10 }],
+      layouts: { full: [{ kind: 'field', fieldId: 'forca' }] },
+    });
+    const sheet = await player.sheets.create({ name: 'Lia', templateId: 'simples' });
+    const user = renderApp(player, `#/fichas/${sheet.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Bônus' }));
+    const dialog = await screen.findByRole('dialog', { name: 'Bônus e efeitos' });
+    expect(within(dialog).getByRole('button', { name: 'Adicionar bônus' })).toBeInTheDocument();
+    expect(screen.queryByRole('group', { name: 'Bônus e efeitos' })).not.toBeInTheDocument();
   });
 
   it('o Mestre aplica uma maldição na ficha da jogadora, que chega na hora', async () => {

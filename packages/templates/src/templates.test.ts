@@ -1,4 +1,5 @@
 import {
+  type Bonus,
   compileTemplate,
   computeDerived,
   createSheet,
@@ -113,8 +114,8 @@ describe('D&D 5e: fórmulas avançadas (1.1.0)', () => {
   if (!template) throw new Error('template ausente');
   const compiled = compile(template);
   const base = createSheet(compiled, { id: 's', name: 'Teste', ownerId: 'u', now: 0 }).values;
-  const calc = (values: Record<string, unknown>) => {
-    const { computed } = computeDerived(compiled, { ...base, ...values } as never);
+  const calc = (values: Record<string, unknown>, bonuses: Bonus[] = []) => {
+    const { computed } = computeDerived(compiled, { ...base, ...values } as never, bonuses);
     return (id: string) => {
       const result = computed[id];
       return result?.ok ? result.value : result;
@@ -122,22 +123,23 @@ describe('D&D 5e: fórmulas avançadas (1.1.0)', () => {
   };
   const item = (id: string, values: Record<string, unknown>) => ({ id, values });
 
-  it('CA total soma a base, os itens equipados e os efeitos de CA ativos', () => {
-    const value = calc({
-      ca: 16,
-      equipamento: [
-        item('escudo', { nome: 'Escudo', bonus_ca: 2, equipado: true }),
-        item('anel', { nome: 'Anel de Proteção', bonus_ca: 1, equipado: false }),
+  it('CA total soma a base e os itens equipados; bônus valem num campo só', () => {
+    const value = calc(
+      {
+        ca: 16,
+        equipamento: [
+          item('escudo', { nome: 'Escudo', bonus_ca: 2, equipado: true }),
+          item('anel', { nome: 'Anel de Proteção', bonus_ca: 1, equipado: false }),
+        ],
+      },
+      [
+        bonus('fe', 'Escudo da Fé', [{ fieldId: 'ca_total', value: 2 }]),
+        bonus('luvas', 'Luvas de Atletismo', [{ fieldId: 'atletismo', value: 2 }]),
       ],
-      efeitos: [
-        item('e1', { nome: 'Escudo da Fé', alvo: 'ca', valor: 2, ativo: true }),
-        item('e2', { nome: 'Bênção (resist.)', alvo: 'resistencias', valor: 1, ativo: true }),
-        item('e3', { nome: 'Antigo', alvo: 'ca', valor: 5, ativo: false }),
-      ],
-    });
+    );
     expect(value('ca_total')).toBe(20); // 16 + 2 (escudo) + 2 (Escudo da Fé)
-    expect(value('salv_for')).toBe(1); // 0 + efeito de resistência
-    expect(value('atletismo')).toBe(0); // efeito de resistência não afeta perícia
+    expect(value('atletismo')).toBe(2); // o bônus vale só em Atletismo…
+    expect(value('acrobacia')).toBe(0); // …e não nas outras perícias
   });
 
   it('CD de magia usa o atributo de conjuração escolhido', () => {
@@ -223,8 +225,12 @@ describe('Lendas d20 (ORC)', () => {
   if (!template) throw new Error('template ausente');
   const compiled = compile(template);
   const base = createSheet(compiled, { id: 's', name: 'Teste', ownerId: 'u', now: 0 }).values;
-  const calc = (values: Record<string, unknown>) => {
-    const { computed, resourceMax } = computeDerived(compiled, { ...base, ...values } as never);
+  const calc = (values: Record<string, unknown>, bonuses: Bonus[] = []) => {
+    const { computed, resourceMax } = computeDerived(
+      compiled,
+      { ...base, ...values } as never,
+      bonuses,
+    );
     const read = (result: { ok: boolean; value?: number } | undefined) =>
       result?.ok ? result.value : 'erro';
     return {
@@ -275,23 +281,27 @@ describe('Lendas d20 (ORC)', () => {
     expect(calc({ ferido: 1 }).max('moribundo')).toBe(3);
   });
 
-  it('magia, efeitos e volume', () => {
+  it('magia, bônus e volume', () => {
     const item = (id: string, values: Record<string, unknown>) => ({ id, values });
-    const { value } = calc({
-      nivel: 3,
-      sab: 4,
-      atributo_magia: 'sab',
-      prof_magia: 'treinado',
-      efeitos: [
-        item('e1', { nome: 'Amedrontado 1', alvo: 'pericias', valor: -1, ativo: true }),
-        item('e2', { nome: 'Amedrontado 1', alvo: 'cd', valor: -1, ativo: true }),
+    const { value } = calc(
+      {
+        nivel: 3,
+        sab: 4,
+        atributo_magia: 'sab',
+        prof_magia: 'treinado',
+        equipamento: [
+          item('a', { nome: 'Armadura', qtd: 1, volume: 2, investido: false }),
+          item('b', { nome: 'Rações', qtd: 5, volume: 0.1, investido: false }),
+          item('c', { nome: 'Anel', qtd: 1, volume: 0, investido: true }),
+        ],
+      },
+      [
+        bonus('medo', 'Amedrontado 1', [
+          { fieldId: 'medicina', value: -1 },
+          { fieldId: 'cd_magia', value: -1 },
+        ]),
       ],
-      equipamento: [
-        item('a', { nome: 'Armadura', qtd: 1, volume: 2, investido: false }),
-        item('b', { nome: 'Rações', qtd: 5, volume: 0.1, investido: false }),
-        item('c', { nome: 'Anel', qtd: 1, volume: 0, investido: true }),
-      ],
-    });
+    );
     expect(value('mod_magia')).toBe(4);
     expect(value('ataque_magia')).toBe(4 + 2 + 3);
     expect(value('cd_magia')).toBe(10 + 4 + 5 - 1);
@@ -300,3 +310,7 @@ describe('Lendas d20 (ORC)', () => {
     expect(value('investidos')).toBe(1);
   });
 });
+
+function bonus(id: string, name: string, targets: Bonus['targets']): Bonus {
+  return { id, name, kind: 'outro', active: true, targets };
+}

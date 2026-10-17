@@ -1,6 +1,6 @@
 {
   "id": "lendas-d20-orc",
-  "version": "1.4.0",
+  "version": "1.5.0",
   "name": "Lendas d20 (ORC)",
   "description": "Ficha para fantasia heroica d20 com graus de proficiência (destreinado a lendário), atributos como modificadores e três ações por turno. ORC Notice: This product is licensed under the ORC License held in the Library of Congress at TX 9-307-067 and available online at various locations including www.azoralaw.com/orclicense, www.gencon.com/orclicense and others. All warranties are disclaimed as set forth therein. Attribution: This product is based on the following Licensed Material: Player Core © 2023 Paizo Inc., Designed by Logan Bonner, Jason Bulmahn, Stephen Radney-MacFarland, and Mark Seifter. Reserved Material: nomes, cenário e marcas da Paizo não são usados. Expressed Material: esta ficha (layout e textos) não é material licenciado.",
   "author": "Tabularium",
@@ -9,6 +9,7 @@
   "tags": ["fantasia", "d20", "orc"],
   "source": "builtin",
   "initiative": "percepcao",
+  "bonusTab": "Combate",
   "fields": [
     {
       "id": "nome",
@@ -276,7 +277,7 @@
       "key": "fortitude",
       "label": "Fortitude (Con)",
       "type": "computed",
-      "formula": "@con + if(@prof_fortitude > 0, @prof_fortitude + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"resistencias\"))",
+      "formula": "@con + if(@prof_fortitude > 0, @prof_fortitude + @nivel, 0)",
       "signed": true
     },
     {
@@ -318,7 +319,7 @@
       "key": "reflexos",
       "label": "Reflexos (Des)",
       "type": "computed",
-      "formula": "@des + if(@prof_reflexos > 0, @prof_reflexos + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"resistencias\"))",
+      "formula": "@des + if(@prof_reflexos > 0, @prof_reflexos + @nivel, 0)",
       "signed": true
     },
     {
@@ -360,7 +361,7 @@
       "key": "vontade",
       "label": "Vontade (Sab)",
       "type": "computed",
-      "formula": "@sab + if(@prof_vontade > 0, @prof_vontade + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"resistencias\"))",
+      "formula": "@sab + if(@prof_vontade > 0, @prof_vontade + @nivel, 0)",
       "signed": true
     },
     {
@@ -402,7 +403,7 @@
       "key": "percepcao",
       "label": "Percepção (Sab)",
       "type": "computed",
-      "formula": "@sab + if(@prof_percepcao > 0, @prof_percepcao + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"percepcao\"))",
+      "formula": "@sab + if(@prof_percepcao > 0, @prof_percepcao + @nivel, 0)",
       "signed": true
     },
     {
@@ -410,7 +411,7 @@
       "key": "ca",
       "label": "Classe de Armadura",
       "type": "computed",
-      "formula": "10 + min(@des, @limite_des) + if(@prof_armadura > 0, @prof_armadura + @nivel, 0) + @bonus_armadura + @escudo_erguido * @escudo_ca + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"ca\"))",
+      "formula": "10 + min(@des, @limite_des) + if(@prof_armadura > 0, @prof_armadura + @nivel, 0) + @bonus_armadura + @escudo_erguido * @escudo_ca",
       "description": "10 + Destreza (até o limite da armadura) + proficiência + armadura + escudo erguido + efeitos."
     },
     {
@@ -561,7 +562,7 @@
       "key": "cd_classe",
       "label": "CD de classe",
       "type": "computed",
-      "formula": "10 + @mod_chave + if(@prof_classe > 0, @prof_classe + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"cd\"))"
+      "formula": "10 + @mod_chave + if(@prof_classe > 0, @prof_classe + @nivel, 0)"
     },
     {
       "id": "resistencias_dano",
@@ -724,7 +725,7 @@
       "key": "acrobatismo",
       "label": "Acrobatismo (Des)",
       "type": "computed",
-      "formula": "@des + if(@prof_acrobatismo > 0, @prof_acrobatismo + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@des + if(@prof_acrobatismo > 0, @prof_acrobatismo + @nivel, 0)",
       "signed": true
     },
     {
@@ -766,7 +767,7 @@
       "key": "arcanismo",
       "label": "Arcanismo (Int)",
       "type": "computed",
-      "formula": "@int + if(@prof_arcanismo > 0, @prof_arcanismo + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@int + if(@prof_arcanismo > 0, @prof_arcanismo + @nivel, 0)",
       "signed": true
     },
     {
@@ -808,7 +809,7 @@
       "key": "atletismo",
       "label": "Atletismo (For)",
       "type": "computed",
-      "formula": "@for + if(@prof_atletismo > 0, @prof_atletismo + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@for + if(@prof_atletismo > 0, @prof_atletismo + @nivel, 0)",
       "signed": true
     },
     {
@@ -850,7 +851,7 @@
       "key": "diplomacia",
       "label": "Diplomacia (Car)",
       "type": "computed",
-      "formula": "@car + if(@prof_diplomacia > 0, @prof_diplomacia + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@car + if(@prof_diplomacia > 0, @prof_diplomacia + @nivel, 0)",
       "signed": true
     },
     {
@@ -892,7 +893,7 @@
       "key": "enganacao",
       "label": "Enganação (Car)",
       "type": "computed",
-      "formula": "@car + if(@prof_enganacao > 0, @prof_enganacao + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@car + if(@prof_enganacao > 0, @prof_enganacao + @nivel, 0)",
       "signed": true
     },
     {
@@ -934,7 +935,7 @@
       "key": "furtividade",
       "label": "Furtividade (Des)",
       "type": "computed",
-      "formula": "@des + if(@prof_furtividade > 0, @prof_furtividade + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@des + if(@prof_furtividade > 0, @prof_furtividade + @nivel, 0)",
       "signed": true
     },
     {
@@ -976,7 +977,7 @@
       "key": "intimidacao",
       "label": "Intimidação (Car)",
       "type": "computed",
-      "formula": "@car + if(@prof_intimidacao > 0, @prof_intimidacao + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@car + if(@prof_intimidacao > 0, @prof_intimidacao + @nivel, 0)",
       "signed": true
     },
     {
@@ -1018,7 +1019,7 @@
       "key": "ladinagem",
       "label": "Ladinagem (Des)",
       "type": "computed",
-      "formula": "@des + if(@prof_ladinagem > 0, @prof_ladinagem + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@des + if(@prof_ladinagem > 0, @prof_ladinagem + @nivel, 0)",
       "signed": true
     },
     {
@@ -1060,7 +1061,7 @@
       "key": "manufatura",
       "label": "Manufatura (Int)",
       "type": "computed",
-      "formula": "@int + if(@prof_manufatura > 0, @prof_manufatura + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@int + if(@prof_manufatura > 0, @prof_manufatura + @nivel, 0)",
       "signed": true
     },
     {
@@ -1102,7 +1103,7 @@
       "key": "medicina",
       "label": "Medicina (Sab)",
       "type": "computed",
-      "formula": "@sab + if(@prof_medicina > 0, @prof_medicina + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@sab + if(@prof_medicina > 0, @prof_medicina + @nivel, 0)",
       "signed": true
     },
     {
@@ -1144,7 +1145,7 @@
       "key": "natureza",
       "label": "Natureza (Sab)",
       "type": "computed",
-      "formula": "@sab + if(@prof_natureza > 0, @prof_natureza + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@sab + if(@prof_natureza > 0, @prof_natureza + @nivel, 0)",
       "signed": true
     },
     {
@@ -1186,7 +1187,7 @@
       "key": "ocultismo",
       "label": "Ocultismo (Int)",
       "type": "computed",
-      "formula": "@int + if(@prof_ocultismo > 0, @prof_ocultismo + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@int + if(@prof_ocultismo > 0, @prof_ocultismo + @nivel, 0)",
       "signed": true
     },
     {
@@ -1228,7 +1229,7 @@
       "key": "performance",
       "label": "Performance (Car)",
       "type": "computed",
-      "formula": "@car + if(@prof_performance > 0, @prof_performance + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@car + if(@prof_performance > 0, @prof_performance + @nivel, 0)",
       "signed": true
     },
     {
@@ -1270,7 +1271,7 @@
       "key": "religiao",
       "label": "Religião (Sab)",
       "type": "computed",
-      "formula": "@sab + if(@prof_religiao > 0, @prof_religiao + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@sab + if(@prof_religiao > 0, @prof_religiao + @nivel, 0)",
       "signed": true
     },
     {
@@ -1312,7 +1313,7 @@
       "key": "sobrevivencia",
       "label": "Sobrevivência (Sab)",
       "type": "computed",
-      "formula": "@sab + if(@prof_sobrevivencia > 0, @prof_sobrevivencia + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@sab + if(@prof_sobrevivencia > 0, @prof_sobrevivencia + @nivel, 0)",
       "signed": true
     },
     {
@@ -1354,7 +1355,7 @@
       "key": "sociedade",
       "label": "Sociedade (Int)",
       "type": "computed",
-      "formula": "@int + if(@prof_sociedade > 0, @prof_sociedade + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"pericias\"))",
+      "formula": "@int + if(@prof_sociedade > 0, @prof_sociedade + @nivel, 0)",
       "signed": true
     },
     {
@@ -1548,7 +1549,7 @@
       "key": "ataque_magia",
       "label": "Ataque com magia",
       "type": "computed",
-      "formula": "@mod_magia + if(@prof_magia > 0, @prof_magia + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"ataques\"))",
+      "formula": "@mod_magia + if(@prof_magia > 0, @prof_magia + @nivel, 0)",
       "signed": true
     },
     {
@@ -1556,7 +1557,7 @@
       "key": "cd_magia",
       "label": "CD de magia",
       "type": "computed",
-      "formula": "10 + @mod_magia + if(@prof_magia > 0, @prof_magia + @nivel, 0) + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"cd\"))"
+      "formula": "10 + @mod_magia + if(@prof_magia > 0, @prof_magia + @nivel, 0)"
     },
     {
       "id": "foco",
@@ -1765,70 +1766,6 @@
       "default": 0,
       "min": 0,
       "integer": true
-    },
-    {
-      "id": "efeitos",
-      "key": "efeitos",
-      "label": "Efeitos temporários",
-      "type": "list",
-      "itemFields": [
-        {
-          "id": "nome",
-          "key": "nome",
-          "label": "Efeito",
-          "type": "text"
-        },
-        {
-          "id": "alvo",
-          "key": "alvo",
-          "label": "Afeta",
-          "type": "select",
-          "options": [
-            {
-              "value": "ca",
-              "label": "Classe de Armadura"
-            },
-            {
-              "value": "ataques",
-              "label": "Ataques"
-            },
-            {
-              "value": "resistencias",
-              "label": "Testes de resistência"
-            },
-            {
-              "value": "pericias",
-              "label": "Perícias"
-            },
-            {
-              "value": "percepcao",
-              "label": "Percepção"
-            },
-            {
-              "value": "cd",
-              "label": "CDs"
-            }
-          ],
-          "default": "ca"
-        },
-        {
-          "id": "valor",
-          "key": "valor",
-          "label": "Valor",
-          "type": "number",
-          "default": 1,
-          "integer": true,
-          "description": "Negativo para penalidades (ex.: Amedrontado 1 = -1)."
-        },
-        {
-          "id": "ativo",
-          "key": "ativo",
-          "label": "Ativo",
-          "type": "boolean",
-          "default": true
-        }
-      ],
-      "description": "Bônus e penalidades de magias, condições e itens. Somados nas fórmulas."
     },
     {
       "id": "personalidade",
@@ -2177,17 +2114,6 @@
           {
             "kind": "field",
             "fieldId": "ataques"
-          }
-        ]
-      },
-      {
-        "kind": "section",
-        "title": "Efeitos temporários",
-        "columns": 1,
-        "children": [
-          {
-            "kind": "field",
-            "fieldId": "efeitos"
           }
         ]
       },

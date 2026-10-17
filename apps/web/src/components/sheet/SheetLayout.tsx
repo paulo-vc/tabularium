@@ -14,6 +14,7 @@ import { useId, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FieldLine, SecondaryValue, StatTile, type CompactFieldProps } from './compact';
+import { BonusSection } from './Bonuses';
 import { AddItemButton, FieldControl } from './fields';
 
 type Columns = 1 | 2 | 3 | 4;
@@ -343,8 +344,18 @@ export function SheetLayout({
         ),
       );
 
+  // A seção "Bônus e efeitos" fica no fim da aba que o sistema escolheu (`bonusTab`).
+  const bonusTab = compiled.template.bonusTab;
+  const withBonuses = (name: string | undefined) =>
+    bonusTab !== undefined && (tabs.length === 1 || name === bonusTab) ? <BonusSection /> : null;
+
   if (tabs.length === 1) {
-    return <div className="grid gap-4">{renderTop(tabs[0]?.nodes ?? [])}</div>;
+    return (
+      <div className="grid gap-4">
+        {renderTop(tabs[0]?.nodes ?? [])}
+        {withBonuses(tabs[0]?.name)}
+      </div>
+    );
   }
 
   return (
@@ -389,6 +400,7 @@ export function SheetLayout({
         className="grid gap-4"
       >
         {renderTop(tabs[active]?.nodes ?? [])}
+        {withBonuses(tabs[active]?.name)}
       </div>
     </div>
   );

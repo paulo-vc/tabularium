@@ -9,7 +9,13 @@ import { useServices } from '@/app/services-context';
 import { useLiveSession } from '@/components/live/use-live-session';
 import { CharacterPortrait } from '@/components/sheet/Portrait';
 import { SheetLayout } from '@/components/sheet/SheetLayout';
-import { BonusContext, BonusesButton, useBonusEffects } from '@/components/sheet/Bonuses';
+import {
+  BonusContext,
+  BonusEditorContext,
+  BonusesButton,
+  useBonusEffects,
+  type BonusEditor,
+} from '@/components/sheet/Bonuses';
 import { pinnedFieldIds, SheetVitals } from '@/components/sheet/SheetVitals';
 import { useSheetEditing } from '@/components/sheet/use-sheet-editing';
 import { RollContext } from '@/components/sheet/roll-context';
@@ -114,6 +120,19 @@ function PlayerSheet({
     player.sheet.bonuses,
   );
   const bonusEffects = useBonusEffects(player.sheet.bonuses);
+  // O Mestre muda os bônus do jogador pela sessão (ex.: aplica uma maldição).
+  const bonusEditor: BonusEditor = {
+    compiled,
+    bonuses: player.sheet.bonuses,
+    onChange: (bonuses) => {
+      void session.setPlayerBonuses(campaignId, sheetId, bonuses).then((result) => {
+        if (!result.ok) {
+          toast.error('Não foi possível alterar os bônus', { description: result.error.message });
+        }
+      });
+    },
+    newId: () => crypto.randomUUID(),
+  };
   const roller = useRoller(compiled);
   // O Mestre rolando pela ficha do jogador: o registro mostra de quem é o teste.
   const playerRoller = useMemo(
@@ -145,22 +164,11 @@ function PlayerSheet({
         <Badge variant={player.online ? 'default' : 'outline'}>
           {player.online ? 'Online' : 'Offline'}
         </Badge>
-        <div className="ml-auto">
-          <BonusesButton
-            compiled={compiled}
-            bonuses={player.sheet.bonuses}
-            onChange={(bonuses) => {
-              void session.setPlayerBonuses(campaignId, sheetId, bonuses).then((result) => {
-                if (!result.ok) {
-                  toast.error('Não foi possível alterar os bônus', {
-                    description: result.error.message,
-                  });
-                }
-              });
-            }}
-            newId={() => crypto.randomUUID()}
-          />
-        </div>
+        {!compiled.template.bonusTab && (
+          <div className="ml-auto">
+            <BonusesButton editor={bonusEditor} />
+          </div>
+        )}
       </div>
       <p className="text-muted-foreground text-sm" role="status">
         {player.online
@@ -175,16 +183,23 @@ function PlayerSheet({
       </p>
       <RollContext value={playerRoller}>
         <BonusContext value={bonusEffects}>
-          <SheetVitals compiled={compiled} values={values} derived={derived} onChange={onChange} />
-          <SheetLayout
-            compiled={compiled}
-            values={values}
-            derived={derived}
-            onChange={onChange}
-            newItemId={() => crypto.randomUUID()}
-            secretFieldIds={secretIds}
-            pinnedFieldIds={pinnedFieldIds(compiled, undefined, secretIds)}
-          />
+          <BonusEditorContext value={bonusEditor}>
+            <SheetVitals
+              compiled={compiled}
+              values={values}
+              derived={derived}
+              onChange={onChange}
+            />
+            <SheetLayout
+              compiled={compiled}
+              values={values}
+              derived={derived}
+              onChange={onChange}
+              newItemId={() => crypto.randomUUID()}
+              secretFieldIds={secretIds}
+              pinnedFieldIds={pinnedFieldIds(compiled, undefined, secretIds)}
+            />
+          </BonusEditorContext>
         </BonusContext>
       </RollContext>
     </div>
