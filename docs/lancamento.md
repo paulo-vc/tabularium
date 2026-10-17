@@ -143,3 +143,11 @@ Mesmo roteiro (tag `v0.3.5`, conferir o rascunho, publicar como versão normal).
 - [ ] Na v0.3.4 instalada, a atualização chega, e as fichas abrem no sistema novo sem perder nada.
 - [ ] Ficha de D&D: "Ataque" e "Ataque + dano" na aba Combate, com o som dos dados.
 - [ ] Bônus: +2 de Força muda o modificador e as perícias; na sessão, o Mestre aplica uma maldição pela ficha do jogador e ela chega na hora.
+
+## v0.3.6
+
+Mesmo roteiro (tag `v0.3.6`, conferir o rascunho, publicar como versão normal). Sem mudança no banco local. D&D 5e vai para 1.6.0 e Lendas d20 para 1.5.0: saem os "Efeitos temporários" (guardados na ficha, sem aparecer).
+
+- [ ] Na v0.3.5 instalada, a atualização chega, e as fichas abrem no sistema novo.
+- [ ] Aba Combate: "Bônus e efeitos" adiciona um bônus numa perícia só (busca "furt"), e só ela muda.
+- [ ] No celular (versão web), o nome da ficha aparece inteiro.

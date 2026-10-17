@@ -2,7 +2,9 @@
 
 As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos ficam nos PRs e em [`docs/`](docs/).
 
-## Próxima versão
+## v0.3.6
+
+Bônus num lugar só, mais fáceis de usar.
 
 - **Bônus mais simples e organizados:** a ficha tinha dois jeitos de fazer a mesma coisa, os "Efeitos temporários" do D&D e do Lendas d20 (em que "Perícias" somava em todas as perícias de uma vez) e o "Bônus" novo. Agora é um só: a seção **Bônus e efeitos**, na aba Combate, onde ficavam os efeitos. Cada bônus vale nos campos que você escolher, um por um: +2 em Furtividade muda só a Furtividade. A escolha do campo tem busca ("furt" acha Furtividade, sem precisar de acento) e vem agrupada pelas seções da ficha (Atributos, Perícias, Resistências…), sem opções que não fazem sentido. D&D 5e 1.6.0 e Lendas d20 1.5.0; os efeitos temporários antigos continuam guardados na ficha, mas não aparecem mais: recrie como bônus os que estiverem em uso.
 - **Nome da ficha no celular:** não fica mais espremido ao lado do retrato e do sistema.
