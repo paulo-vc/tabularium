@@ -17,7 +17,13 @@ import { SheetLayout } from '@/components/sheet/SheetLayout';
 import { pinnedFieldIds, SheetVitals } from '@/components/sheet/SheetVitals';
 import { useDraft } from '@/components/sheet/use-draft';
 import { useSheetEditing } from '@/components/sheet/use-sheet-editing';
-import { BonusContext, BonusesButton, useBonusEffects } from '@/components/sheet/Bonuses';
+import {
+  BonusContext,
+  BonusEditorContext,
+  BonusesButton,
+  useBonusEffects,
+  type BonusEditor,
+} from '@/components/sheet/Bonuses';
 import { RollContext } from '@/components/sheet/roll-context';
 import { useRoller } from '@/components/live/use-roller';
 import { useDeviceId } from '@/components/use-device';
@@ -157,6 +163,12 @@ function SheetEditor({ id, compiled }: { id: string; compiled: OpenedReady['comp
 
   if (!sheet) return null;
   const { template } = compiled;
+  const bonusEditor: BonusEditor = {
+    compiled,
+    bonuses: sheet.bonuses ?? [],
+    onChange: (bonuses) => void services.sheets.setBonuses(id, bonuses),
+    newId: () => crypto.randomUUID(),
+  };
 
   return (
     <div className="space-y-4">
@@ -176,65 +188,63 @@ function SheetEditor({ id, compiled }: { id: string; compiled: OpenedReady['comp
             name.blur();
             if (!name.draft.trim()) name.setDraft(sheet.name);
           }}
-          className="h-10 max-w-md flex-1 border-transparent text-xl font-bold shadow-none hover:border-input"
+          className="h-10 max-w-md min-w-40 flex-1 border-transparent text-xl font-bold shadow-none hover:border-input"
         />
         <Badge variant="secondary">{template.name}</Badge>
-        <div className="ml-auto">
-          <BonusesButton
-            compiled={compiled}
-            bonuses={sheet.bonuses ?? []}
-            onChange={(bonuses) => void services.sheets.setBonuses(id, bonuses)}
-            newId={() => crypto.randomUUID()}
-          />
+        <div className="ml-auto flex items-center gap-1">
+          {/* Sem aba própria no sistema, os bônus ficam neste botão. */}
+          {!template.bonusTab && <BonusesButton editor={bonusEditor} />}
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="icon" aria-label="Ações da ficha">
+                <EllipsisVerticalIcon />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="end">
+              <DropdownMenuItem
+                onSelect={() =>
+                  downloadFile(services.files.exportSheet({ ...sheet, values }, template))
+                }
+              >
+                <DownloadIcon /> Exportar
+              </DropdownMenuItem>
+              <DropdownMenuItem
+                onSelect={async () => {
+                  const copy = await services.sheets.duplicate(id);
+                  if (copy) navigate(`/fichas/${copy.id}`);
+                }}
+              >
+                <CopyIcon /> Duplicar
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+              <DropdownMenuItem variant="destructive" onSelect={() => setConfirmDelete(true)}>
+                <Trash2Icon /> Excluir
+              </DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
         </div>
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <Button variant="ghost" size="icon" aria-label="Ações da ficha">
-              <EllipsisVerticalIcon />
-            </Button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end">
-            <DropdownMenuItem
-              onSelect={() =>
-                downloadFile(services.files.exportSheet({ ...sheet, values }, template))
-              }
-            >
-              <DownloadIcon /> Exportar
-            </DropdownMenuItem>
-            <DropdownMenuItem
-              onSelect={async () => {
-                const copy = await services.sheets.duplicate(id);
-                if (copy) navigate(`/fichas/${copy.id}`);
-              }}
-            >
-              <CopyIcon /> Duplicar
-            </DropdownMenuItem>
-            <DropdownMenuSeparator />
-            <DropdownMenuItem variant="destructive" onSelect={() => setConfirmDelete(true)}>
-              <Trash2Icon /> Excluir
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
       </div>
 
       <RollContext value={roller}>
         <BonusContext value={bonusEffects}>
-          <SheetVitals
-            compiled={compiled}
-            values={values}
-            derived={derived}
-            onChange={onChange}
-            hiddenFieldIds={hidden}
-          />
-          <SheetLayout
-            compiled={compiled}
-            values={values}
-            derived={derived}
-            onChange={onChange}
-            newItemId={() => crypto.randomUUID()}
-            {...(hidden && { hiddenFieldIds: hidden })}
-            pinnedFieldIds={pinnedFieldIds(compiled, hidden)}
-          />
+          <BonusEditorContext value={bonusEditor}>
+            <SheetVitals
+              compiled={compiled}
+              values={values}
+              derived={derived}
+              onChange={onChange}
+              hiddenFieldIds={hidden}
+            />
+            <SheetLayout
+              compiled={compiled}
+              values={values}
+              derived={derived}
+              onChange={onChange}
+              newItemId={() => crypto.randomUUID()}
+              {...(hidden && { hiddenFieldIds: hidden })}
+              pinnedFieldIds={pinnedFieldIds(compiled, hidden)}
+            />
+          </BonusEditorContext>
         </BonusContext>
       </RollContext>
 
