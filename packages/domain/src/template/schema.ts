@@ -233,6 +233,11 @@ export const SystemTemplateSchema = z.object({
    * o resultado entra na ordem de turno. Sem ele, o Mestre digita as iniciativas.
    */
   initiative: IdSchema.optional(),
+  /**
+   * Aba da ficha em que aparece a seção "Bônus e efeitos" (itens, maldições, bênçãos), no fim
+   * dela. Sem isso, os bônus ficam num botão no topo da ficha.
+   */
+  bonusTab: z.string().trim().min(1).max(40).optional(),
   /** Versão mínima do app capaz de abrir este template. */
   minAppVersion: SemVerSchema.optional(),
   fields: z.array(FieldDefSchema).min(1).max(LIMITS.fields),
