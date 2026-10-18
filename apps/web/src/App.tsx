@@ -13,6 +13,7 @@ import { HomePage } from '@/pages/HomePage';
 import { InvitePage } from '@/pages/InvitePage';
 import { PlayerSheetPage } from '@/pages/PlayerSheetPage';
 import { SheetPage } from '@/pages/SheetPage';
+import { SheetPrintPage } from '@/pages/SheetPrintPage';
 import { SystemsPage } from '@/pages/SystemsPage';
 
 /**
@@ -47,6 +48,9 @@ export function App({ services }: { services: Services }) {
               </Route>
               <Route path="/convite/:code">
                 {(params) => <InvitePage key={params.code} code={params.code} />}
+              </Route>
+              <Route path="/fichas/:id/imprimir">
+                {(params) => <SheetPrintPage key={params.id} id={params.id} />}
               </Route>
               <Route path="/fichas/:id">
                 {(params) => <SheetPage key={params.id} id={params.id} />}

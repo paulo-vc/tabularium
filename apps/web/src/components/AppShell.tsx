@@ -33,8 +33,8 @@ function NavLink({ href, also, children }: { href: string; also?: string; childr
 
 export function AppShell({ children }: { children: ReactNode }) {
   return (
-    <div className="bg-background text-foreground min-h-dvh">
-      <header className="bg-background/95 sticky top-0 z-10 border-b backdrop-blur">
+    <div className="bg-background text-foreground min-h-dvh print:bg-white">
+      <header className="bg-background/95 sticky top-0 z-10 border-b backdrop-blur print:hidden">
         <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 sm:gap-4">
           <Link
             href="/"
@@ -64,8 +64,8 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6">{children}</main>
-      <footer className="text-muted-foreground mx-auto flex max-w-6xl flex-wrap gap-x-4 gap-y-1 px-4 pb-6 text-xs">
+      <main className="mx-auto max-w-6xl px-4 py-6 print:max-w-none print:p-0">{children}</main>
+      <footer className="text-muted-foreground mx-auto flex max-w-6xl flex-wrap gap-x-4 gap-y-1 px-4 pb-6 text-xs print:hidden">
         <span>Tabularium RPG {__APP_VERSION__}</span>
         <a
           href={newIssueUrl}
@@ -78,12 +78,15 @@ export function AppShell({ children }: { children: ReactNode }) {
           Reportar um problema
         </a>
       </footer>
-      <UpdateNotice />
-      <GmChangeNotice />
-      <ChatDock />
-      <CutsceneOverlay />
-      <RollNotice />
-      <SessionNotices />
+      {/* Avisos e o chat não saem na impressão. */}
+      <div className="print:hidden">
+        <UpdateNotice />
+        <GmChangeNotice />
+        <ChatDock />
+        <CutsceneOverlay />
+        <RollNotice />
+        <SessionNotices />
+      </div>
     </div>
   );
 }
