@@ -2,6 +2,10 @@
 
 As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos ficam nos PRs e em [`docs/`](docs/).
 
+## Próxima versão
+
+- **Imprimir a ficha:** no menu de ações da ficha (⋮), "Imprimir ou PDF" abre a ficha como uma folha: todas as abas em sequência, com o retrato, os valores com bônus (ex.: "18 (16 +2)"), as perícias em linhas com as marcas de proficiência, as listas em tabela e os bônus ativos no fim. Textos vazios viram linhas para escrever à mão. Para PDF, escolha "Salvar como PDF" como impressora. Sai sempre em fundo branco, mesmo com o app no tema escuro, e os campos secretos do Mestre não aparecem.
+
 ## v0.3.6
 
 Bônus num lugar só, mais fáceis de usar.

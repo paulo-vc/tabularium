@@ -5,6 +5,7 @@ import {
   CopyIcon,
   DownloadIcon,
   EllipsisVerticalIcon,
+  PrinterIcon,
   Trash2Icon,
   TriangleAlertIcon,
 } from 'lucide-react';
@@ -215,6 +216,9 @@ function SheetEditor({ id, compiled }: { id: string; compiled: OpenedReady['comp
                 }}
               >
                 <CopyIcon /> Duplicar
+              </DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => navigate(`/fichas/${id}/imprimir`)}>
+                <PrinterIcon /> Imprimir ou PDF
               </DropdownMenuItem>
               <DropdownMenuSeparator />
               <DropdownMenuItem variant="destructive" onSelect={() => setConfirmDelete(true)}>
