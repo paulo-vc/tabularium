@@ -3,6 +3,7 @@ import type { RollEntry } from './dice/log';
 import type { ChatMessage } from './chat/schema';
 import type { JournalEntry } from './journal/schema';
 import type { StoredImage } from './cutscene/schema';
+import type { StoredTrack } from './music/schema';
 import type { CharacterSheet, FieldValue } from './sheet/schema';
 import type { Portrait } from './sheet/portrait';
 import type { SoundSettings } from './preferences/sounds';
@@ -203,5 +204,25 @@ export interface ChatRepository {
   list(campaignId: string): Promise<ChatMessage[]>;
   /** Acrescenta as mensagens novas (as já guardadas, pelo `id`, são ignoradas). */
   add(campaignId: string, messages: readonly ChatMessage[]): Promise<void>;
+  deleteCampaign(campaignId: string): Promise<void>;
+}
+
+/** Uma trilha com o conteúdo. */
+export interface TrackWithData {
+  meta: StoredTrack;
+  data: Uint8Array;
+}
+
+/**
+ * Trilhas da campanha: a biblioteca do Mestre (`biblioteca`) e, no jogador, as recebidas ao
+ * ouvir a música da mesa (`recebida`, guardadas para não baixar de novo).
+ */
+export interface TrackRepository {
+  /** Só os dados (sem o conteúdo), das mais recentes para as mais antigas. */
+  list(campaignId: string, origin: StoredTrack['origin']): Promise<StoredTrack[]>;
+  get(campaignId: string, trackId: string): Promise<TrackWithData | undefined>;
+  findByHash(campaignId: string, hash: string): Promise<TrackWithData | undefined>;
+  save(campaignId: string, track: TrackWithData): Promise<void>;
+  delete(campaignId: string, trackId: string): Promise<void>;
   deleteCampaign(campaignId: string): Promise<void>;
 }

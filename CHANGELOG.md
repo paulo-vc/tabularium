@@ -4,6 +4,7 @@ As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos
 
 ## Próxima versão
 
+- **Música do Mestre:** na aba Música do painel, o Mestre guarda trilhas (MP3 ou OGG, até 15 MB) e toca uma para a mesa, com pausar, repetir e parar. A trilha chega aos jogadores pela sessão e fica guardada no aparelho deles (tocar de novo não baixa outra vez). Um selo no canto da tela mostra o que toca, o download e o volume da música, que cada um ajusta no próprio aparelho.
 - **Imprimir a ficha:** no menu de ações da ficha (⋮), "Imprimir ou PDF" abre a ficha como uma folha: todas as abas em sequência, com o retrato, os valores com bônus (ex.: "18 (16 +2)"), as perícias em linhas com as marcas de proficiência, as listas em tabela e os bônus ativos no fim. Textos vazios viram linhas para escrever à mão. Para PDF, escolha "Salvar como PDF" como impressora. Sai sempre em fundo branco, mesmo com o app no tema escuro, e os campos secretos do Mestre não aparecem.
 
 ## v0.3.6

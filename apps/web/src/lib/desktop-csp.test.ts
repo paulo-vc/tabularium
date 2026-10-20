@@ -29,6 +29,10 @@ describe('CSP do app desktop', () => {
     expect(directive('img-src')).toContain('data:');
   });
 
+  it('toca a música da mesa (trilhas guardadas no aparelho, em blob:)', () => {
+    expect(directive('media-src')).toContain('blob:');
+  });
+
   it('não libera scripts de fora', () => {
     expect(directive('script-src')).toEqual([]);
     expect(directive('default-src')).toEqual(["'self'"]);

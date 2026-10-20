@@ -3,6 +3,9 @@ import {
   type Bonus,
   type ChatMessage,
   type Cover,
+  MAX_TRACK_BYTES,
+  type MusicState,
+  sniffAudioMime,
   FieldValueSchema,
   type CharacterSheet,
   type FieldValue,
@@ -21,12 +24,14 @@ import {
   encodeBye,
   encodeChat,
   encodeImageRequest,
+  encodeTrackRequest,
   PROTOCOL_VERSION,
   syncEncoder,
   type Hello,
   type Reject,
 } from './protocol';
 import { newChallenge, verifyChallenge } from './identity';
+import { FileAssembler } from './file-transfer';
 import { ImageAssembler } from './image-transfer';
 import { BONUSES, readBonuses, reconcile, VALUES } from './sheet-doc';
 import type { ConnectionInfo, SyncTransport } from './transport';
@@ -72,6 +77,12 @@ export interface ClientCallbacks {
   onRolls?: (entries: RollEntry[]) => void;
   /** Mensagens do chat chegaram (da mesa, sussurros do Mestre ou o histórico recente). */
   onChat?: (messages: ChatMessage[]) => void;
+  /** O que toca na mesa mudou (`null`: o Mestre parou a música). */
+  onMusic?: (music: MusicState | null) => void;
+  /** Chegou, completa e conferida, a trilha pedida com `requestTrack`. */
+  onTrack?: (hash: string, data: Uint8Array) => void;
+  /** Progresso da trilha que está chegando (partes recebidas, de quantas). */
+  onTrackProgress?: (hash: string, received: number, total: number) => void;
   /** A capa da campanha (`null`: o Mestre não tem ou removeu). */
   onCover?: (cover: Cover | null) => void;
   /** A ordem de turno do combate mudou (`null`: o Mestre encerrou o combate). */
@@ -115,6 +126,9 @@ export class SessionClient {
   /** Cutscene atual (para saber qual imagem aceitar) e a imagem sendo recebida. */
   private cutscene: Cutscene | null = null;
   private assembler: ImageAssembler | null = null;
+  /** Música atual (para saber qual trilha aceitar) e a trilha sendo recebida. */
+  private music: MusicState | null = null;
+  private trackAssembler: FileAssembler | null = null;
   private current: ClientStatus = { state: 'procurando-mestre' };
   private readonly listeners = new Set<() => void>();
   private stopped = false;
@@ -207,6 +221,20 @@ export class SessionClient {
     if (this.gmPeer === null || this.stopped || this.cutscene?.hash !== hash) return;
     this.assembler = new ImageAssembler(this.cutscene);
     this.transport.send(this.gmPeer, encodeImageRequest(hash));
+  }
+
+  /**
+   * Pede ao Mestre a trilha da música atual (quem ainda não a tem). Chega em `onTrack`,
+   * conferida (hash, tamanho e tipo real do áudio).
+   */
+  requestTrack(hash: string): void {
+    const track = this.music?.track;
+    if (this.gmPeer === null || this.stopped || !track || track.hash !== hash) return;
+    this.trackAssembler = new FileAssembler(
+      track,
+      (bytes) => bytes.byteLength <= MAX_TRACK_BYTES && sniffAudioMime(bytes) === track.mime,
+    );
+    this.transport.send(this.gmPeer, encodeTrackRequest(hash));
   }
 
   /** Caminho e latência da conexão com o Mestre (`null` sem Mestre ou sem medida). */
@@ -334,6 +362,26 @@ export class SessionClient {
 
     if (message.type === 'log') {
       this.callbacks.onRolls?.(message.entries);
+      return;
+    }
+
+    if (message.type === 'music') {
+      this.music = message.music;
+      if (this.trackAssembler?.hash !== message.music?.track.hash) this.trackAssembler = null;
+      this.callbacks.onMusic?.(message.music);
+      return;
+    }
+
+    if (message.type === 'track-part') {
+      const assembler = this.trackAssembler;
+      const track = assembler?.add(message.hash, message.index, message.total, message.data);
+      if (track) {
+        this.trackAssembler = null;
+        this.callbacks.onTrack?.(message.hash, track);
+      } else if (assembler?.hash === message.hash) {
+        const { received, total } = assembler.progress();
+        this.callbacks.onTrackProgress?.(message.hash, received, total);
+      }
       return;
     }
 

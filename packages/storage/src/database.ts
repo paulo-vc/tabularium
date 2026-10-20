@@ -4,6 +4,7 @@ import type {
   ChatMessage,
   GmKeyRecord,
   StoredImage,
+  StoredTrack,
   JournalEntry,
   RollEntry,
   SecretValuesRecord,
@@ -28,6 +29,16 @@ export interface ImageRecord {
   hash: string;
   origin: StoredImage['origin'];
   meta: StoredImage;
+  data: Uint8Array;
+}
+
+/** Uma trilha da música (biblioteca do Mestre ou recebida pelo jogador), com o conteúdo. */
+export interface TrackRecord {
+  campaignId: string;
+  id: string;
+  hash: string;
+  origin: StoredTrack['origin'];
+  meta: StoredTrack;
   data: Uint8Array;
 }
 
@@ -73,6 +84,7 @@ export class TabulaDatabase extends Dexie {
   journal!: Table<JournalRecord, [string, string]>;
   images!: Table<ImageRecord, [string, string]>;
   chat!: Table<ChatRecord, [string, string]>;
+  tracks!: Table<TrackRecord, [string, string]>;
 
   constructor(name: string = DEFAULT_DATABASE_NAME) {
     super(name);
@@ -116,6 +128,10 @@ export class TabulaDatabase extends Dexie {
     // v10: chat da sessão.
     this.version(10).stores({
       chat: '[campaignId+id], campaignId, [campaignId+at]',
+    });
+    // v11: trilhas da música do Mestre (a biblioteca dele e as recebidas pelos jogadores).
+    this.version(11).stores({
+      tracks: '[campaignId+id], campaignId, [campaignId+hash], [campaignId+origin]',
     });
   }
 }

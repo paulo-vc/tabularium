@@ -31,3 +31,18 @@ window.matchMedia ??= (query: string) =>
 let objectUrls = 0;
 URL.createObjectURL ??= () => `blob:teste/${++objectUrls}`;
 URL.revokeObjectURL ??= () => {};
+
+// O jsdom não toca áudio: tocar e pausar só mudam o estado (a música da mesa usa <audio>).
+Object.defineProperty(HTMLMediaElement.prototype, 'play', {
+  configurable: true,
+  value(this: HTMLMediaElement) {
+    Object.defineProperty(this, 'paused', { configurable: true, value: false });
+    return Promise.resolve();
+  },
+});
+Object.defineProperty(HTMLMediaElement.prototype, 'pause', {
+  configurable: true,
+  value(this: HTMLMediaElement) {
+    Object.defineProperty(this, 'paused', { configurable: true, value: true });
+  },
+});

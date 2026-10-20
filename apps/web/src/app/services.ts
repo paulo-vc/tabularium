@@ -6,6 +6,7 @@ import {
   DexieChatRepository,
   DexieGmKeyRepository,
   DexieImageRepository,
+  DexieTrackRepository,
   DexieJournalRepository,
   DexieSecretValuesRepository,
   DexieSessionStateRepository,
@@ -21,6 +22,7 @@ import { TemplateEditorService } from './editor';
 import { TemplateCatalog } from './catalog';
 import { FileService } from './files';
 import { JournalService } from './journal';
+import { MusicService } from './music';
 import { SoundService } from './sounds';
 import { createWebAudioPlayer, type SoundPlayer } from '@/lib/sounds';
 import { createBrowserAttention, type Attention } from '@/lib/attention';
@@ -57,6 +59,7 @@ export interface Services {
   editor: TemplateEditorService;
   /** Diário da campanha (notas do Mestre e entradas compartilhadas). */
   journal: JournalService;
+  music: MusicService;
   sounds: SoundService;
   /** Avisa fora do app (título piscando, barra de tarefas, notificação do sistema). */
   attention: Attention;
@@ -121,6 +124,7 @@ export function createServices(
   const journal = new DexieJournalRepository(db);
   const images = new DexieImageRepository(db);
   const chat = new DexieChatRepository(db);
+  const tracks = new DexieTrackRepository(db);
   const files = new FileService(sheetRepository, templateRepository, catalog, clock, ids);
   return {
     catalog,
@@ -155,11 +159,13 @@ export function createServices(
       journal,
       images,
       chat,
+      tracks,
     ),
     journal: new JournalService(journal, clock, ids),
     sounds: new SoundService(device, soundPlayer ?? createWebAudioPlayer()),
     attention: attention ?? createBrowserAttention(),
     gallery: new GalleryService(images, processImage, clock, ids),
+    music: new MusicService(tracks, clock, ids),
     campaigns: new CampaignService(
       campaignRepository,
       sessionStates,
@@ -178,6 +184,7 @@ export function createServices(
       images,
       chat,
       processImage,
+      tracks,
     ),
   };
 }
