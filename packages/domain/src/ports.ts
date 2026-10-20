@@ -224,5 +224,10 @@ export interface TrackRepository {
   findByHash(campaignId: string, hash: string): Promise<TrackWithData | undefined>;
   save(campaignId: string, track: TrackWithData): Promise<void>;
   delete(campaignId: string, trackId: string): Promise<void>;
+  /**
+   * Apaga as trilhas recebidas mais antigas (de todas as campanhas) até o total caber em
+   * `maxBytes`. A biblioteca do Mestre e as trilhas em `keep` (hash) nunca saem.
+   */
+  pruneReceived(maxBytes: number, keep: readonly string[]): Promise<void>;
   deleteCampaign(campaignId: string): Promise<void>;
 }

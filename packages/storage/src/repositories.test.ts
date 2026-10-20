@@ -681,6 +681,25 @@ describe('DexieTrackRepository', () => {
     expect(await tracks.list('c1', 'biblioteca')).toEqual([]);
   });
 
+  it('o limite das recebidas apaga as mais antigas, mas não a biblioteca nem a que toca', async () => {
+    const tracks = new DexieTrackRepository(db);
+    await tracks.save('c1', { meta: meta('a', 100, 'recebida'), data: mp3(100) }); // mais antiga
+    await tracks.save('c2', { meta: meta('b', 200, 'recebida'), data: mp3(200) });
+    await tracks.save('c1', { meta: meta('c', 300, 'recebida'), data: mp3(300) });
+    await tracks.save('c1', { meta: meta('d', 400), data: mp3(400) }); // biblioteca
+
+    // 600 recebidos, limite 500: sai a mais antiga ("a"), e já cabe. "b" está tocando.
+    await tracks.pruneReceived(500, [meta('b', 200).hash]);
+    expect((await tracks.list('c1', 'recebida')).map((t) => t.id)).toEqual(['c']);
+    expect((await tracks.list('c2', 'recebida')).map((t) => t.id)).toEqual(['b']);
+    expect((await tracks.list('c1', 'biblioteca')).map((t) => t.id)).toEqual(['d']);
+
+    // Mais apertado: "c" também sai, "b" continua (está tocando) mesmo passando do limite.
+    await tracks.pruneReceived(100, [meta('b', 200).hash]);
+    expect(await tracks.list('c1', 'recebida')).toEqual([]);
+    expect((await tracks.list('c2', 'recebida')).map((t) => t.id)).toEqual(['b']);
+  });
+
   it('recusa conteúdo que não é áudio ou que não bate com o tamanho', async () => {
     const tracks = new DexieTrackRepository(db);
     await expect(

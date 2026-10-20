@@ -47,11 +47,11 @@ export class MusicService {
 
   /**
    * Guarda uma trilha na biblioteca. Vai aos jogadores como está (sem conversão): só MP3 ou
-   * OGG, conferidos pelos primeiros bytes, e até 15 MB.
+   * OGG, conferidos pelos primeiros bytes, e até 8 MB.
    */
   async add(campaignId: string, file: File): Promise<Result<StoredTrack, Issue>> {
     if (file.size > MAX_TRACK_BYTES) {
-      return invalid('A trilha é grande demais (até 15 MB). Use um MP3 mais curto ou mais leve.');
+      return invalid('A trilha é grande demais (até 8 MB). Use um MP3 mais curto ou mais leve.');
     }
     const data = Uint8Array.from(new Uint8Array(await file.arrayBuffer()));
     const mime = sniffAudioMime(data);

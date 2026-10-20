@@ -6,8 +6,14 @@ import { IdSchema, TimestampSchema } from '../schema/primitives';
 export const AUDIO_MIMES = ['audio/mpeg', 'audio/ogg'] as const;
 export type AudioMime = (typeof AUDIO_MIMES)[number];
 
-/** Tamanho máximo de uma trilha (uns 10 minutos de MP3 a 192 kbps). */
-export const MAX_TRACK_BYTES = 15 * 1024 * 1024;
+/**
+ * Tamanho máximo de uma trilha: uns 8 minutos de MP3 a 128 kbps, o bastante para uma
+ * ambientação em loop. O Mestre envia uma cópia a cada jogador, e no 4G isso pesa.
+ */
+export const MAX_TRACK_BYTES = 8 * 1024 * 1024;
+
+/** Espaço máximo das trilhas recebidas num aparelho (as mais antigas saem). */
+export const RECEIVED_TRACKS_BYTES = 50 * 1024 * 1024;
 
 /** Uma trilha: identificada pelo conteúdo (SHA-256), como as imagens da cutscene. */
 export const TrackInfoSchema = z.object({

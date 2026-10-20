@@ -158,7 +158,7 @@ const ChatSchema = z.object({ messages: z.array(ChatMessageSchema).min(1).max(CH
 
 const CoverMessageSchema = z.object({ cover: CoverSchema.nullable() });
 const MusicMessageSchema = z.object({ music: MusicStateSchema.nullable() });
-/** Partes de uma trilha: até 15 MB em partes de 256 KB. */
+/** Partes de uma trilha: até 8 MB em partes de 256 KB. */
 export const MAX_TRACK_CHUNKS = Math.ceil(MAX_TRACK_BYTES / IMAGE_CHUNK_BYTES);
 
 export function encodeMusic(music: MusicState | null): Uint8Array {

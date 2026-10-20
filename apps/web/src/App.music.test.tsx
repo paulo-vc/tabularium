@@ -133,6 +133,34 @@ describe('música do Mestre', () => {
     await until(() => expect(screen.queryByRole('region', { name: 'Música da mesa' })).toBeNull());
   });
 
+  it('com "Baixar músicas" desligado, a jogadora só vê o título; ligar baixa na hora', async () => {
+    const { campaign } = await setUpTable();
+    await player.sounds.update({ downloadMusic: false });
+    await gm.session.startAsGameMaster(campaign.id);
+    const added = await gm.music.add(
+      campaign.id,
+      new File([fakeMp3(300_000)], 'Chuva.mp3', { type: 'audio/mpeg' }),
+    );
+    if (!added.ok) throw new Error(added.error.message);
+    await player.session.joinAsPlayer(campaign.id);
+    await until(() => expect(playerMusic()).toBeNull());
+    await gm.session.playTrack(campaign.id, added.value.id);
+    await until(() => expect(playerMusic()).toMatchObject({ skipped: true, ready: false }));
+    expect(await player.music.byHash(campaign.id, added.value.hash)).toBeUndefined();
+
+    window.location.hash = '#/';
+    const user = userEvent.setup();
+    render(<App services={player} />);
+    await until(() => {
+      expect(screen.getByRole('region', { name: 'Música da mesa' })).toHaveTextContent(
+        'Chuva · não baixada',
+      );
+    });
+    await user.click(screen.getByRole('button', { name: 'Volume da música' }));
+    await user.click(await screen.findByRole('checkbox', { name: /Baixar músicas/ }));
+    await until(() => expect(playerMusic()).toMatchObject({ ready: true }));
+  });
+
   it('arquivo que não é áudio é recusado', async () => {
     const { campaign } = await setUpTable();
     const result = await gm.music.add(

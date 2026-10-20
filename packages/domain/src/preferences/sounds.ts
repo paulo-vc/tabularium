@@ -11,6 +11,8 @@ export const SoundSettingsSchema = z.object({
   volume: z.number().min(0).max(1),
   /** Volume da música da mesa (de 0 a 1), à parte dos avisos. */
   musicVolume: z.number().min(0).max(1).optional(),
+  /** Baixar e tocar a música da mesa neste aparelho (desligar economiza dados no 4G). */
+  downloadMusic: z.boolean().optional(),
 });
 export type SoundSettings = z.infer<typeof SoundSettingsSchema>;
 
