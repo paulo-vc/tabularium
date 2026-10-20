@@ -141,7 +141,7 @@ export function MusicPanel({ campaignId }: { campaignId: string }) {
 
         {tracks === undefined ? null : tracks.length === 0 ? (
           <p className="text-muted-foreground text-sm">
-            Nenhuma trilha ainda. Adicione arquivos MP3 ou OGG (até 15 MB cada).
+            Nenhuma trilha ainda. Adicione arquivos MP3 ou OGG (até 8 MB cada).
           </p>
         ) : (
           <ul aria-label="Trilhas" className="divide-y rounded-lg border">

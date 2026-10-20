@@ -45,9 +45,10 @@ function useTrackUrl(campaignId: string | null, hash: string | null) {
  */
 export function MusicPlayer() {
   const live = useLiveSession();
-  const { sounds } = useServices();
+  const { sounds, session } = useServices();
   const settings = useLiveQuery(() => sounds.settings(), [sounds]);
   const volume = settings?.musicVolume ?? DEFAULT_MUSIC_VOLUME;
+  const download = settings?.downloadMusic !== false;
   const audio = useRef<HTMLAudioElement>(null);
   const [blocked, setBlocked] = useState(false);
   /** O arquivo não toca neste aparelho (ex.: sem o codec de MP3 no Linux). */
@@ -58,11 +59,14 @@ export function MusicPlayer() {
   let state: MusicState | null = null;
   let since: number | null = null;
   let downloading: { received: number; total: number } | null = null;
+  let skipped = false;
   if (live.kind === 'mestre') state = live.music;
   if (live.kind === 'jogador' && live.music) {
     if (live.music.ready) {
       state = live.music.state;
       since = live.music.since;
+    } else if (live.music.skipped) {
+      skipped = true;
     } else {
       downloading = { received: live.music.received ?? 0, total: live.music.total ?? 1 };
     }
@@ -108,7 +112,7 @@ export function MusicPlayer() {
   }, [state, since, url]);
 
   const title = state?.track.title ?? pending?.track.title;
-  const visible = live.kind !== 'nenhuma' && (state !== null || downloading !== null);
+  const visible = live.kind !== 'nenhuma' && (state !== null || downloading !== null || skipped);
 
   return (
     <>
@@ -136,6 +140,7 @@ export function MusicPlayer() {
               </span>
             )}
             {state && !state.playing && <span className="text-muted-foreground"> · pausada</span>}
+            {skipped && <span className="text-muted-foreground"> · não baixada</span>}
             {broken !== null && broken === url && (
               <span className="text-destructive"> · não deu para tocar este arquivo aqui</span>
             )}
@@ -179,6 +184,25 @@ export function MusicPlayer() {
                   void sounds.update({ musicVolume: Number(event.target.value) / 100 })
                 }
               />
+              <label className="flex items-start gap-2 pt-1 text-sm">
+                <input
+                  type="checkbox"
+                  className="accent-primary mt-0.5"
+                  checked={download}
+                  onChange={(event) => {
+                    const on = event.target.checked;
+                    void sounds.update({ downloadMusic: on }).then(() => {
+                      if (on) session.fetchMusic();
+                    });
+                  }}
+                />
+                <span>
+                  Baixar músicas neste aparelho
+                  <span className="text-muted-foreground block text-xs">
+                    Desligue no 4G para economizar dados.
+                  </span>
+                </span>
+              </label>
               <p className="text-muted-foreground text-xs">Só neste aparelho.</p>
             </PopoverContent>
           </Popover>

@@ -1,5 +1,6 @@
 import {
   type MusicState,
+  RECEIVED_TRACKS_BYTES,
   type TrackRepository,
   BonusSchema,
   type Bonus,
@@ -119,6 +120,8 @@ export type LiveSession =
         since: number;
         received?: number;
         total?: number;
+        /** A trilha não foi baixada: este aparelho desligou "Baixar músicas". */
+        skipped?: boolean;
       } | null;
       /** Última alteração feita pelo Mestre na ficha (IDs dos campos), para avisar o jogador. */
       gmChange?: { fieldIds: string[]; count: number };
@@ -176,6 +179,8 @@ export class LiveSessionManager {
     setInitiative?: (tracker: Tracker | null) => void;
     /** Só na sessão do Mestre: mostra uma imagem à mesa (ou fecha, com `null`). */
     setCutscene?: (cutscene: { info: Cutscene; data: Uint8Array } | null) => void;
+    /** Só na sessão do jogador: baixa já a trilha que toca (ex.: "Baixar músicas" foi ligado). */
+    fetchMusic?: () => void;
     /** Só na sessão do Mestre: toca, pausa ou para a música da mesa. */
     setMusic?: (music: { state: MusicState; data: Uint8Array } | null) => void;
   } | null = null;
@@ -500,14 +505,20 @@ export class LiveSessionManager {
           };
           publish();
           if (same) return;
-          void this.tracks.findByHash(campaignId, state.track.hash).then((stored) => {
+          void Promise.all([
+            this.tracks.findByHash(campaignId, state.track.hash),
+            this.device.getSoundSettings(),
+          ]).then(([stored, settings]) => {
             if (music?.state.track.hash !== state.track.hash) return;
             if (stored) {
               music = { ...music, ready: true };
-              publish();
+            } else if (settings.downloadMusic === false) {
+              // Este aparelho não baixa música (ex.: no 4G): mostra só o que toca.
+              music = { ...music, skipped: true };
             } else {
               client.requestTrack(state.track.hash);
             }
+            publish();
           });
         },
         onTrackProgress: (hash, received, total) => {
@@ -526,10 +537,13 @@ export class LiveSessionManager {
           };
           this.tracks
             .save(campaignId, { meta, data })
-            .then(() => {
-              if (music?.state.track.hash !== hash) return;
-              music = { ...music, ready: true };
-              publish();
+            .then(async () => {
+              if (music?.state.track.hash === hash) {
+                music = { ...music, ready: true };
+                publish();
+              }
+              // As trilhas recebidas não crescem sem fim: as mais antigas saem.
+              await this.tracks.pruneReceived(RECEIVED_TRACKS_BYTES, [hash]);
             })
             .catch((error: unknown) => console.error('Falha ao guardar a trilha', error));
         },
@@ -625,6 +639,12 @@ export class LiveSessionManager {
         client.roll(entry);
       },
       shareChat: (message) => client.chat(message),
+      fetchMusic: () => {
+        if (!music || music.ready) return;
+        music = { ...music, skipped: false };
+        publish();
+        client.requestTrack(music.state.track.hash);
+      },
     };
     client.start();
     publish();
@@ -900,6 +920,11 @@ export class LiveSessionManager {
       },
       data: stored.data,
     });
+  }
+
+  /** O jogador baixa já a trilha que toca (depois de ligar "Baixar músicas"). */
+  fetchMusic(): void {
+    this.active?.fetchMusic?.();
   }
 
   /** O Mestre para a música da mesa. */
