@@ -5,6 +5,7 @@ import {
   type Bonus,
   type ChatMessage,
   type Cover,
+  type MusicState,
   LIMITS,
   LOG_CATCH_UP,
   type FieldValue,
@@ -18,6 +19,7 @@ import * as encoding from 'lib0/encoding';
 import * as syncProtocol from 'y-protocols/sync';
 import * as Y from 'yjs';
 import { signChallenge, type GmKeyPair } from './identity';
+import { chunkBytes } from './file-transfer';
 import { chunkImage } from './image-transfer';
 import {
   decodeMessage,
@@ -29,6 +31,8 @@ import {
   encodeBye,
   encodeChat,
   encodeCover,
+  encodeMusic,
+  encodeTrackPart,
   encodeJournalKeep,
   encodeJournalPut,
   encodeCutscene,
@@ -107,6 +111,10 @@ export class SessionHost {
   private turnOrder: PublicTracker | null = null;
   /** Entradas do diário compartilhadas com a mesa (por ID), já enviadas aos online. */
   private journal = new Map<string, JournalEntry>();
+  /** Música que toca na mesa agora (e o conteúdo da trilha, enviado a quem pedir). */
+  private music: { state: MusicState; data: Uint8Array } | null = null;
+  /** Quantas vezes cada participante pediu a trilha atual (contra pedidos sem fim). */
+  private readonly trackRequests = new Map<string, number>();
   /** Capa da campanha, enviada a quem entra e a todos quando muda. */
   private cover: Cover | null = null;
   /** Imagem mostrada à mesa agora (e o conteúdo, enviado a quem pedir). */
@@ -282,6 +290,18 @@ export class SessionHost {
     for (const peerId of this.sheetOfPeer.keys()) this.send(peerId, message);
   }
 
+  /**
+   * Toca (ou pausa, ou para, com `null`) a música da mesa. Como a cutscene, o conteúdo só vai
+   * a quem pedir e só o da trilha atual. Trocar a trilha libera novos pedidos.
+   */
+  setMusic(state: MusicState | null, data?: Uint8Array): void {
+    if (this.stopped) return;
+    if (this.music?.state.track.hash !== state?.track.hash) this.trackRequests.clear();
+    this.music = state && data ? { state, data } : null;
+    const message = encodeMusic(this.music?.state ?? null);
+    for (const peerId of this.sheetOfPeer.keys()) this.send(peerId, message);
+  }
+
   /** Troca a capa da campanha (`null`: sem capa) e avisa os jogadores online. */
   setCover(cover: Cover | null): void {
     if (this.stopped || (cover?.src ?? null) === (this.cover?.src ?? null)) return;
@@ -428,6 +448,8 @@ export class SessionHost {
       this.send(peerId, encodeTemplate(template));
     } else if (message.type === 'image-request') {
       this.sendImage(peerId, message.hash);
+    } else if (message.type === 'track-request') {
+      this.sendTrack(peerId, message.hash);
     } else if (message.type === 'bye') {
       this.templateSent.delete(peerId);
       this.detach(peerId);
@@ -504,6 +526,7 @@ export class SessionHost {
     if (firstHello) this.send(peerId, encodeCover(this.cover));
     if (firstHello && this.turnOrder) this.send(peerId, encodeTurn(this.turnOrder));
     if (firstHello && this.cutscene) this.send(peerId, encodeCutscene(this.cutscene.info));
+    if (firstHello && this.music) this.send(peerId, encodeMusic(this.music.state));
     if (firstHello) {
       // O diário inteiro a quem chega: a lista das que valem e cada entrada.
       this.send(peerId, encodeJournalKeep([...this.journal.keys()]));
@@ -522,6 +545,19 @@ export class SessionHost {
     const parts = chunkImage(current.data);
     parts.forEach((part, index) =>
       this.send(peerId, encodeImagePart(hash, index, parts.length, part)),
+    );
+  }
+
+  /** Envia a trilha atual, em partes, a um jogador da sessão que a pediu. */
+  private sendTrack(peerId: string, hash: string): void {
+    const current = this.music;
+    if (!current || current.state.track.hash !== hash || !this.sheetOfPeer.has(peerId)) return;
+    const asked = (this.trackRequests.get(peerId) ?? 0) + 1;
+    if (asked > MAX_IMAGE_REQUESTS) return;
+    this.trackRequests.set(peerId, asked);
+    const parts = chunkBytes(current.data);
+    parts.forEach((part, index) =>
+      this.send(peerId, encodeTrackPart(hash, index, parts.length, part)),
     );
   }
 

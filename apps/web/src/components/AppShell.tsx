@@ -3,6 +3,7 @@ import { Link, useRoute } from 'wouter';
 import { cn } from '@/lib/utils';
 import { ChatDock } from './live/ChatDock';
 import { CutsceneOverlay } from './live/CutsceneOverlay';
+import { MusicPlayer } from './live/MusicPlayer';
 import { GmChangeNotice } from './live/GmChangeNotice';
 import { LiveSessionIndicator } from './live/LiveSessionIndicator';
 import { RollNotice } from './live/RollNotice';
@@ -84,6 +85,7 @@ export function AppShell({ children }: { children: ReactNode }) {
         <GmChangeNotice />
         <ChatDock />
         <CutsceneOverlay />
+        <MusicPlayer />
         <RollNotice />
         <SessionNotices />
       </div>

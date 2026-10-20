@@ -343,4 +343,41 @@ test.describe('mesa ao vivo, de ponta a ponta', () => {
     await gm.getByRole('button', { name: 'Remover capa' }).click();
     await expect(cover).toBeHidden();
   });
+
+  test('música: o Mestre toca uma trilha e a jogadora a recebe pela sessão', async ({
+    browser,
+  }) => {
+    const gm = await newDevice(browser);
+    const player = await newDevice(browser);
+    await createCampaign(gm);
+    await joinWithInvite(player, await inviteLink(gm), 'Ana', 'Lia');
+    await startTable(gm, player, 'Ana');
+
+    // "MP3" de 2 MB (8 partes): marca ID3 e o resto qualquer. A transferência, a conferência
+    // (hash e tipo) e a tela são as de verdade; tocar o som não é o que se testa aqui.
+    const mp3 = Buffer.alloc(2 * 1024 * 1024, 7);
+    mp3.write('ID3', 0, 'latin1');
+    await gm.getByRole('tab', { name: /Música/ }).click();
+    await gm.getByLabel('Arquivo da trilha').setInputFiles({
+      name: 'Taverna do Javali.mp3',
+      mimeType: 'audio/mpeg',
+      buffer: mp3,
+    });
+    await gm.getByRole('button', { name: 'Tocar Taverna do Javali' }).click();
+    await expect(gm.getByRole('region', { name: 'Tocando agora' })).toContainText(
+      'Tocando para a mesa',
+    );
+
+    const music = player.getByRole('region', { name: 'Música da mesa' });
+    await expect(music).toContainText('Taverna do Javali');
+    // Terminado o download, o selo deixa de mostrar o progresso.
+    await expect(music).not.toContainText('baixando', { timeout: 20_000 });
+    if (process.env.SHOTS) {
+      await gm.screenshot({ path: `${process.env.SHOTS}/musica-mestre.png` });
+      await player.screenshot({ path: `${process.env.SHOTS}/musica-jogadora.png` });
+    }
+
+    await gm.getByRole('button', { name: 'Parar a música' }).click();
+    await expect(music).toBeHidden();
+  });
 });

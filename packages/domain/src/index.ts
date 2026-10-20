@@ -44,6 +44,8 @@ export type {
   GmKeyRecord,
   GmKeyRepository,
   ImageRepository,
+  TrackRepository,
+  TrackWithData,
   ImageWithData,
   JournalRepository,
   RollLogRepository,
@@ -89,3 +91,4 @@ export * from './journal/schema';
 export * from './cutscene/schema';
 export * from './chat/schema';
 export * from './preferences/sounds';
+export * from './music/schema';

@@ -25,6 +25,7 @@ import {
   DexieChatRepository,
   DexieGmKeyRepository,
   DexieImageRepository,
+  DexieTrackRepository,
   DexieJournalRepository,
   DexieSecretValuesRepository,
   DexieSheetRepository,
@@ -324,7 +325,7 @@ describe('migração do banco', () => {
     try {
       expect(await new DexieSheetRepository(current).get('antiga')).toBeDefined();
       expect(await new DexieCampaignRepository(current).list()).toEqual([]);
-      expect(current.verno).toBe(10);
+      expect(current.verno).toBe(11);
     } finally {
       current.close();
       await Dexie.delete(name);
@@ -651,5 +652,42 @@ describe('DexieChatRepository', () => {
   it('recusa mensagem inválida', async () => {
     const chat = new DexieChatRepository(db);
     await expect(chat.add('c1', [message('a', 1, '')])).rejects.toBeInstanceOf(InvalidDataError);
+  });
+});
+
+describe('DexieTrackRepository', () => {
+  const mp3 = (size: number) => {
+    const data = new Uint8Array(size);
+    data.set([0x49, 0x44, 0x33], 0); // "ID3"
+    return data;
+  };
+  const meta = (id: string, size: number, origin: 'biblioteca' | 'recebida' = 'biblioteca') => ({
+    id,
+    hash: id.padEnd(64, '0').replace(/[^0-9a-f]/g, 'a'),
+    mime: 'audio/mpeg' as const,
+    size,
+    title: `Trilha ${id}`,
+    origin,
+    createdAt: size,
+  });
+
+  it('guarda, lista por origem, acha pelo hash e apaga por campanha', async () => {
+    const tracks = new DexieTrackRepository(db);
+    await tracks.save('c1', { meta: meta('a', 10), data: mp3(10) });
+    await tracks.save('c1', { meta: meta('b', 20, 'recebida'), data: mp3(20) });
+    expect((await tracks.list('c1', 'biblioteca')).map((t) => t.id)).toEqual(['a']);
+    expect((await tracks.findByHash('c1', meta('b', 20).hash))?.meta.id).toBe('b');
+    await tracks.deleteCampaign('c1');
+    expect(await tracks.list('c1', 'biblioteca')).toEqual([]);
+  });
+
+  it('recusa conteúdo que não é áudio ou que não bate com o tamanho', async () => {
+    const tracks = new DexieTrackRepository(db);
+    await expect(
+      tracks.save('c1', { meta: meta('a', 10), data: new Uint8Array(10) }),
+    ).rejects.toThrow(InvalidDataError);
+    await expect(tracks.save('c1', { meta: meta('a', 10), data: mp3(9) })).rejects.toThrow(
+      InvalidDataError,
+    );
   });
 });

@@ -5,6 +5,7 @@ import {
   CopyIcon,
   DicesIcon,
   ImageIcon,
+  MusicIcon,
   SettingsIcon,
   SwordsIcon,
   Trash2Icon,
@@ -18,6 +19,7 @@ import { encodeInvite } from '@/app/invite-link';
 import { useServices } from '@/app/services-context';
 import { CampaignCoverEditor } from '@/components/campaign/CampaignCover';
 import { CutscenePanel } from '@/components/campaign/CutscenePanel';
+import { MusicPanel } from '@/components/campaign/MusicPanel';
 import { DangerZone } from '@/components/campaign/DangerZone';
 import { GameMasterJournal } from '@/components/campaign/JournalPanel';
 import { GameMasterInitiative } from '@/components/live/InitiativePanel';
@@ -32,7 +34,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { publicAppUrl } from '@/lib/public-url';
 
-type Tab = 'jogadores' | 'combate' | 'rolagens' | 'cutscene' | 'diario' | 'campanha';
+type Tab = 'jogadores' | 'combate' | 'rolagens' | 'cutscene' | 'musica' | 'diario' | 'campanha';
 
 /** Abas que no computador ficam na coluna da direita (no celular, viram abas). */
 const SIDE: readonly Tab[] = ['combate', 'rolagens'];
@@ -96,6 +98,17 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
       ),
     },
     {
+      id: 'musica',
+      label: (
+        <>
+          <MusicIcon className="size-4" /> Música
+          {active && live.music?.playing && (
+            <span className="bg-primary size-2 rounded-full" aria-hidden />
+          )}
+        </>
+      ),
+    },
+    {
       id: 'diario',
       label: (
         <>
@@ -126,6 +139,7 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
             </>
           )}
           {main === 'cutscene' && <CutscenePanel campaignId={campaign.id} />}
+          {main === 'musica' && <MusicPanel campaignId={campaign.id} />}
           {main === 'diario' && <GameMasterJournal campaignId={campaign.id} />}
           {main === 'campanha' && (
             <>

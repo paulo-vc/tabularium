@@ -1,4 +1,6 @@
 import {
+  type MusicState,
+  type TrackRepository,
   BonusSchema,
   type Bonus,
   type ChatMessage,
@@ -78,6 +80,8 @@ export type LiveSession =
       connections: Record<string, ConnectionInfo>;
       /** Imagem que o Mestre está mostrando à mesa (cutscene), ou `null`. */
       cutscene: Cutscene | null;
+      /** Música que toca na mesa, ou `null`. */
+      music: MusicState | null;
     }
   | {
       kind: 'jogador';
@@ -104,6 +108,18 @@ export type LiveSession =
        * chegou, para distinguir a mesma imagem mostrada de novo), ou `null`.
        */
       cutscene: { info: Cutscene; ready: boolean; since: number } | null;
+      /**
+       * Música da mesa: o estado mandado pelo Mestre, se a trilha já está neste aparelho
+       * (`ready`), o progresso do download (`received` de `total` partes) e quando o estado
+       * chegou (`since`, para continuar do ponto certo).
+       */
+      music: {
+        state: MusicState;
+        ready: boolean;
+        since: number;
+        received?: number;
+        total?: number;
+      } | null;
       /** Última alteração feita pelo Mestre na ficha (IDs dos campos), para avisar o jogador. */
       gmChange?: { fieldIds: string[]; count: number };
     };
@@ -160,6 +176,8 @@ export class LiveSessionManager {
     setInitiative?: (tracker: Tracker | null) => void;
     /** Só na sessão do Mestre: mostra uma imagem à mesa (ou fecha, com `null`). */
     setCutscene?: (cutscene: { info: Cutscene; data: Uint8Array } | null) => void;
+    /** Só na sessão do Mestre: toca, pausa ou para a música da mesa. */
+    setMusic?: (music: { state: MusicState; data: Uint8Array } | null) => void;
   } | null = null;
   private readonly rollListeners = new Set<(entry: RollEntry) => void>();
   private readonly ownRollListeners = new Set<(entry: RollEntry) => void>();
@@ -186,6 +204,7 @@ export class LiveSessionManager {
     private readonly journal: JournalRepository,
     private readonly images: ImageRepository,
     private readonly chatLog: ChatRepository,
+    private readonly tracks: TrackRepository,
   ) {
     this.rooms = new TransportPool(createTransport);
   }
@@ -271,8 +290,10 @@ export class LiveSessionManager {
         initiative,
         connections,
         cutscene,
+        music: music?.state ?? null,
       });
     let cutscene: Cutscene | null = null;
+    let music: { state: MusicState; data: Uint8Array } | null = null;
     // Mede a conexão com cada jogador online (caminho e latência), para diagnóstico.
     let connections: Record<string, ConnectionInfo> = {};
     const measure = async () => {
@@ -351,6 +372,11 @@ export class LiveSessionManager {
         host.setCutscene(cutscene, next?.data);
         publish();
       },
+      setMusic: (next) => {
+        music = next;
+        host.setMusic(next?.state ?? null, next?.data);
+        publish();
+      },
     };
     host.start();
     publish();
@@ -379,6 +405,8 @@ export class LiveSessionManager {
     let connectedInMs: number | null = null;
     let connection: ConnectionInfo | null = null;
     let cutscene: { info: Cutscene; ready: boolean; since: number } | null = null;
+    type PlayerMusic = Extract<LiveSession, { kind: 'jogador' }>['music'];
+    let music: PlayerMusic = null;
 
     // O Mestre alterou a ficha: grava na ficha local o que for válido para o sistema.
     const applyGmChanges = async (changes: RemoteChanges) => {
@@ -457,6 +485,54 @@ export class LiveSessionManager {
             })
             .catch((error: unknown) => console.error('Falha ao guardar a imagem', error));
         },
+        // Música: a trilha já está aqui? Senão, pede ao Mestre (chega em `onTrack`).
+        onMusic: (state) => {
+          if (!state) {
+            music = null;
+            publish();
+            return;
+          }
+          const same = music?.state.track.hash === state.track.hash;
+          music = {
+            state,
+            ready: same ? (music?.ready ?? false) : false,
+            since: this.clock.now(),
+          };
+          publish();
+          if (same) return;
+          void this.tracks.findByHash(campaignId, state.track.hash).then((stored) => {
+            if (music?.state.track.hash !== state.track.hash) return;
+            if (stored) {
+              music = { ...music, ready: true };
+              publish();
+            } else {
+              client.requestTrack(state.track.hash);
+            }
+          });
+        },
+        onTrackProgress: (hash, received, total) => {
+          if (music?.state.track.hash !== hash) return;
+          music = { ...music, received, total };
+          publish();
+        },
+        onTrack: (hash, data) => {
+          const track = music?.state.track;
+          if (!track || track.hash !== hash) return;
+          const meta = {
+            ...track,
+            id: hash,
+            origin: 'recebida' as const,
+            createdAt: this.clock.now(),
+          };
+          this.tracks
+            .save(campaignId, { meta, data })
+            .then(() => {
+              if (music?.state.track.hash !== hash) return;
+              music = { ...music, ready: true };
+              publish();
+            })
+            .catch((error: unknown) => console.error('Falha ao guardar a trilha', error));
+        },
         onJournalEntry: (entry) => {
           this.journal
             .save(campaignId, entry)
@@ -495,6 +571,7 @@ export class LiveSessionManager {
         connectedInMs,
         connection,
         cutscene,
+        music,
         ...(gmChange && { gmChange }),
       });
     // Tempo até conectar (e reconectar), para o jogador ver o progresso e relatar demoras.
@@ -506,8 +583,9 @@ export class LiveSessionManager {
       } else if (!connected && searchingSince === null) {
         searchingSince = this.clock.now();
         connection = null;
-        // Sem o Mestre, a imagem que ele mostrava fecha.
+        // Sem o Mestre, a imagem que ele mostrava fecha e a música para.
         cutscene = null;
+        music = null;
       }
       publish();
     });
@@ -775,6 +853,61 @@ export class LiveSessionManager {
     }
     this.active?.setInitiative?.(next);
     return ok(undefined);
+  }
+
+  /** O Mestre toca uma trilha da biblioteca para a mesa (do começo). */
+  async playTrack(
+    campaignId: string,
+    trackId: string,
+    options: { loop?: boolean } = {},
+  ): Promise<Result<void, Issue>> {
+    const snapshot = this.snapshot;
+    if (snapshot.kind !== 'mestre' || snapshot.campaignId !== campaignId) {
+      return failure('sem-sessao', 'Abra a sessão para tocar música para a mesa.');
+    }
+    const track = await this.tracks.get(campaignId, trackId);
+    if (!track) return failure('trilha-ausente', 'Esta trilha não existe mais.');
+    const { id: _id, origin: _origin, createdAt: _createdAt, ...info } = track.meta;
+    const loop = options.loop ?? snapshot.music?.loop ?? true;
+    this.active?.setMusic?.({
+      state: { track: info, playing: true, loop, position: 0 },
+      data: track.data,
+    });
+    return ok(undefined);
+  }
+
+  /**
+   * O Mestre pausa, retoma ou liga/desliga o repetir da música atual. `position`: o ponto da
+   * trilha agora (em segundos), para a mesa pausar ou continuar dali.
+   */
+  async updateMusic(
+    campaignId: string,
+    change: { playing?: boolean; loop?: boolean; position?: number },
+  ): Promise<void> {
+    const snapshot = this.snapshot;
+    if (snapshot.kind !== 'mestre' || snapshot.campaignId !== campaignId || !snapshot.music) {
+      return;
+    }
+    const current = snapshot.music;
+    const stored = await this.tracks.findByHash(campaignId, current.track.hash);
+    if (!stored) return;
+    this.active?.setMusic?.({
+      state: {
+        ...current,
+        ...(change.playing !== undefined && { playing: change.playing }),
+        ...(change.loop !== undefined && { loop: change.loop }),
+        position: Math.max(0, change.position ?? current.position),
+      },
+      data: stored.data,
+    });
+  }
+
+  /** O Mestre para a música da mesa. */
+  stopMusic(campaignId: string): void {
+    const snapshot = this.snapshot;
+    if (snapshot.kind === 'mestre' && snapshot.campaignId === campaignId) {
+      this.active?.setMusic?.(null);
+    }
   }
 
   /** O Mestre mostra uma imagem da galeria à mesa, em tela cheia. */

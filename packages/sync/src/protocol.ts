@@ -5,6 +5,9 @@ import {
   compileTemplate,
   CoverSchema,
   type Cover,
+  MAX_TRACK_BYTES,
+  MusicStateSchema,
+  type MusicState,
   GmKeySchema,
   IdSchema,
   LabelSchema,
@@ -46,6 +49,9 @@ import { z } from 'zod';
  *   IMAGE_PART       [12][hash][i][n][bytes]  uma parte da imagem (até 256 KB)
  *   CHAT             [13][json]       mensagens do chat (o Mestre repassa; sussurros só a quem recebe)
  *   COVER            [14][json]       capa da campanha (ou nenhuma), enviada pelo Mestre
+ *   MUSIC            [15][json]       o que toca na mesa (trilha, tocando, repetir, ponto) ou nada
+ *   TRACK_REQUEST    [16][json]       o jogador pede a trilha que não tem
+ *   TRACK_PART       [17][hash][i][n][bytes]  uma parte da trilha (até 256 KB)
  *
  * Topologia em estrela: jogadores só conversam com o Mestre; cada ficha é um documento
  * separado, sincronizado apenas entre o dono e o Mestre (jogadores não recebem as fichas
@@ -72,6 +78,9 @@ const MessageType = {
   ImagePart: 12,
   Chat: 13,
   Cover: 14,
+  Music: 15,
+  TrackRequest: 16,
+  TrackPart: 17,
 } as const;
 
 const base = {
@@ -134,7 +143,10 @@ export type IncomingMessage =
   | { type: 'image-request'; hash: string }
   | { type: 'image-part'; hash: string; index: number; total: number; data: Uint8Array }
   | { type: 'chat'; messages: ChatMessage[] }
-  | { type: 'cover'; cover: Cover | null };
+  | { type: 'cover'; cover: Cover | null }
+  | { type: 'music'; music: MusicState | null }
+  | { type: 'track-request'; hash: string }
+  | { type: 'track-part'; hash: string; index: number; total: number; data: Uint8Array };
 
 const LogSchema = z.object({ entries: z.array(RollEntrySchema).min(1).max(LOG_CATCH_UP) });
 
@@ -145,6 +157,33 @@ export function encodeLog(entries: RollEntry[]): Uint8Array {
 const ChatSchema = z.object({ messages: z.array(ChatMessageSchema).min(1).max(CHAT_CATCH_UP) });
 
 const CoverMessageSchema = z.object({ cover: CoverSchema.nullable() });
+const MusicMessageSchema = z.object({ music: MusicStateSchema.nullable() });
+/** Partes de uma trilha: até 15 MB em partes de 256 KB. */
+export const MAX_TRACK_CHUNKS = Math.ceil(MAX_TRACK_BYTES / IMAGE_CHUNK_BYTES);
+
+export function encodeMusic(music: MusicState | null): Uint8Array {
+  return encodeJson(MessageType.Music, { music });
+}
+
+export function encodeTrackRequest(hash: string): Uint8Array {
+  return encodeJson(MessageType.TrackRequest, { hash });
+}
+
+/** Uma parte da trilha, em binário (como as partes de imagem). */
+export function encodeTrackPart(
+  hash: string,
+  index: number,
+  total: number,
+  data: Uint8Array,
+): Uint8Array {
+  const encoder = encoding.createEncoder();
+  encoding.writeVarUint(encoder, MessageType.TrackPart);
+  encoding.writeVarString(encoder, hash);
+  encoding.writeVarUint(encoder, index);
+  encoding.writeVarUint(encoder, total);
+  encoding.writeVarUint8Array(encoder, data);
+  return encoding.toUint8Array(encoder);
+}
 
 export function encodeCover(cover: Cover | null): Uint8Array {
   return encodeJson(MessageType.Cover, { cover });
@@ -290,6 +329,23 @@ export function decodeMessage(data: Uint8Array): IncomingMessage | null {
       }
       case MessageType.Bye:
         return { type: 'bye' };
+      case MessageType.Music: {
+        const message = MusicMessageSchema.safeParse(parseJson(decoding.readVarString(decoder)));
+        return message.success ? { type: 'music', music: message.data.music } : null;
+      }
+      case MessageType.TrackRequest: {
+        const request = ImageRequestSchema.safeParse(parseJson(decoding.readVarString(decoder)));
+        return request.success ? { type: 'track-request', hash: request.data.hash } : null;
+      }
+      case MessageType.TrackPart: {
+        const hash = ImageHashSchema.safeParse(decoding.readVarString(decoder));
+        const index = decoding.readVarUint(decoder);
+        const total = decoding.readVarUint(decoder);
+        const data = decoding.readVarUint8Array(decoder);
+        if (!hash.success || total < 1 || total > MAX_TRACK_CHUNKS || index >= total) return null;
+        if (data.byteLength < 1 || data.byteLength > IMAGE_CHUNK_BYTES) return null;
+        return { type: 'track-part', hash: hash.data, index, total, data };
+      }
       case MessageType.Cover: {
         const message = CoverMessageSchema.safeParse(parseJson(decoding.readVarString(decoder)));
         return message.success ? { type: 'cover', cover: message.data.cover } : null;

@@ -29,6 +29,11 @@ import {
   type ImageRepository,
   type ImageWithData,
   sniffImageMime,
+  sniffAudioMime,
+  StoredTrackSchema,
+  type StoredTrack,
+  type TrackRepository,
+  type TrackWithData,
   type StoredImage,
   StoredImageSchema,
   JournalEntrySchema,
@@ -477,5 +482,51 @@ export class DexieChatRepository implements ChatRepository {
 
   async deleteCampaign(campaignId: string): Promise<void> {
     await this.db.chat.where('campaignId').equals(campaignId).delete();
+  }
+}
+
+export class DexieTrackRepository implements TrackRepository {
+  constructor(private readonly db: TabulaDatabase) {}
+
+  async list(campaignId: string, origin: StoredTrack['origin']): Promise<StoredTrack[]> {
+    const records = await this.db.tracks.where({ campaignId, origin }).toArray();
+    return records.map((record) => record.meta).sort((a, b) => b.createdAt - a.createdAt);
+  }
+
+  async get(campaignId: string, trackId: string): Promise<TrackWithData | undefined> {
+    const record = await this.db.tracks.get([campaignId, trackId]);
+    return record && { meta: record.meta, data: record.data };
+  }
+
+  async findByHash(campaignId: string, hash: string): Promise<TrackWithData | undefined> {
+    const record = await this.db.tracks.where({ campaignId, hash }).first();
+    return record && { meta: record.meta, data: record.data };
+  }
+
+  async save(campaignId: string, { meta, data }: TrackWithData): Promise<void> {
+    const parsed = StoredTrackSchema.safeParse(meta);
+    if (!parsed.success) {
+      throw new InvalidDataError('Trilha inválida', zodIssues(parsed.error.issues));
+    }
+    // O conteúdo precisa ser o que os dados dizem: tamanho e tipo real (pelos primeiros bytes).
+    if (data.byteLength !== parsed.data.size || sniffAudioMime(data) !== parsed.data.mime) {
+      throw new InvalidDataError('O conteúdo não confere com a trilha', []);
+    }
+    await this.db.tracks.put({
+      campaignId,
+      id: parsed.data.id,
+      hash: parsed.data.hash,
+      origin: parsed.data.origin,
+      meta: parsed.data,
+      data,
+    });
+  }
+
+  async delete(campaignId: string, trackId: string): Promise<void> {
+    await this.db.tracks.delete([campaignId, trackId]);
+  }
+
+  async deleteCampaign(campaignId: string): Promise<void> {
+    await this.db.tracks.where('campaignId').equals(campaignId).delete();
   }
 }
