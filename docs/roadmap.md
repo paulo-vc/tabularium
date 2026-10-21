@@ -20,10 +20,6 @@ O criador está completo, mas ainda é difícil para quem não está acostumado 
 
 O retrato do personagem e a capa da campanha já existem (v0.3.2). Falta o ícone do sistema, que iria junto do arquivo do sistema (e do catálogo da comunidade).
 
-### Convite mais curto
-
-O convite já caiu de ~460 para ~190 caracteres (v0.2.1). Um código curto e padronizado (ex.: `K7QX-9MPA`) exigiria que o Mestre estivesse online para trocá-lo pelo convite completo, e quem visse o código poderia responder antes do Mestre e se passar por ele. Precisa de um desenho que mantenha a verificação do Mestre.
-
 ### Ferramentas do Mestre
 
 - **Soundboard:** efeitos curtos disparados pelo Mestre, no mesmo esquema da música (que já existe).
@@ -36,6 +32,7 @@ O convite já caiu de ~460 para ~190 caracteres (v0.2.1). Um código curto e pad
 - **Retrato do personagem** (v0.3.2): imagem na ficha, que vai junto ao Mestre e na exportação.
 - **Música do Mestre** (próxima versão): trilhas MP3/OGG tocadas para a mesa, com volume por aparelho.
 - **Imprimir a ficha** (próxima versão): folha para papel ou PDF, pelo menu da ficha.
+- **Convite curto** (próxima versão): código de 20 caracteres para digitar, com a sessão do Mestre aberta.
 - **Sussurro entre jogadores** (próxima versão): cifrado de ponta a ponta; o Mestre repassa sem ler.
 - **Sons** (v0.3.3): sua vez, rolagens, mensagens e sussurros, com volume e opção de desligar.
 - **Capa da campanha** (v0.3.2): escolhida pelo Mestre, chega aos jogadores na sessão.
