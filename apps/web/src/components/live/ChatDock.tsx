@@ -110,7 +110,10 @@ function ChatPanel({
         .filter((player) => player.online)
         .map((player) => ({ id: player.userId, name: player.displayName }));
     }
-    return campaign ? [{ id: campaign.gmId, name: campaign.gmName }] : [];
+    return [
+      ...(campaign ? [{ id: campaign.gmId, name: campaign.gmName }] : []),
+      ...live.peers.map((peer) => ({ id: peer.userId, name: peer.displayName })),
+    ];
   }, [live, campaign]);
   const recipient = recipients.find((r) => r.id === to);
 

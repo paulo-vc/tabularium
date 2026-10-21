@@ -171,4 +171,39 @@ describe('chat da sessão', () => {
       ]);
     });
   });
+
+  it('jogadoras sussurram entre si, e o Mestre não recebe a mensagem', async () => {
+    const { campaign, sheet } = await setUpLiveTable();
+    const biaDb = new TabulaDatabase(`ui-chat-bia-${crypto.randomUUID()}`);
+    const bia = createServices(biaDb, { createTransport: () => network.join() });
+    try {
+      await bia.files.installTemplate(TEMPLATE);
+      await bia.campaigns.join(inviteFor(campaign), 'Bia');
+      const created = await bia.campaigns.createLinkedSheet(campaign.id, 'Nim');
+      if (!created.ok) throw new Error(created.error.message);
+      await bia.session.joinAsPlayer(campaign.id);
+
+      const user = renderApp(player, `#/fichas/${sheet.id}`);
+      await user.click(await screen.findByRole('button', { name: 'Abrir chat' }));
+      const panel = screen.getByRole('region', { name: 'Chat da sessão' });
+      await until(() => {
+        expect(within(panel).getByRole('option', { name: 'Sussurro: Bia' })).toBeInTheDocument();
+      });
+      await user.selectOptions(within(panel).getByLabelText('Para'), 'Sussurro: Bia');
+      await user.type(within(panel).getByLabelText('Mensagem'), 'O Mestre não sabe.{Enter}');
+
+      await until(async () => {
+        const received = await bia.session.chat(campaign.id);
+        expect(received.map((m) => [m.authorName, m.text])).toEqual([
+          ['Ana', 'O Mestre não sabe.'],
+        ]);
+      });
+      expect(await gm.session.chat(campaign.id)).toEqual([]);
+    } finally {
+      await bia.session.stop();
+      await network.settle();
+      biaDb.close();
+      await biaDb.delete();
+    }
+  });
 });

@@ -20,7 +20,7 @@ export type ChatKind = z.infer<typeof ChatKindSchema>;
 /**
  * Uma mensagem do chat da sessão. Vem de outros participantes: o formato é conferido, e o
  * Mestre só repassa mensagens do próprio autor. `to` é o sussurro: a mensagem só vai a essa
- * pessoa (hoje, entre o Mestre e um jogador).
+ * pessoa (entre o Mestre e um jogador, ou entre jogadores, cifrado pelo caminho).
  */
 export const ChatMessageSchema = z
   .object({
