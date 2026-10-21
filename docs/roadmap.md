@@ -30,10 +30,10 @@ O retrato do personagem e a capa da campanha já existem (v0.3.2). Falta o ícon
 - **Notas e diário da campanha** (v0.3.0): notas só do Mestre e entradas compartilhadas com a mesa.
 - **Cutscene** (v0.3.0): imagens do Mestre em tela cheia para a mesa.
 - **Retrato do personagem** (v0.3.2): imagem na ficha, que vai junto ao Mestre e na exportação.
-- **Música do Mestre** (próxima versão): trilhas MP3/OGG tocadas para a mesa, com volume por aparelho.
-- **Imprimir a ficha** (próxima versão): folha para papel ou PDF, pelo menu da ficha.
-- **Convite curto** (próxima versão): código de 20 caracteres para digitar, com a sessão do Mestre aberta.
-- **Sussurro entre jogadores** (próxima versão): cifrado de ponta a ponta; o Mestre repassa sem ler.
+- **Música do Mestre** (v0.4.0): trilhas MP3/OGG tocadas para a mesa, com volume por aparelho.
+- **Imprimir a ficha** (v0.4.0): folha para papel ou PDF, pelo menu da ficha.
+- **Convite curto** (v0.4.0): código de 20 caracteres para digitar, com a sessão do Mestre aberta.
+- **Sussurro entre jogadores** (v0.4.0): cifrado de ponta a ponta; o Mestre repassa sem ler.
 - **Sons** (v0.3.3): sua vez, rolagens, mensagens e sussurros, com volume e opção de desligar.
 - **Capa da campanha** (v0.3.2): escolhida pelo Mestre, chega aos jogadores na sessão.
 - **Chat da sessão** (v0.3.0): falar como o personagem, ações com `/me`, rolagens com `/r` e sussurros entre o Mestre e um jogador.

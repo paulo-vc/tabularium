@@ -2,7 +2,9 @@
 
 As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos ficam nos PRs e em [`docs/`](docs/).
 
-## Próxima versão
+## v0.4.0
+
+A mesa ganha som e privacidade: música do Mestre, sussurros entre jogadores e um convite curto para digitar. E a ficha agora sai impressa ou em PDF.
 
 - **Convite curto:** além do link, o convite agora tem um código de 20 caracteres para ditar ou digitar no celular (ex.: `K7QM-2XPA-9DFR-WB3N-5T6H`), em Campanhas → Entrar com convite. Ele funciona enquanto a sessão do Mestre está aberta: o app busca com o Mestre o convite completo e confere que veio mesmo dele, então ninguém se passa pelo Mestre só por ter visto o código. Tanto faz maiúsculas, espaços ou trocar O por 0. O código longo, que funciona sem a sessão aberta, continua em "Código completo".
 - **Sussurro entre jogadores:** no chat, o campo "Para" agora lista também os outros jogadores online. O sussurro vai cifrado de um aparelho ao outro: passa pelo Mestre, que só repassa e não consegue ler. Os sussurros com o Mestre continuam como antes.

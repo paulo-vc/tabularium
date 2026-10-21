@@ -151,3 +151,13 @@ Mesmo roteiro (tag `v0.3.6`, conferir o rascunho, publicar como versão normal).
 - [ ] Na v0.3.5 instalada, a atualização chega, e as fichas abrem no sistema novo.
 - [ ] Aba Combate: "Bônus e efeitos" adiciona um bônus numa perícia só (busca "furt"), e só ela muda.
 - [ ] No celular (versão web), o nome da ficha aparece inteiro.
+
+## v0.4.0
+
+Mesmo roteiro (tag `v0.4.0`, conferir o rascunho, publicar como versão normal). O banco local vai para a v11 (tabela `tracks`, das trilhas); a migração é automática. A política de segurança do desktop libera `media-src blob:` para a música. O protocolo ganhou mensagens novas (música, sussurro, sala do convite curto); versões antigas ignoram o que não conhecem.
+
+- [ ] Na v0.3.6 instalada, a atualização chega, e campanhas e fichas abrem como antes.
+- [ ] Música: o Mestre no desktop toca uma trilha MP3; o jogador na web ouve, pausa e repete acompanham, e "Baixar músicas" desligado mostra só o título.
+- [ ] Sussurro: com dois jogadores, um sussurra ao outro, e o chat do Mestre não mostra nada.
+- [ ] Convite curto: com a sessão aberta, um jogador digita o código no celular e entra.
+- [ ] Imprimir: "Imprimir ou PDF" no menu da ficha abre a impressão do sistema no desktop.
