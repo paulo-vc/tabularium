@@ -30,6 +30,7 @@ import {
 import * as decoding from 'lib0/decoding';
 import * as encoding from 'lib0/encoding';
 import { z } from 'zod';
+import { SealedWhisperSchema, WhisperKeySchema, type SealedWhisper } from './whisper';
 
 /**
  * Protocolo da sessão (binário, com lib0):
@@ -52,6 +53,8 @@ import { z } from 'zod';
  *   MUSIC            [15][json]       o que toca na mesa (trilha, tocando, repetir, ponto) ou nada
  *   TRACK_REQUEST    [16][json]       o jogador pede a trilha que não tem
  *   TRACK_PART       [17][hash][i][n][bytes]  uma parte da trilha (até 256 KB)
+ *   WHISPER_PEERS    [18][json]       jogadores online e as chaves de sussurro deles (do Mestre)
+ *   WHISPER          [19][json]       sussurro entre jogadores, cifrado (o Mestre só repassa)
  *
  * Topologia em estrela: jogadores só conversam com o Mestre; cada ficha é um documento
  * separado, sincronizado apenas entre o dono e o Mestre (jogadores não recebem as fichas
@@ -81,6 +84,8 @@ const MessageType = {
   Music: 15,
   TrackRequest: 16,
   TrackPart: 17,
+  WhisperPeers: 18,
+  Whisper: 19,
 } as const;
 
 const base = {
@@ -112,6 +117,8 @@ export const HelloSchema = z.discriminatedUnion('role', [
     sheetId: IdSchema,
     templateId: IdSchema,
     challenge: ChallengeSchema.optional(),
+    /** Chave pública para sussurros entre jogadores (versões antigas não mandam). */
+    whisperKey: WhisperKeySchema.optional(),
   }),
 ]);
 export type Hello = z.infer<typeof HelloSchema>;
@@ -146,7 +153,27 @@ export type IncomingMessage =
   | { type: 'cover'; cover: Cover | null }
   | { type: 'music'; music: MusicState | null }
   | { type: 'track-request'; hash: string }
-  | { type: 'track-part'; hash: string; index: number; total: number; data: Uint8Array };
+  | { type: 'track-part'; hash: string; index: number; total: number; data: Uint8Array }
+  | { type: 'whisper-peers'; peers: WhisperPeer[] }
+  | { type: 'whisper'; whisper: SealedWhisper };
+
+/** Outro jogador online a quem dá para sussurrar. */
+export const WhisperPeerSchema = z.object({
+  userId: IdSchema,
+  displayName: LabelSchema,
+  key: WhisperKeySchema,
+});
+export type WhisperPeer = z.infer<typeof WhisperPeerSchema>;
+
+const WhisperPeersSchema = z.object({ peers: z.array(WhisperPeerSchema).max(64) });
+
+export function encodeWhisperPeers(peers: readonly WhisperPeer[]): Uint8Array {
+  return encodeJson(MessageType.WhisperPeers, { peers });
+}
+
+export function encodeWhisper(whisper: SealedWhisper): Uint8Array {
+  return encodeJson(MessageType.Whisper, whisper);
+}
 
 const LogSchema = z.object({ entries: z.array(RollEntrySchema).min(1).max(LOG_CATCH_UP) });
 
@@ -349,6 +376,14 @@ export function decodeMessage(data: Uint8Array): IncomingMessage | null {
       case MessageType.Cover: {
         const message = CoverMessageSchema.safeParse(parseJson(decoding.readVarString(decoder)));
         return message.success ? { type: 'cover', cover: message.data.cover } : null;
+      }
+      case MessageType.WhisperPeers: {
+        const message = WhisperPeersSchema.safeParse(parseJson(decoding.readVarString(decoder)));
+        return message.success ? { type: 'whisper-peers', peers: message.data.peers } : null;
+      }
+      case MessageType.Whisper: {
+        const whisper = SealedWhisperSchema.safeParse(parseJson(decoding.readVarString(decoder)));
+        return whisper.success ? { type: 'whisper', whisper: whisper.data } : null;
       }
       case MessageType.Chat: {
         const chat = ChatSchema.safeParse(parseJson(decoding.readVarString(decoder)));

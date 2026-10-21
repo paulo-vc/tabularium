@@ -98,6 +98,8 @@ export type LiveSession =
       impersonations: number;
       /** Ordem de turno como o Mestre a mostra (sem os ocultos), ou `null` fora de combate. */
       initiative: PublicTracker | null;
+      /** Outros jogadores online, a quem dá para sussurrar (cifrado, o Mestre não lê). */
+      peers: { userId: string; displayName: string }[];
       /** Desde quando procura o Mestre (`null` quando conectado), para mostrar o tempo. */
       searchingSince: number | null;
       /** Quanto levou a última conexão com o Mestre, em ms. */
@@ -174,7 +176,7 @@ export class LiveSessionManager {
     /** Envia a rolagem à mesa (o Mestre não envia as secretas). */
     shareRoll: (entry: RollEntry) => void;
     /** Envia a mensagem do chat (`false`: sem conexão com o Mestre). */
-    shareChat: (message: ChatMessage) => boolean;
+    shareChat: (message: ChatMessage) => boolean | Promise<boolean>;
     /** Só na sessão do Mestre: troca a ordem de turno. */
     setInitiative?: (tracker: Tracker | null) => void;
     /** Só na sessão do Mestre: mostra uma imagem à mesa (ou fecha, com `null`). */
@@ -412,6 +414,7 @@ export class LiveSessionManager {
     let cutscene: { info: Cutscene; ready: boolean; since: number } | null = null;
     type PlayerMusic = Extract<LiveSession, { kind: 'jogador' }>['music'];
     let music: PlayerMusic = null;
+    let peers: { userId: string; displayName: string }[] = [];
 
     // O Mestre alterou a ficha: grava na ficha local o que for válido para o sistema.
     const applyGmChanges = async (changes: RemoteChanges) => {
@@ -449,6 +452,10 @@ export class LiveSessionManager {
         },
         onRolls: (entries) => this.recordRolls(campaignId, entries),
         onChat: (messages) => this.recordChat(campaignId, messages),
+        onWhisperPeers: (list) => {
+          peers = list;
+          publish();
+        },
         // Capa da campanha: fica neste aparelho, para aparecer mesmo fora da sessão.
         onCover: (cover) => {
           this.saveCover(campaignId, cover).catch((error: unknown) =>
@@ -580,6 +587,7 @@ export class LiveSessionManager {
         connectionFailures: client.connectionFailures(),
         gmIdentity: client.identity(),
         initiative,
+        peers,
         impersonations: client.impersonations(),
         searchingSince,
         connectedInMs,
@@ -638,7 +646,11 @@ export class LiveSessionManager {
       shareRoll: (entry) => {
         client.roll(entry);
       },
-      shareChat: (message) => client.chat(message),
+      // Sussurro a outro jogador vai cifrado; o resto, como sempre, pelo Mestre.
+      shareChat: (message) =>
+        message.to !== undefined && message.toName !== undefined && message.to !== campaign.gmId
+          ? client.whisper({ ...message, to: message.to, toName: message.toName })
+          : client.chat(message),
       fetchMusic: () => {
         if (!music || music.ready) return;
         music = { ...music, skipped: false };
@@ -800,8 +812,13 @@ export class LiveSessionManager {
     if (!ChatMessageSchema.safeParse(message).success) {
       return failure('mensagem-invalida', 'Não foi possível enviar esta mensagem.');
     }
-    if (!active.shareChat(message)) {
-      return failure('sem-conexao', 'Sem conexão com o Mestre: a mensagem não foi enviada.');
+    if (!(await active.shareChat(message))) {
+      return failure(
+        'sem-conexao',
+        input.to
+          ? 'A mensagem não foi enviada: sem conexão, ou a pessoa saiu da sessão.'
+          : 'Sem conexão com o Mestre: a mensagem não foi enviada.',
+      );
     }
     await this.chatLog.add(active.campaignId, [message]);
     return ok(message);

@@ -283,6 +283,16 @@ test.describe('mesa ao vivo, de ponta a ponta', () => {
     await gmChat.getByLabel('Mensagem').press('Enter');
     await expect(biaChat).toContainText('Paulo · Teste');
     await expect(biaChat).not.toContainText('Desconfio');
+
+    // Entre jogadoras, o sussurro vai cifrado: chega à Bia, e o Mestre não o vê.
+    await anaChat.getByLabel('Para').selectOption({ label: 'Sussurro: Bia' });
+    await anaChat.getByLabel('Mensagem').fill('Vamos sair pelos fundos.');
+    await anaChat.getByLabel('Mensagem').press('Enter');
+    await expect(biaChat).toContainText('Ana: Vamos sair pelos fundos.');
+    await gmChat.getByLabel('Mensagem').fill('/r 1d1+4 Outro teste');
+    await gmChat.getByLabel('Mensagem').press('Enter');
+    await expect(anaChat).toContainText('Paulo · Outro teste');
+    await expect(gmChat).not.toContainText('fundos');
   });
 
   test('retrato: a jogadora escolhe um retrato e o Mestre o vê no card', async ({ browser }) => {

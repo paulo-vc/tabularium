@@ -23,17 +23,20 @@ import {
   encodeLog,
   encodeBye,
   encodeChat,
+  encodeWhisper,
   encodeImageRequest,
   encodeTrackRequest,
   PROTOCOL_VERSION,
   syncEncoder,
   type Hello,
   type Reject,
+  type WhisperPeer,
 } from './protocol';
 import { newChallenge, verifyChallenge } from './identity';
 import { FileAssembler } from './file-transfer';
 import { ImageAssembler } from './image-transfer';
 import { BONUSES, readBonuses, reconcile, VALUES } from './sheet-doc';
+import { generateWhisperKeys, openWhisper, sealWhisper } from './whisper';
 import type { ConnectionInfo, SyncTransport } from './transport';
 
 export type ClientStatus =
@@ -77,6 +80,8 @@ export interface ClientCallbacks {
   onRolls?: (entries: RollEntry[]) => void;
   /** Mensagens do chat chegaram (da mesa, sussurros do Mestre ou o histórico recente). */
   onChat?: (messages: ChatMessage[]) => void;
+  /** Outros jogadores online a quem dá para sussurrar (lista inteira, a cada mudança). */
+  onWhisperPeers?: (peers: { userId: string; displayName: string }[]) => void;
   /** O que toca na mesa mudou (`null`: o Mestre parou a música). */
   onMusic?: (music: MusicState | null) => void;
   /** Chegou, completa e conferida, a trilha pedida com `requestTrack`. */
@@ -129,6 +134,10 @@ export class SessionClient {
   /** Música atual (para saber qual trilha aceitar) e a trilha sendo recebida. */
   private music: MusicState | null = null;
   private trackAssembler: FileAssembler | null = null;
+  /** Chaves de sussurro desta conexão (nunca saem do aparelho, só a pública). */
+  private readonly whisperKeys = generateWhisperKeys();
+  /** Chave pública de cada jogador online, pelo ID (vinda do Mestre). */
+  private whisperPeers = new Map<string, WhisperPeer>();
   private current: ClientStatus = { state: 'procurando-mestre' };
   private readonly listeners = new Set<() => void>();
   private stopped = false;
@@ -187,6 +196,7 @@ export class SessionClient {
         this.challenged.delete(peerId);
         if (peerId !== this.gmPeer) return;
         this.gmPeer = null;
+        this.setWhisperPeers([]);
         if (this.current.state !== 'recusado') this.setStatus({ state: 'procurando-mestre' });
       },
       onMessage: (peerId, data) => this.receive(peerId, data),
@@ -291,6 +301,28 @@ export class SessionClient {
     return true;
   }
 
+  /**
+   * Sussurra para outro jogador, cifrado: o Mestre repassa, mas não lê.
+   * @returns `false` se não está conectado ou o jogador não está (ou não aceita sussurros).
+   */
+  async whisper(message: ChatMessage & { to: string; toName: string }): Promise<boolean> {
+    const peer = this.whisperPeers.get(message.to);
+    if (!peer) return false;
+    const sealed = await sealWhisper(this.whisperKeys, peer.key, message);
+    if (!sealed || this.gmPeer === null || this.current.state !== 'conectado' || this.stopped) {
+      return false;
+    }
+    this.transport.send(this.gmPeer, encodeWhisper(sealed));
+    return true;
+  }
+
+  private setWhisperPeers(peers: WhisperPeer[]): void {
+    this.whisperPeers = new Map(peers.map((peer) => [peer.userId, peer]));
+    this.callbacks.onWhisperPeers?.(
+      peers.map(({ userId, displayName }) => ({ userId, displayName })),
+    );
+  }
+
   /** Estado do documento, para salvar e continuar numa próxima sessão. */
   exportState(): Uint8Array {
     return Y.encodeStateAsUpdate(this.doc);
@@ -306,6 +338,7 @@ export class SessionClient {
       sheetId: this.latest.id,
       templateId: this.latest.templateRef.id,
       challenge: this.challenge,
+      whisperKey: this.whisperKeys.publicKey,
     };
   }
 
@@ -387,6 +420,22 @@ export class SessionClient {
 
     if (message.type === 'cover') {
       this.callbacks.onCover?.(message.cover);
+      return;
+    }
+
+    if (message.type === 'whisper-peers') {
+      if (peerId !== this.gmPeer) return;
+      this.setWhisperPeers(message.peers.filter((peer) => peer.userId !== this.me.userId));
+      return;
+    }
+
+    if (message.type === 'whisper') {
+      const sealed = message.whisper;
+      const sender = this.whisperPeers.get(sealed.authorId);
+      if (peerId !== this.gmPeer || sealed.to !== this.me.userId || !sender) return;
+      void openWhisper(this.whisperKeys, sender.key, sealed).then((opened) => {
+        if (opened && !this.stopped) this.callbacks.onChat?.([opened]);
+      });
       return;
     }
 

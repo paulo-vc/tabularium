@@ -30,6 +30,8 @@ import {
   encodeTurn,
   encodeBye,
   encodeChat,
+  encodeWhisper,
+  encodeWhisperPeers,
   encodeCover,
   encodeMusic,
   encodeTrackPart,
@@ -44,6 +46,7 @@ import {
 } from './protocol';
 import { deepEqual, readSheet, VALUES, writeBonuses, type SheetSnapshot } from './sheet-doc';
 import type { ConnectionInfo, SyncTransport } from './transport';
+import type { SealedWhisper } from './whisper';
 
 export interface HostCampaign {
   id: string;
@@ -88,6 +91,8 @@ interface Entry {
   displayName: string;
   /** Participante conectado que é o dono da ficha agora, ou `null`. */
   peerId: string | null;
+  /** Chave pública de sussurro da conexão atual (versões antigas não têm). */
+  whisperKey?: string | undefined;
   snapshot: SheetSnapshot | null | undefined; // undefined = recalcular
 }
 
@@ -354,8 +359,8 @@ export class SessionHost {
     if (!entry) return;
     const known = new Set(this.recentChat.map((message) => message.id));
     for (const message of messages) {
-      // Cada jogador só manda mensagens próprias (com o nome com que entrou), novas, e
-      // sussurra só ao Mestre (entre jogadores, ainda não).
+      // Cada jogador só manda mensagens próprias (com o nome com que entrou), novas, e às
+      // claras sussurra só ao Mestre (entre jogadores, o sussurro vai cifrado: `relayWhisper`).
       if (message.authorId !== entry.userId || message.authorName !== entry.displayName) continue;
       if (known.has(message.id)) continue;
       if (message.to !== undefined && message.to !== this.campaign.gmId) continue;
@@ -457,6 +462,8 @@ export class SessionHost {
       this.receiveRolls(peerId, message.entries);
     } else if (message.type === 'chat') {
       this.receiveChat(peerId, message.messages);
+    } else if (message.type === 'whisper') {
+      this.relayWhisper(peerId, message.whisper);
     } else if (message.type === 'sync') {
       const sheetId = this.sheetOfPeer.get(peerId);
       const entry = sheetId === undefined ? undefined : this.entries.get(sheetId);
@@ -505,9 +512,15 @@ export class SessionHost {
     const firstHello = entry.peerId !== peerId;
     // O mesmo jogador reconectando (outra aba, rede trocada): a conexão mais nova assume.
     if (entry.peerId !== null && entry.peerId !== peerId) this.sheetOfPeer.delete(entry.peerId);
+    const peersChanged =
+      firstHello ||
+      entry.whisperKey !== hello.whisperKey ||
+      entry.displayName !== hello.displayName;
     entry.peerId = peerId;
     entry.displayName = hello.displayName;
+    entry.whisperKey = hello.whisperKey;
     this.sheetOfPeer.set(peerId, hello.sheetId);
+    if (peersChanged) this.shareWhisperPeers();
 
     const step1 = syncEncoder(hello.sheetId);
     syncProtocol.writeSyncStep1(step1, entry.doc);
@@ -588,8 +601,46 @@ export class SessionHost {
     if (sheetId === undefined) return;
     this.sheetOfPeer.delete(peerId);
     const entry = this.entries.get(sheetId);
-    if (entry?.peerId === peerId) entry.peerId = null;
+    if (entry?.peerId === peerId) {
+      entry.peerId = null;
+      entry.whisperKey = undefined;
+    }
+    this.shareWhisperPeers();
     this.notify();
+  }
+
+  /** Cada jogador online recebe os outros (com chave) a quem pode sussurrar. */
+  private shareWhisperPeers(): void {
+    const online = [...this.entries.values()].filter(
+      (entry) => entry.peerId !== null && entry.whisperKey !== undefined,
+    );
+    for (const entry of this.entries.values()) {
+      if (entry.peerId === null) continue;
+      const peers = online
+        .filter((other) => other.userId !== entry.userId)
+        .map((other) => ({
+          userId: other.userId,
+          displayName: other.displayName,
+          key: other.whisperKey as string,
+        }));
+      this.send(entry.peerId, encodeWhisperPeers(peers));
+    }
+  }
+
+  /**
+   * Sussurro cifrado entre jogadores: o Mestre confere quem manda e repassa só a quem recebe.
+   * Não guarda nem consegue ler.
+   */
+  private relayWhisper(peerId: string, whisper: SealedWhisper): void {
+    const sheetId = this.sheetOfPeer.get(peerId);
+    const sender = sheetId === undefined ? undefined : this.entries.get(sheetId);
+    if (!sender || whisper.authorId !== sender.userId) return;
+    if (whisper.authorName !== sender.displayName) return;
+    const recipient = [...this.entries.values()].find(
+      (entry) => entry.userId === whisper.to && entry.peerId !== null,
+    );
+    if (!recipient?.peerId || recipient.whisperKey === undefined) return;
+    this.send(recipient.peerId, encodeWhisper(whisper));
   }
 
   private send(peerId: string, data: Uint8Array): void {
