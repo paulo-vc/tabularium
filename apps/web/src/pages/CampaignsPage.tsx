@@ -1,6 +1,7 @@
 import { roleOf } from '@tabula/domain';
 import { useLiveQuery } from 'dexie-react-hooks';
-import { DoorOpenIcon, PlusIcon, UsersIcon } from 'lucide-react';
+import { DoorOpenIcon, LoaderCircleIcon, PlusIcon, UsersIcon } from 'lucide-react';
+import { parseShortInviteCode } from '@tabula/sync';
 import { useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
 import { Link, useLocation } from 'wouter';
@@ -137,7 +138,7 @@ function NewCampaignDialog() {
         </Button>
       </DialogTrigger>
       <DialogContent>
-        <form onSubmit={submit} className="space-y-4">
+        <form onSubmit={(event) => void submit(event)} className="space-y-4">
           <DialogHeader>
             <DialogTitle>Nova campanha</DialogTitle>
             <DialogDescription>
@@ -194,17 +195,36 @@ function JoinDialog() {
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
   const [error, setError] = useState<string | null>(null);
+  const { session } = useServices();
+  const [searching, setSearching] = useState<AbortController | null>(null);
 
-  const submit = (event: FormEvent) => {
+  const finish = (invite: Parameters<typeof encodeInvite>[0]) => {
+    setOpen(false);
+    setText('');
+    navigate(`${INVITE_ROUTE}${encodeInvite(invite)}`);
+  };
+
+  const submit = async (event: FormEvent) => {
     event.preventDefault();
     const decoded = decodeInvite(text);
-    if (!decoded.ok) {
+    if (decoded.ok) return finish(decoded.value);
+    const code = parseShortInviteCode(text);
+    if (!code) {
       setError(decoded.error.message);
       return;
     }
-    setOpen(false);
-    setText('');
-    navigate(`${INVITE_ROUTE}${encodeInvite(decoded.value)}`);
+    // Código curto: o convite completo vem do Mestre, que precisa estar com a sessão aberta.
+    const controller = new AbortController();
+    setSearching(controller);
+    const result = await session.fetchInvite(code, controller.signal);
+    setSearching(null);
+    if (result.ok) return finish(result.invite);
+    if (result.reason === 'cancelado') return;
+    setError(
+      result.reason === 'falha-de-conexao'
+        ? 'O Mestre foi encontrado, mas a conexão não abriu (rede restritiva). Peça o link do convite.'
+        : 'O Mestre não foi encontrado. O código curto só funciona com a sessão dele aberta; confira o código ou peça o link.',
+    );
   };
 
   return (
@@ -213,6 +233,7 @@ function JoinDialog() {
       onOpenChange={(next) => {
         setOpen(next);
         setError(null);
+        if (!next) searching?.abort();
       }}
     >
       <DialogTrigger asChild>
@@ -224,14 +245,18 @@ function JoinDialog() {
         <form onSubmit={submit} className="space-y-4">
           <DialogHeader>
             <DialogTitle>Entrar com convite</DialogTitle>
-            <DialogDescription>Cole o link ou o código que o Mestre enviou.</DialogDescription>
+            <DialogDescription>
+              Cole o link que o Mestre enviou, ou digite o código curto (ex.:
+              K7QM-2XPA-9DFR-WB3N-5T6H).
+            </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">
             <Label htmlFor="convite-texto">Convite</Label>
             <Textarea
               id="convite-texto"
               value={text}
-              rows={4}
+              rows={3}
+              disabled={searching !== null}
               autoFocus
               // Links não têm espaços: sem isso a caixa cresceria na horizontal para fora da tela.
               className="field-sizing-fixed break-all"
@@ -249,8 +274,14 @@ function JoinDialog() {
             )}
           </div>
           <DialogFooter>
-            <Button type="submit" disabled={text.trim() === ''}>
-              Continuar
+            <Button type="submit" disabled={text.trim() === '' || searching !== null}>
+              {searching ? (
+                <>
+                  <LoaderCircleIcon className="animate-spin" /> Procurando o Mestre…
+                </>
+              ) : (
+                'Continuar'
+              )}
             </Button>
           </DialogFooter>
         </form>

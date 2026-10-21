@@ -1,4 +1,5 @@
 import { inviteFor, type Campaign } from '@tabula/domain';
+import { shortInviteCode } from '@tabula/sync';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   BookOpenIcon,
@@ -215,7 +216,9 @@ function InviteCard({ campaign, compact }: { campaign: Campaign; compact: boolea
   const { campaigns } = useServices();
   const [open, setOpen] = useState(false);
   const baseUrl = publicAppUrl();
-  const code = encodeInvite(inviteFor(campaign));
+  const invite = inviteFor(campaign);
+  const code = encodeInvite(invite);
+  const short = shortInviteCode(invite);
   const link = baseUrl ? campaigns.inviteLink(campaign, baseUrl) : null;
 
   if (compact && !open) {
@@ -256,28 +259,49 @@ function InviteCard({ campaign, compact }: { campaign: Campaign; compact: boolea
             </div>
           </div>
         )}
-        <div className="space-y-2">
-          <Label htmlFor="convite-codigo">{link ? 'Ou só o código' : 'Código do convite'}</Label>
-          <div className="flex gap-2">
+        {short && (
+          <div className="space-y-2">
+            <Label htmlFor="convite-curto">{link ? 'Ou o código curto' : 'Código curto'}</Label>
+            <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
+              <output
+                id="convite-curto"
+                className="bg-muted min-w-0 flex-1 rounded-md px-3 py-1.5 text-center font-mono text-base tracking-wider whitespace-nowrap select-all sm:text-lg"
+              >
+                {short}
+              </output>
+              <Button
+                type="button"
+                variant="outline"
+                className="self-end sm:self-auto"
+                onClick={() => void copy(short, 'Código')}
+              >
+                <CopyIcon /> Copiar
+              </Button>
+            </div>
+            <p className="text-muted-foreground text-xs">
+              Para ditar ou digitar no celular, em Campanhas → Entrar com convite. Funciona com a
+              sessão aberta.
+            </p>
+          </div>
+        )}
+        <details className="group text-sm">
+          <summary className="text-muted-foreground hover:text-foreground cursor-pointer text-xs">
+            Código completo (funciona sem a sessão aberta)
+          </summary>
+          <div className="mt-2 flex gap-2">
             <Input
               id="convite-codigo"
+              aria-label="Código completo do convite"
               readOnly
               value={code}
               className="font-mono"
               onFocus={(e) => e.target.select()}
             />
-            <Button
-              type="button"
-              variant={link ? 'outline' : 'default'}
-              onClick={() => void copy(code, 'Código')}
-            >
+            <Button type="button" variant="outline" onClick={() => void copy(code, 'Código')}>
               <CopyIcon /> Copiar
             </Button>
           </div>
-          <p className="text-muted-foreground text-xs">
-            O jogador cola o código em Campanhas → Entrar com convite.
-          </p>
-        </div>
+        </details>
       </CardContent>
     </Card>
   );

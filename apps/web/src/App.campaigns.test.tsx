@@ -58,7 +58,10 @@ describe('Mestre', () => {
     expect(screen.getByText('Você é o Mestre')).toBeInTheDocument();
     // Em jsdom o endereço é http://localhost: há link e código.
     expect((screen.getByLabelText('Link') as HTMLInputElement).value).toContain('#/convite/');
-    expect((screen.getByLabelText('Ou só o código') as HTMLInputElement).value).toMatch(
+    expect(screen.getByLabelText('Ou o código curto')).toHaveTextContent(
+      /^[0-9A-Z]{4}(-[0-9A-Z]{4}){4}$/,
+    );
+    expect((screen.getByLabelText('Código completo do convite') as HTMLInputElement).value).toMatch(
       /^[A-Za-z0-9_-]+$/,
     );
   });

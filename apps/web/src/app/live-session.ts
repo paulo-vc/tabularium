@@ -9,6 +9,7 @@ import {
   CHAT_TEXT_LIMIT,
   ChatMessageSchema,
   parseChatInput,
+  inviteFor,
   err,
   linkedSheetId,
   ok,
@@ -57,6 +58,11 @@ import {
   type SavedSheetState,
   type ConnectionInfo,
   type SyncTransport,
+  fetchInviteByCode,
+  inviteLobbyRoom,
+  serveInviteLobby,
+  shortInviteCode,
+  type InviteLobbyResult,
 } from '@tabula/sync';
 import { liveQuery, type Subscription } from 'dexie';
 import type { TemplateCatalog } from './catalog';
@@ -267,6 +273,13 @@ export class LiveSessionManager {
       },
       saved,
     );
+    // Convite curto: enquanto a sessão está aberta, o Mestre entrega o convite a quem digita
+    // o código (assinado; o código prende a chave dele e o segredo da campanha).
+    const invite = inviteFor(campaign);
+    const lobbyCode = shortInviteCode(invite);
+    const closeLobby = lobbyCode
+      ? serveInviteLobby(this.rooms.lease(inviteLobbyRoom(lobbyCode)), invite, identity)
+      : null;
     host.seedRolls(await this.rollLog.list(campaignId));
     host.seedChat(await this.chatLog.list(campaignId));
     const stopChat = host.onChat((message) => this.recordChat(campaignId, [message]));
@@ -357,6 +370,7 @@ export class LiveSessionManager {
         stopRolls();
         stopChat();
         unsubscribe();
+        await closeLobby?.();
         await host.stop();
       },
       setPlayerValues: (sheetId, values) => host.setValues(sheetId, values),
@@ -854,6 +868,16 @@ export class LiveSessionManager {
   private async compiledFor(campaign: Campaign): Promise<CompiledTemplate | undefined> {
     const template = await this.catalog.get(campaign.templateRef.id);
     return template ? this.catalog.compile(template) : undefined;
+  }
+
+  /**
+   * Busca o convite completo pelo código curto. Funciona com a sessão do Mestre aberta;
+   * o convite chega conferido (ver `fetchInviteByCode`).
+   */
+  fetchInvite(code: string, signal?: AbortSignal): Promise<InviteLobbyResult> {
+    return fetchInviteByCode(this.rooms.lease(inviteLobbyRoom(code)), code, {
+      ...(signal ? { signal } : {}),
+    });
   }
 
   /**

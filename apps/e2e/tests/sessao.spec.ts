@@ -390,4 +390,27 @@ test.describe('mesa ao vivo, de ponta a ponta', () => {
     await gm.getByRole('button', { name: 'Parar a música' }).click();
     await expect(music).toBeHidden();
   });
+
+  test('convite curto: a jogadora digita o código e entra, com a sessão do Mestre aberta', async ({
+    browser,
+  }) => {
+    const gm = await newDevice(browser);
+    const ana = await newDevice(browser);
+    await createCampaign(gm);
+    const code = (await gm.getByLabel('Ou o código curto').textContent()) ?? '';
+    expect(code).toMatch(/^[0-9A-Z]{4}(-[0-9A-Z]{4}){4}$/);
+    await gm.getByRole('button', { name: 'Iniciar sessão' }).click();
+
+    await ana.goto('#/campanhas');
+    await ana.getByRole('button', { name: 'Entrar com convite' }).click();
+    await ana.getByRole('textbox', { name: 'Convite' }).fill(code.toLowerCase().replace(/-/g, ' '));
+    await ana.getByRole('button', { name: 'Continuar' }).click();
+    await ana.getByLabel('Seu nome (como o Mestre verá)').fill('Ana');
+    await ana.getByRole('button', { name: 'Entrar na campanha' }).click();
+    await ana.getByLabel('Crie sua ficha').fill('Lia');
+    await ana.getByRole('button', { name: 'Criar', exact: true }).click();
+    await ana.getByRole('button', { name: 'Entrar na sessão' }).click();
+    await expect(ana.getByText(/Conectado\./)).toBeVisible();
+    await expect(gm.getByRole('article', { name: 'Jogador Ana' })).toBeVisible();
+  });
 });
