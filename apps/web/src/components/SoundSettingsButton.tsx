@@ -14,7 +14,7 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-/** Cores dos dados 3D (as mesmas para a mesa toda, neste aparelho). */
+/** Cores dos dados 3D. A escolhida vai junto das suas rolagens: a mesa vê seus dados nela. */
 const DICE_COLORS = [
   { name: 'Marfim', value: DEFAULT_DICE_COLOR },
   { name: 'Rubi', value: '#b91c1c' },
@@ -103,26 +103,31 @@ export function SoundSettingsButton() {
                 </Label>
               </div>
               {settings.dice3d !== false && (
-                <div role="radiogroup" aria-label="Cor dos dados" className="flex gap-1.5 pl-6">
-                  {DICE_COLORS.map(({ name, value }) => {
-                    const chosen = (settings.diceColor ?? DEFAULT_DICE_COLOR) === value;
-                    return (
-                      <button
-                        key={value}
-                        type="button"
-                        role="radio"
-                        aria-checked={chosen}
-                        aria-label={name}
-                        title={name}
-                        className={cn(
-                          'size-6 rounded-full border shadow-sm transition-transform hover:scale-110',
-                          chosen && 'ring-primary ring-offset-background ring-2 ring-offset-2',
-                        )}
-                        style={{ backgroundColor: value }}
-                        onClick={() => void sounds.update({ diceColor: value })}
-                      />
-                    );
-                  })}
+                <div className="space-y-1 pl-6">
+                  <div role="radiogroup" aria-label="Cor dos dados" className="flex gap-1.5">
+                    {DICE_COLORS.map(({ name, value }) => {
+                      const chosen = (settings.diceColor ?? DEFAULT_DICE_COLOR) === value;
+                      return (
+                        <button
+                          key={value}
+                          type="button"
+                          role="radio"
+                          aria-checked={chosen}
+                          aria-label={name}
+                          title={name}
+                          className={cn(
+                            'size-6 rounded-full border shadow-sm transition-transform hover:scale-110',
+                            chosen && 'ring-primary ring-offset-background ring-2 ring-offset-2',
+                          )}
+                          style={{ backgroundColor: value }}
+                          onClick={() => void sounds.update({ diceColor: value })}
+                        />
+                      );
+                    })}
+                  </div>
+                  <p className="text-muted-foreground text-xs">
+                    Na sessão, a mesa vê seus dados nesta cor.
+                  </p>
                 </div>
               )}
             </div>
