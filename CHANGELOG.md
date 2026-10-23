@@ -2,7 +2,9 @@
 
 As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos ficam nos PRs e em [`docs/`](docs/).
 
-## Próxima versão
+## v0.4.1
+
+Dados 3D: as rolagens caem na tela e param na face sorteada, e a mesa vê os dados de cada um na cor dele.
 
 - **Dados 3D:** as rolagens agora caem na tela em 3D: d4, d6, d8, d10, d12, d20 e o d100 (dois d10, dezenas e unidades). Os dados giram e param exatamente na face do resultado, que já foi sorteado e conferido, então ninguém vê um número diferente do registrado. Na sessão, cada um vê os dados de todo mundo, como numa torre de dados: as rolagens da mesa aparecem na bandeja, com o resultado embaixo, no lugar do aviso de antes. Nas preferências do ícone de som, dá para desligar os dados 3D ou escolher a cor (marfim, rubi, safira, esmeralda, ametista ou ônix). Com "reduzir movimento" ligado no sistema, os dados aparecem já parados. A parte 3D só carrega na primeira rolagem.
 - **Cada um com a sua cor de dados:** a cor escolhida vai junto das suas rolagens, e na sessão a mesa vê seus dados nela. Dá para saber de quem é a rolagem só de olhar. Rolagens de versões anteriores aparecem na cor de quem está vendo.

@@ -161,3 +161,12 @@ Mesmo roteiro (tag `v0.4.0`, conferir o rascunho, publicar como versão normal).
 - [ ] Sussurro: com dois jogadores, um sussurra ao outro, e o chat do Mestre não mostra nada.
 - [ ] Convite curto: com a sessão aberta, um jogador digita o código no celular e entra.
 - [ ] Imprimir: "Imprimir ou PDF" no menu da ficha abre a impressão do sistema no desktop.
+
+## v0.4.1
+
+Mesmo roteiro (tag `v0.4.1`, conferir o rascunho, publicar como versão normal). Sem mudança no banco local. As rolagens ganham o campo opcional `diceColor`, que versões antigas ignoram. A parte 3D (three.js) vem num pedaço separado, carregado na primeira rolagem.
+
+- [ ] Na v0.4.0 instalada, a atualização chega.
+- [ ] No app desktop, rolar mostra os dados 3D (ou parados, com as animações do Windows desligadas).
+- [ ] Na sessão, a cor escolhida por um jogador aparece nos dados dele na tela do Mestre.
+- [ ] Desligar "Dados 3D nas rolagens" volta ao aviso de antes.
