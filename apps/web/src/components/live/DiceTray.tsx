@@ -70,7 +70,9 @@ export function DiceTray() {
       if (cancelled) return;
       // Quem pede menos movimento no sistema vê os dados já parados, sem girar.
       if (stage.current && dice.length > 0) {
-        await stage.current.roll(dice, settings.current.color, prefersReducedMotion());
+        // Cada um rola com a própria cor; sem cor (versão antiga ou nunca escolhida), a deste aparelho.
+        const color = roll.entry.diceColor ?? settings.current.color;
+        await stage.current.roll(dice, color, prefersReducedMotion());
       }
       if (!cancelled) hide = setTimeout(() => setVisible(false), HOLD_MS);
     })();

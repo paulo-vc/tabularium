@@ -62,6 +62,11 @@ export const RollEntrySchema = z.object({
    * total como a iniciativa de quem rolou na ordem de turno.
    */
   purpose: z.literal('iniciativa').optional(),
+  /** Cor dos dados 3D de quem rolou (#rrggbb), para a mesa reconhecer de quem é a rolagem. */
+  diceColor: z
+    .string()
+    .regex(/^#[0-9a-f]{6}$/i)
+    .optional(),
 });
 export type RollEntry = z.infer<typeof RollEntrySchema>;
 

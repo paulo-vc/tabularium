@@ -748,6 +748,7 @@ export class LiveSessionManager {
       id: await this.device.getDeviceId(),
       name: (await this.device.getDisplayName()) ?? 'Você',
     };
+    const { diceColor } = await this.device.getSoundSettings();
     const entry: RollEntry = {
       id: this.newId(),
       at: this.clock.now(),
@@ -758,6 +759,7 @@ export class LiveSessionManager {
       // Só o Mestre rola em segredo.
       secret: input.secret === true && this.snapshot.kind === 'mestre',
       ...(input.purpose && { purpose: input.purpose }),
+      ...(diceColor && { diceColor }),
     };
     if (active) {
       active.shareRoll(entry);

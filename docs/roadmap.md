@@ -12,7 +12,7 @@ O criador está completo, mas ainda é difícil para quem não está acostumado 
 
 ### Dados 3D: o que falta
 
-Os dados 3D já existem (próxima versão). Faltam dados com faces definidas pelo sistema (ex.: dados de dualidade), textura e a cor escolhida por cada jogador valendo para os dados dele na tela de todos.
+Os dados 3D já existem (próxima versão). Faltam dados com faces definidas pelo sistema (ex.: dados de dualidade) e textura.
 
 ### Ícone do sistema
 

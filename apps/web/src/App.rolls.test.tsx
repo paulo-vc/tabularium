@@ -157,6 +157,17 @@ describe('rolagens pela ficha', () => {
     });
   });
 
+  it('a rolagem leva a cor dos dados de quem rolou, para a mesa ver nela', async () => {
+    const { campaign } = await setUpLiveTable();
+    await player.sounds.update({ diceColor: '#b91c1c' });
+    await player.session.roll({ label: 'Furtividade', expression: '1d20+3' });
+    await waitLong(async () => {
+      await network.settle();
+      const [received] = await gm.session.rolls(campaign.id);
+      expect(received).toMatchObject({ authorName: 'Ana', diceColor: '#b91c1c' });
+    });
+  });
+
   it('rolagem secreta do Mestre aparece marcada só para ele', async () => {
     const { campaign } = await setUpLiveTable();
     const user = renderApp(gm, `#/campanhas/${campaign.id}`);
