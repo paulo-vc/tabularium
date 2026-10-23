@@ -1,9 +1,11 @@
 import { err, ok, type Result } from '../result';
+import type { CustomDie } from './custom';
 
 /**
  * Notação de dados: termos somados ou subtraídos.
  *
  *   1d20+5      2d6 + 1d4 - 1      4d6kh3 (mantém os 3 maiores)      2d20kl1 (o menor)
+ *   4dF         1dEsperanca+1dMedo (dados do sistema, ver `CustomDie`)
  *
  * Sem `eval` e com limites (quantidade de dados, faces, tamanho), porque a expressão vem de
  * fichas e sistemas de terceiros.
@@ -24,6 +26,11 @@ export interface DiceTerm {
   sides: number;
   /** Manter só os maiores (`kh`) ou menores (`kl`). */
   keep?: { mode: 'maiores' | 'menores'; count: number } | undefined;
+  /**
+   * Dado do sistema: `sides` é o número de faces, o resultado é a face (de 1 a n) e soma o
+   * `value` dela. Vai inteiro na rolagem, para quem recebe conferir sem ter o sistema.
+   */
+  custom?: CustomDie | undefined;
 }
 
 export interface ConstantTerm {
@@ -40,9 +47,28 @@ export interface DiceError {
 }
 
 const TERM = /^(\d*)d(\d+)(?:(kh|kl)(\d+))?$|^(\d+)$/;
+const CUSTOM_TERM = /^(\d*)d([a-z][a-z0-9]*)$/;
 
-/** Lê uma expressão de dados ("1d20+5"). Espaços são ignorados; "D" vale como "d". */
-export function parseDice(source: string): Result<DiceExpression, DiceError> {
+/** Separa "fkh2" em dado "f" e "kh2", conferindo que o dado existe. */
+function customTerm(
+  text: string,
+  dice: ReadonlyMap<string, CustomDie>,
+): { die: CustomDie; keep?: [string, string] } | null {
+  const exact = dice.get(text);
+  if (exact) return { die: exact };
+  const split = /^(.+?)(kh|kl)(\d+)$/.exec(text);
+  const die = split && dice.get(split[1] as string);
+  return die && split ? { die, keep: [split[2] as string, split[3] as string] } : null;
+}
+
+/**
+ * Lê uma expressão de dados ("1d20+5"). Espaços são ignorados; "D" vale como "d".
+ * `custom`: os dados do sistema (`4dF`), se houver.
+ */
+export function parseDice(
+  source: string,
+  custom: readonly CustomDie[] = [],
+): Result<DiceExpression, DiceError> {
   const text = source.replace(/\s+/g, '').toLowerCase();
   if (text === '')
     return err({ code: 'expressao-vazia', message: 'Informe os dados (ex.: 1d20+5)' });
@@ -67,6 +93,40 @@ export function parseDice(source: string): Result<DiceExpression, DiceError> {
     const sign: 1 | -1 = part.startsWith('-') ? -1 : 1;
     const body = part.replace(/^[+-]/, '');
     const match = TERM.exec(body);
+    const customMatch = match ? null : CUSTOM_TERM.exec(body);
+    if (customMatch) {
+      const byId = new Map(custom.map((die) => [die.id.toLowerCase(), die]));
+      const found = customTerm(customMatch[2] as string, byId);
+      if (!found) {
+        return err({
+          code: 'expressao-invalida',
+          message: `"d${customMatch[2] as string}" não é um dado deste sistema`,
+        });
+      }
+      const count = customMatch[1] === '' ? 1 : Number(customMatch[1]);
+      if (count < 1) return invalid;
+      totalDice += count;
+      if (totalDice > DICE_LIMITS.dice) {
+        return err({
+          code: 'expressao-grande-demais',
+          message: `Mais de ${DICE_LIMITS.dice} dados`,
+        });
+      }
+      const term: DiceTerm = {
+        kind: 'dados',
+        sign,
+        count,
+        sides: found.die.faces.length,
+        custom: found.die,
+      };
+      if (found.keep) {
+        const keep = Number(found.keep[1]);
+        if (keep < 1 || keep > count) return invalid;
+        term.keep = { mode: found.keep[0] === 'kh' ? 'maiores' : 'menores', count: keep };
+      }
+      terms.push(term);
+      continue;
+    }
     if (!match) return invalid;
     if (match[5] !== undefined) {
       const value = Number(match[5]);
@@ -99,7 +159,7 @@ export function printDice(expression: DiceExpression): string {
       const body =
         term.kind === 'constante'
           ? String(term.value)
-          : `${term.count}d${term.sides}${term.keep ? `${term.keep.mode === 'maiores' ? 'kh' : 'kl'}${term.keep.count}` : ''}`;
+          : `${term.count}d${term.custom ? term.custom.id : term.sides}${term.keep ? `${term.keep.mode === 'maiores' ? 'kh' : 'kl'}${term.keep.count}` : ''}`;
       if (index === 0) return term.sign < 0 ? `-${body}` : body;
       return `${term.sign < 0 ? '-' : '+'} ${body}`;
     })
@@ -130,9 +190,9 @@ export function rollDice(expression: DiceExpression, roll: DieRoller): RollResul
     const values = Array.from({ length: term.count }, () => roll(term.sides));
     const kept = new Set<number>();
     if (term.keep) {
-      // Índices ordenados pelo valor; empate: o primeiro rolado fica.
+      // Índices ordenados pelo valor (o da face, num dado do sistema); empate: o primeiro fica.
       const order = values
-        .map((value, index) => ({ value, index }))
+        .map((face, index) => ({ value: faceValue(term, face), index }))
         .sort((a, b) =>
           term.keep?.mode === 'maiores'
             ? b.value - a.value || a.index - b.index
@@ -144,7 +204,10 @@ export function rollDice(expression: DiceExpression, roll: DieRoller): RollResul
       value,
       dropped: term.keep !== undefined && !kept.has(index),
     }));
-    const sum = results.reduce((total, die) => total + (die.dropped ? 0 : die.value), 0);
+    const sum = results.reduce(
+      (total, die) => total + (die.dropped ? 0 : faceValue(term, die.value)),
+      0,
+    );
     return { ...term, results, subtotal: term.sign * sum };
   });
   return {
@@ -152,6 +215,16 @@ export function rollDice(expression: DiceExpression, roll: DieRoller): RollResul
     terms,
     total: terms.reduce((total, term) => total + term.subtotal, 0),
   };
+}
+
+/** Quanto soma a face sorteada: ela mesma, ou o valor dela num dado do sistema. */
+export function faceValue(term: Pick<DiceTerm, 'custom'>, face: number): number {
+  return term.custom ? (term.custom.faces[face - 1]?.value ?? 0) : face;
+}
+
+/** O que aparece na face: o número, ou o rótulo dela num dado do sistema. */
+export function faceText(term: Pick<DiceTerm, 'custom'>, face: number): string {
+  return term.custom ? (term.custom.faces[face - 1]?.label ?? '?') : String(face);
 }
 
 /** Rolagem de um teste: o dado do sistema (ex.: 1d20) mais o modificador. */
@@ -166,7 +239,7 @@ export function describeRoll(result: RollResult): string {
     const body =
       term.kind === 'constante'
         ? String(term.value)
-        : `[${term.results.map((die) => (die.dropped ? `(${die.value})` : String(die.value))).join(', ')}]`;
+        : `[${term.results.map((die) => (die.dropped ? `(${faceText(term, die.value)})` : faceText(term, die.value))).join(', ')}]`;
     if (index === 0) return term.sign < 0 ? `-${body}` : body;
     return `${term.sign < 0 ? '-' : '+'} ${body}`;
   });

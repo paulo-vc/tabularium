@@ -2,6 +2,7 @@ import {
   checkExpression,
   listItemValue,
   parseDice,
+  type CustomDie,
   type FieldOf,
   type ListItem,
 } from '@tabula/domain';
@@ -19,6 +20,8 @@ export interface Roller {
   rollAll: (title: string, rolls: readonly { name: string; expression: string }[]) => void;
   /** Dado dos testes do sistema ("1d20", "2d12"…). */
   checkDice: string;
+  /** Dados do sistema (`4dF`), aceitos nas expressões. */
+  dice?: readonly CustomDie[] | undefined;
 }
 
 /** Sem provedor, a ficha não mostra botões de rolar (ex.: cards resumidos). */
@@ -27,7 +30,7 @@ export const RollContext = createContext<Roller | null>(null);
 /** Botão de rolar uma expressão de dados. Some se a expressão for inválida. */
 export function RollButton({ label, expression }: { label: string; expression: string }) {
   const roller = useContext(RollContext);
-  if (!roller || !parseDice(expression).ok) return null;
+  if (!roller || !parseDice(expression, roller.dice).ok) return null;
   return (
     <Button
       type="button"
@@ -72,7 +75,7 @@ export function AttackButtons({
   const bonus = bonusField ? Number(listItemValue(bonusField, item)) || 0 : 0;
   const hit = checkExpression(roller.checkDice, bonus);
   const damage = damageField ? String(listItemValue(damageField, item) ?? '') : '';
-  const hasDamage = damage.trim() !== '' && parseDice(damage).ok;
+  const hasDamage = damage.trim() !== '' && parseDice(damage, roller.dice).ok;
   return (
     <div className="flex shrink-0 gap-1">
       <Button

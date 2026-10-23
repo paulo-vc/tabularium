@@ -1,4 +1,4 @@
-import { inviteFor, type SystemTemplate } from '@tabula/domain';
+import { describeRoll, inviteFor, type SystemTemplate } from '@tabula/domain';
 import { TabulaDatabase } from '@tabula/storage';
 import { MemoryNetwork } from '@tabula/sync';
 import { cleanup, render, screen, waitFor, within } from '@testing-library/react';
@@ -41,6 +41,20 @@ const TEMPLATE: SystemTemplate = {
   name: 'Sistema de Dados',
   source: 'local',
   checkDice: '2d12',
+  dice: [
+    {
+      id: 'F',
+      name: 'Dado Fate',
+      faces: [
+        { label: '−', value: -1 },
+        { label: '−', value: -1 },
+        { label: '0', value: 0 },
+        { label: '0', value: 0 },
+        { label: '+', value: 1 },
+        { label: '+', value: 1 },
+      ],
+    },
+  ],
   fields: [
     { id: 'agil', key: 'agil', label: 'Agilidade', type: 'number', default: 2 },
     {
@@ -165,6 +179,19 @@ describe('rolagens pela ficha', () => {
       await network.settle();
       const [received] = await gm.session.rolls(campaign.id);
       expect(received).toMatchObject({ authorName: 'Ana', diceColor: '#b91c1c' });
+    });
+  });
+
+  it('dados do sistema: a jogadora rola 4dF pelo chat e o Mestre recebe conferido', async () => {
+    const { campaign } = await setUpLiveTable();
+    // Sorteio fixo em 4: a face "0" do dado Fate.
+    const said = await player.session.say({ text: '/r 4dF+1 Atletismo' });
+    expect(said.ok).toBe(true);
+    await waitLong(async () => {
+      await network.settle();
+      const [received] = await gm.session.rolls(campaign.id);
+      expect(received?.label).toBe('Atletismo');
+      expect(received && describeRoll(received.result)).toBe('4dF + 1 → [0, 0, 0, 0] + 1 = 1');
     });
   });
 

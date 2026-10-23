@@ -35,7 +35,12 @@ export function RollLog({
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    const result = await session.roll({ label: '', expression, secret: isGameMaster && secret });
+    const result = await session.roll({
+      label: '',
+      expression,
+      secret: isGameMaster && secret,
+      campaignId,
+    });
     if (!result.ok) {
       toast.error('Não foi possível rolar', { description: result.error.message });
       return;

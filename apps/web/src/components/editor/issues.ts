@@ -17,6 +17,8 @@ const PROPERTY_NAMES: Record<string, string> = {
   title: 'título da seção',
   tags: 'etiquetas',
   checkDice: 'dado dos testes',
+  dice: 'dados do sistema',
+  faces: 'faces',
 };
 
 /**

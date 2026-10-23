@@ -67,6 +67,9 @@ export type ChatInput =
   | { kind: 'acao'; text: string }
   | { kind: 'mensagem'; text: string };
 
+const DICE_PART = String.raw`(?:\d*d\d+(?:k[hl]\d+)?|\d+d[a-z][a-z0-9]*|\d+)`;
+const DICE_WORD = new RegExp(String.raw`^[+-]?(?:${DICE_PART}(?:[+-]${DICE_PART})*[+-]?)?$`, 'i');
+
 export function parseChatInput(raw: string): ChatInput | null {
   const text = raw.trim();
   if (text.length === 0) return null;
@@ -74,9 +77,10 @@ export function parseChatInput(raw: string): ChatInput | null {
   const name = command?.[1]?.toLowerCase();
   const rest = command?.[2]?.trim() ?? '';
   if (name === 'r' || name === 'rolar') {
-    // A expressão são as primeiras palavras feitas só de dados ("1d20 + 3"); o resto é o rótulo.
+    // A expressão são as primeiras palavras feitas só de dados ("1d20 + 3", "4dF"); o resto é
+    // o rótulo. Dado do sistema precisa da quantidade na frente, para "dano" não virar dado.
     const words = rest.split(/\s+/).filter(Boolean);
-    const dice = words.findIndex((word) => !/^[0-9dkhl+-]+$/i.test(word));
+    const dice = words.findIndex((word) => !DICE_WORD.test(word));
     const cut = dice === -1 ? words.length : dice;
     if (cut === 0) return null;
     return {

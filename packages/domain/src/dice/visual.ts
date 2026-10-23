@@ -11,6 +11,9 @@ export interface VisualDie {
   tens?: true;
   /** Descartado (ex.: o menor em 4d6kh3): aparece apagado. */
   dropped: boolean;
+  /** Dado do sistema: o que vai em cada face (da 1 à n) e a cor fixa, se houver. */
+  labels?: string[];
+  color?: string;
 }
 
 /** Mais dados que isso não cabem na bandeja (o resto vira "+N"). */
@@ -43,7 +46,15 @@ export function diceToShow(result: RollEntry['result']): { dice: VisualDie[]; hi
     if (term.kind !== 'dados') continue;
     for (const die of term.results) {
       const shape = SHAPES[term.sides];
-      if (shape) {
+      if (shape && term.custom) {
+        all.push({
+          shape,
+          face: die.value,
+          dropped: die.dropped,
+          labels: term.custom.faces.map((face) => face.label),
+          ...(term.custom.color && { color: term.custom.color }),
+        });
+      } else if (shape) {
         all.push({ shape, face: die.value, dropped: die.dropped });
       } else if (term.sides === 100) {
         const tens = Math.floor(die.value / 10) % 10;

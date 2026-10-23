@@ -49,8 +49,9 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
   const { catalog } = useServices();
   const live = useLiveSession();
   // Dado dos testes do sistema: o Mestre rola a iniciativa das criaturas com ele ("+3").
-  const checkDice = useLiveQuery(
-    async () => (await catalog.get(campaign.templateRef.id))?.checkDice,
+  // E os dados do sistema (`4dF`), que também valem ali.
+  const template = useLiveQuery(
+    () => catalog.get(campaign.templateRef.id),
     [catalog, campaign.templateRef.id],
   );
   const [tab, setTab] = useState<Tab>('jogadores');
@@ -179,7 +180,11 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
         >
           <div className={cn(tab === 'rolagens' && 'max-lg:hidden')}>
             {active ? (
-              <GameMasterInitiative campaignId={campaign.id} checkDice={checkDice} />
+              <GameMasterInitiative
+                campaignId={campaign.id}
+                checkDice={template?.checkDice}
+                dice={template?.dice}
+              />
             ) : (
               <Card>
                 <CardHeader>

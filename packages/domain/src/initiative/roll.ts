@@ -1,3 +1,4 @@
+import type { CustomDie } from '../dice/custom';
 import { checkExpression, parseDice } from '../dice/dice';
 import type { DerivedValues } from '../sheet/compute';
 import type { SheetValues } from '../sheet/schema';
@@ -26,7 +27,7 @@ export function initiativeExpression(
   }
   if (modifier === null || !Number.isFinite(modifier)) return null;
   const expression = checkExpression(compiled.template.checkDice ?? '1d20', Math.trunc(modifier));
-  return parseDice(expression).ok ? expression : null;
+  return parseDice(expression, compiled.template.dice).ok ? expression : null;
 }
 
 /** O que o Mestre digitou como iniciativa de uma criatura. */
@@ -40,11 +41,15 @@ export type InitiativeInput =
  * - uma rolagem ("1d20+3", "2d12") é rolada como está.
  * `null` se não for nenhum desses.
  */
-export function parseInitiativeInput(text: string, checkDice = '1d20'): InitiativeInput | null {
+export function parseInitiativeInput(
+  text: string,
+  checkDice = '1d20',
+  dice: readonly CustomDie[] = [],
+): InitiativeInput | null {
   const input = text.trim().replace(/\s+/g, '');
   if (/^-?\d{1,3}$/.test(input)) return { kind: 'valor', value: Number(input) };
   const modifier = /^[+-]\d{1,3}$/.test(input) ? Number(input) : null;
   const expression = modifier !== null ? checkExpression(checkDice, modifier) : input.toLowerCase();
   if (!/d/.test(expression)) return null;
-  return parseDice(expression).ok ? { kind: 'rolar', expression } : null;
+  return parseDice(expression, dice).ok ? { kind: 'rolar', expression } : null;
 }

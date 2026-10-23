@@ -35,7 +35,7 @@ function labelTexture(text: string, ink: string): Texture | null {
   const context = canvas.getContext('2d');
   if (!context) return null;
   context.fillStyle = ink;
-  context.font = `bold ${text.length > 1 ? 64 : 84}px Geist Variable, system-ui, sans-serif`;
+  context.font = `bold ${text.length > 2 ? 48 : text.length > 1 ? 64 : 84}px Geist Variable, system-ui, sans-serif`;
   context.textAlign = 'center';
   context.textBaseline = 'middle';
   context.fillText(text, 64, 64);
@@ -141,12 +141,31 @@ export function createDiceStage(canvas: HTMLCanvasElement): DiceStage | null {
         opacity: 0.35,
       });
       owned.push(body, faded);
+      const extra = new Map<string, { body: MeshStandardMaterial; faded: MeshStandardMaterial }>();
+      const materialsFor = (tint: string) => {
+        let pair = extra.get(tint);
+        if (!pair) {
+          pair = {
+            body: new MeshStandardMaterial({ color: tint, roughness: 0.35, flatShading: true }),
+            faded: new MeshStandardMaterial({ color: tint, transparent: true, opacity: 0.35 }),
+          };
+          extra.set(tint, pair);
+          owned.push(pair.body, pair.faded);
+        }
+        return pair;
+      };
 
       const pieces = dice.map((die, index) => {
         const model = dieModel(die.shape);
-        const mesh = new Mesh(model.geometry, die.dropped ? faded : body);
+        // Dado do sistema com cor fixa (ex.: Esperança e Medo) usa a dele.
+        const own = die.color ? materialsFor(die.color) : null;
+        const mesh = new Mesh(
+          model.geometry,
+          die.dropped ? (own?.faded ?? faded) : (own?.body ?? body),
+        );
         for (const face of model.faces) {
-          const texture = labelTexture(faceLabel(die.shape, face.value, die.tens), ink);
+          const text = die.labels?.[face.value - 1] ?? faceLabel(die.shape, face.value, die.tens);
+          const texture = labelTexture(text, die.color ? inkFor(die.color) : ink);
           if (!texture) continue;
           const material: Material = new MeshBasicMaterial({
             map: texture,

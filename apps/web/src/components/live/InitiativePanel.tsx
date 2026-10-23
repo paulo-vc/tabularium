@@ -9,6 +9,7 @@ import {
   turnOrder,
   updateCombatant,
   type Combatant,
+  type CustomDie,
   type PublicTracker,
   type Tracker,
 } from '@tabula/domain';
@@ -96,14 +97,19 @@ function RoundTitle({ tracker }: { tracker: { phase: string; round: number } | n
   );
 }
 
+const NO_DICE: readonly CustomDie[] = [];
+
 /** Ordem de turno, do lado do Mestre: monta o combate, define iniciativas e passa a vez. */
 export function GameMasterInitiative({
   campaignId,
   checkDice = '1d20',
+  dice = NO_DICE,
 }: {
   campaignId: string;
   /** Dado dos testes do sistema: um modificador ("+3") rola com ele. */
   checkDice?: string | undefined;
+  /** Dados do sistema (`4dF`), aceitos nas iniciativas digitadas. */
+  dice?: readonly CustomDie[] | undefined;
 }) {
   const { session } = useServices();
   const live = useLiveSession();
@@ -132,7 +138,7 @@ export function GameMasterInitiative({
         })),
       ),
     );
-  const parsedInitiative = parseInitiativeInput(initiative, checkDice);
+  const parsedInitiative = parseInitiativeInput(initiative, checkDice, dice);
   const count = Number(quantity);
   const validCount = Number.isInteger(count) && count >= 1 && count <= MAX_AT_ONCE;
 

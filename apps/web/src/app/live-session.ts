@@ -32,6 +32,7 @@ import {
   type Campaign,
   type CharacterSheet,
   type CompiledTemplate,
+  type CustomDie,
   type FieldValue,
   type SecretValuesRepository,
   type CampaignRepository,
@@ -740,10 +741,16 @@ export class LiveSessionManager {
     secret?: boolean;
     /** `iniciativa`: o Mestre usa o total na ordem de turno (ver `RollEntry.purpose`). */
     purpose?: 'iniciativa';
+    /** Dados do sistema (`4dF`). Na sessão, valem os do sistema da campanha. */
+    dice?: readonly CustomDie[] | undefined;
+    /** Fora da sessão, a campanha de onde se rola: valem os dados do sistema dela. */
+    campaignId?: string | undefined;
   }): Promise<Result<RollEntry, Issue>> {
-    const parsed = parseDice(input.expression);
-    if (!parsed.ok) return failure(parsed.error.code, parsed.error.message);
     const active = this.active;
+    const campaignId = active?.campaignId ?? input.campaignId;
+    const dice = campaignId ? await this.campaignDice(campaignId) : (input.dice ?? []);
+    const parsed = parseDice(input.expression, dice);
+    if (!parsed.ok) return failure(parsed.error.code, parsed.error.message);
     const author = active?.author ?? {
       id: await this.device.getDeviceId(),
       name: (await this.device.getDisplayName()) ?? 'Você',
@@ -865,6 +872,12 @@ export class LiveSessionManager {
   /** Valores secretos de uma ficha de jogador (só no aparelho do Mestre). */
   async secretValues(campaignId: string, sheetId: string): Promise<Record<string, FieldValue>> {
     return (await this.secrets.get(campaignId, sheetId))?.values ?? {};
+  }
+
+  /** Dados do sistema da campanha (`4dF`), para as rolagens da sessão. */
+  private async campaignDice(campaignId: string): Promise<readonly CustomDie[]> {
+    const campaign = await this.campaigns.get(campaignId);
+    return (campaign && (await this.catalog.get(campaign.templateRef.id))?.dice) ?? [];
   }
 
   private async compiledFor(campaign: Campaign): Promise<CompiledTemplate | undefined> {
