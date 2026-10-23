@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { IdSchema, LabelSchema } from '../schema/primitives';
-import { DICE_LIMITS, printDice, type DiceExpression } from './dice';
+import { CustomDieSchema } from './custom';
+import { DICE_LIMITS, faceValue, printDice, type DiceExpression } from './dice';
 
 /** Quantas entradas cada campanha guarda no registro (as mais antigas saem). */
 export const LOG_LIMIT = 200;
@@ -24,6 +25,8 @@ const TermResultSchema = z.discriminatedUnion('kind', [
       .array(z.object({ value: Int(1, DICE_LIMITS.sides), dropped: z.boolean() }))
       .max(DICE_LIMITS.dice),
     subtotal: z.number().int(),
+    /** Dado do sistema: as faces vão junto, para conferir sem ter o sistema. */
+    custom: CustomDieSchema.optional(),
   }),
   z.object({
     kind: z.literal('constante'),
@@ -78,11 +81,15 @@ function isConsistent(result: RawRoll): boolean {
       if (term.subtotal !== term.sign * term.value) return false;
     } else {
       if (term.results.length !== term.count) return false;
+      if (term.custom && term.custom.faces.length !== term.sides) return false;
       if (term.results.some((die) => die.value > term.sides)) return false;
       const dropped = term.results.filter((die) => die.dropped).length;
       const keep = term.keep?.count ?? term.count;
       if (keep > term.count || dropped !== term.count - keep) return false;
-      const sum = term.results.reduce((s, die) => s + (die.dropped ? 0 : die.value), 0);
+      const sum = term.results.reduce(
+        (s, die) => s + (die.dropped ? 0 : faceValue(term, die.value)),
+        0,
+      );
       if (term.subtotal !== term.sign * sum) return false;
     }
     total += term.subtotal;
@@ -96,6 +103,7 @@ function isConsistent(result: RawRoll): boolean {
           count: term.count,
           sides: term.sides,
           ...(term.keep && { keep: term.keep }),
+          ...(term.custom && { custom: term.custom }),
         },
   );
   return total === result.total && printDice(expression) === result.expression;

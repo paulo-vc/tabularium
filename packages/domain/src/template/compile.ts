@@ -281,8 +281,17 @@ export function compileTemplate(template: SystemTemplate): Result<CompiledTempla
     issues.push(issue('dependencia-circular', ['fields'], `Dependência circular: ${cycle}`));
   }
 
+  const ids = new Set<string>();
+  template.dice?.forEach((die, index) => {
+    const id = die.id.toLowerCase();
+    if (ids.has(id)) {
+      issues.push(issue('dado-repetido', ['dice', index, 'id'], `Dado "d${die.id}" repetido`));
+    }
+    ids.add(id);
+  });
+
   if (template.checkDice !== undefined) {
-    const dice = parseDice(template.checkDice);
+    const dice = parseDice(template.checkDice, template.dice);
     if (!dice.ok) issues.push(issue('dado-de-teste-invalido', ['checkDice'], dice.error.message));
   }
 

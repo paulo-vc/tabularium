@@ -1,5 +1,6 @@
 import { z } from 'zod';
 import { MAX_FORMULA_LENGTH } from '../formula';
+import { CustomDieSchema } from '../dice/custom';
 import {
   DescriptionSchema,
   FiniteNumberSchema,
@@ -227,6 +228,8 @@ export const SystemTemplateSchema = z.object({
    * em sistemas de dados de dualidade, "3d6" em outros…
    */
   checkDice: z.string().max(LIMITS.label).optional(),
+  /** Dados com faces próprias (ex.: o dado Fate, `4dF`). Valem nas rolagens deste sistema. */
+  dice: z.array(CustomDieSchema).max(12).optional(),
   /**
    * Campo numérico que é o modificador de iniciativa (ex.: "Iniciativa" no D&D, "Percepção"
    * no Lendas d20). Com ele, o jogador rola a iniciativa pela ficha (`checkDice` + o valor) e

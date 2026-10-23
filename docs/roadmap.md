@@ -12,7 +12,7 @@ O criador está completo, mas ainda é difícil para quem não está acostumado 
 
 ### Dados 3D: o que falta
 
-Os dados 3D já existem (v0.4.1). Faltam dados com faces definidas pelo sistema (ex.: dados de dualidade) e textura.
+Os dados 3D e os dados com faces do sistema já existem. Faltam: criar os dados do sistema pelo editor (hoje, só no arquivo do sistema), textura e mostrar o resultado dos dados de dualidade ("com Esperança" ou "com Medo").
 
 ### Ícone do sistema
 
@@ -28,6 +28,7 @@ O retrato do personagem e a capa da campanha já existem (v0.3.2). Falta o ícon
 - **Notas e diário da campanha** (v0.3.0): notas só do Mestre e entradas compartilhadas com a mesa.
 - **Cutscene** (v0.3.0): imagens do Mestre em tela cheia para a mesa.
 - **Retrato do personagem** (v0.3.2): imagem na ficha, que vai junto ao Mestre e na exportação.
+- **Dados do sistema** (próxima versão): faces próprias (`4dF`, Esperança e Medo), na ficha, no chat e em 3D.
 - **Dados 3D** (v0.4.1): rolagens em 3D que param na face sorteada; a mesa vê os dados de todos.
 - **Música do Mestre** (v0.4.0): trilhas MP3/OGG tocadas para a mesa, com volume por aparelho.
 - **Imprimir a ficha** (v0.4.0): folha para papel ou PDF, pelo menu da ficha.

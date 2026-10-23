@@ -2,6 +2,10 @@
 
 As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos ficam nos PRs e em [`docs/`](docs/).
 
+## Próxima versão
+
+- **Dados do sistema:** um sistema pode ter dados com faces próprias, como o dado Fate (−, −, 0, 0, +, +) ou os dados de dualidade, com Esperança e Medo em cores diferentes. Rola-se com `d` e o nome do dado, com a quantidade na frente: `4dF`, `1dEsperanca+1dMedo`. Funciona na ficha, no chat (`/r 4dF+2`), no painel do Mestre e na iniciativa. Os dados 3D mostram as faces do sistema, e a mesa confere o resultado como nas outras rolagens. Por enquanto, os dados são definidos no arquivo do sistema (`dice`); no editor, fica para depois.
+
 ## v0.4.1
 
 Dados 3D: as rolagens caem na tela e param na face sorteada, e a mesa vê os dados de cada um na cor dele.

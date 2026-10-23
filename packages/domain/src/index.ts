@@ -83,6 +83,7 @@ export {
 
 export * from './template/editing';
 
+export * from './dice/custom';
 export * from './dice/dice';
 export * from './dice/log';
 export * from './dice/visual';
