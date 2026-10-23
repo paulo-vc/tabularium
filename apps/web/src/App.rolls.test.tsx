@@ -132,10 +132,29 @@ describe('rolagens pela ficha', () => {
       expect(within(list).getByText(/Furtividade/)).toBeInTheDocument();
       expect(within(list).getByText('7')).toBeInTheDocument();
     });
-    // Aviso de rolagem de outra pessoa.
-    expect(
-      await screen.findByText('Ana · Furtividade: 7', undefined, { timeout: 8000 }),
-    ).toBeInTheDocument();
+    // A rolagem de outra pessoa cai na bandeja de dados, com o resultado.
+    await waitFor(
+      () => {
+        const tray = screen
+          .getAllByRole('status')
+          .find((status) => status.textContent?.startsWith('Ana · Furtividade'));
+        expect(tray).toHaveTextContent('Ana · Furtividade: 7');
+      },
+      { timeout: 8000 },
+    );
+  });
+
+  it('com os dados 3D desligados, a rolagem da mesa vem num aviso', async () => {
+    const { campaign } = await setUpLiveTable();
+    await gm.sounds.update({ dice3d: false });
+    renderApp(gm, `#/campanhas/${campaign.id}`);
+    expect(await screen.findByText('Nenhuma rolagem ainda.')).toBeInTheDocument();
+
+    await player.session.roll({ label: 'Furtividade', expression: '1d20+3' });
+    await waitLong(async () => {
+      await network.settle();
+      expect(screen.getByText('Ana · Furtividade: 7')).toBeInTheDocument();
+    });
   });
 
   it('rolagem secreta do Mestre aparece marcada só para ele', async () => {

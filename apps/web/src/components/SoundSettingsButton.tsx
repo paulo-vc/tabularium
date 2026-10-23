@@ -6,13 +6,25 @@ import {
   notificationState,
   type NotificationState,
 } from '@/lib/attention';
+import { DEFAULT_DICE_COLOR } from '@tabula/domain';
+import { cn } from '@/lib/utils';
 import { useServices } from '@/app/services-context';
 import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
-/** Botão no cabeçalho com as preferências de som deste aparelho. */
+/** Cores dos dados 3D (as mesmas para a mesa toda, neste aparelho). */
+const DICE_COLORS = [
+  { name: 'Marfim', value: DEFAULT_DICE_COLOR },
+  { name: 'Rubi', value: '#b91c1c' },
+  { name: 'Safira', value: '#1d4ed8' },
+  { name: 'Esmeralda', value: '#047857' },
+  { name: 'Ametista', value: '#7e22ce' },
+  { name: 'Ônix', value: '#1c1917' },
+];
+
+/** Botão no cabeçalho com as preferências de som (e dos dados) deste aparelho. */
 export function SoundSettingsButton() {
   const { sounds } = useServices();
   const base = useId();
@@ -35,7 +47,7 @@ export function SoundSettingsButton() {
       </PopoverTrigger>
       <PopoverContent align="end" className="w-64 space-y-4">
         <div>
-          <h2 className="text-sm font-semibold">Sons e avisos</h2>
+          <h2 className="text-sm font-semibold">Sons, avisos e dados</h2>
           <p className="text-muted-foreground text-xs">
             Avisos curtos na sessão: sua vez no combate, rolagens da mesa, mensagens e sussurros do
             chat.
@@ -78,6 +90,41 @@ export function SoundSettingsButton() {
                   <PlayIcon /> Testar
                 </Button>
               </div>
+            </div>
+            <div className="space-y-2 border-t pt-3">
+              <div className="flex items-center gap-2">
+                <Checkbox
+                  id={`${base}-dados`}
+                  checked={settings.dice3d !== false}
+                  onCheckedChange={(checked) => void sounds.update({ dice3d: checked === true })}
+                />
+                <Label htmlFor={`${base}-dados`} className="font-normal">
+                  Dados 3D nas rolagens
+                </Label>
+              </div>
+              {settings.dice3d !== false && (
+                <div role="radiogroup" aria-label="Cor dos dados" className="flex gap-1.5 pl-6">
+                  {DICE_COLORS.map(({ name, value }) => {
+                    const chosen = (settings.diceColor ?? DEFAULT_DICE_COLOR) === value;
+                    return (
+                      <button
+                        key={value}
+                        type="button"
+                        role="radio"
+                        aria-checked={chosen}
+                        aria-label={name}
+                        title={name}
+                        className={cn(
+                          'size-6 rounded-full border shadow-sm transition-transform hover:scale-110',
+                          chosen && 'ring-primary ring-offset-background ring-2 ring-offset-2',
+                        )}
+                        style={{ backgroundColor: value }}
+                        onClick={() => void sounds.update({ diceColor: value })}
+                      />
+                    );
+                  })}
+                </div>
+              )}
             </div>
           </>
         )}

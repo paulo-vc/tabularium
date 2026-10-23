@@ -10,11 +10,9 @@ Ideias levantadas em 2026-10, ainda sem desenho. A ordem não é de prioridade.
 
 O criador está completo, mas ainda é difícil para quem não está acostumado com campos, fórmulas e seções. Caminhos possíveis: começar de um modelo pronto (atributos, perícias, recursos), assistentes por etapa e exemplos ao lado das fórmulas.
 
-### Dados 3D e torre de dados
+### Dados 3D: o que falta
 
-- Rolador de dados 3D, com dados personalizáveis: faces conforme o sistema (ex.: dados de dualidade), cor e textura.
-- Uma "torre de dados" na sessão: uma caixa em que toda a mesa vê a rolagem acontecer.
-- Hoje a rolagem já é sorteada por quem rola e conferida por todos (`docs/architecture.md`, "Rolagens"). A animação 3D seria só a apresentação desse resultado, para ninguém ver um resultado diferente do registrado.
+Os dados 3D já existem (próxima versão). Faltam dados com faces definidas pelo sistema (ex.: dados de dualidade), textura e a cor escolhida por cada jogador valendo para os dados dele na tela de todos.
 
 ### Ícone do sistema
 
@@ -30,6 +28,7 @@ O retrato do personagem e a capa da campanha já existem (v0.3.2). Falta o ícon
 - **Notas e diário da campanha** (v0.3.0): notas só do Mestre e entradas compartilhadas com a mesa.
 - **Cutscene** (v0.3.0): imagens do Mestre em tela cheia para a mesa.
 - **Retrato do personagem** (v0.3.2): imagem na ficha, que vai junto ao Mestre e na exportação.
+- **Dados 3D** (próxima versão): rolagens em 3D que param na face sorteada; a mesa vê os dados de todos.
 - **Música do Mestre** (v0.4.0): trilhas MP3/OGG tocadas para a mesa, com volume por aparelho.
 - **Imprimir a ficha** (v0.4.0): folha para papel ou PDF, pelo menu da ficha.
 - **Convite curto** (v0.4.0): código de 20 caracteres para digitar, com a sessão do Mestre aberta.
