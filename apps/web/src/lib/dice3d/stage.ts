@@ -120,7 +120,7 @@ export function createDiceStage(canvas: HTMLCanvasElement): DiceStage | null {
       const rows = Math.ceil(dice.length / columns);
       const spacing = 2.5;
       // Enquadra tudo (na largura e na altura), com margem para o quique.
-      const half = Math.max((rows * spacing) / 2, (columns * spacing) / 2 / aspect, 2.2) + 1;
+      const half = Math.max((rows * spacing) / 2, (columns * spacing) / 2 / aspect, 1.5) + 0.7;
       camera.left = -half * aspect;
       camera.right = half * aspect;
       camera.top = half;

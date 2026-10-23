@@ -4,6 +4,7 @@ import { DicesIcon, EyeOffIcon } from 'lucide-react';
 import { useId, useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
 import { useServices } from '@/app/services-context';
+import { useDiceTray } from './DiceTray';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,6 +30,7 @@ export function RollLog({
 }) {
   const { session } = useServices();
   const base = useId();
+  const { enabled: tray } = useDiceTray();
   const rolls = useLiveQuery(() => session.rolls(campaignId), [session, campaignId]);
   const [expression, setExpression] = useState('1d20');
   const [secret, setSecret] = useState(false);
@@ -45,6 +47,8 @@ export function RollLog({
       toast.error('Não foi possível rolar', { description: result.error.message });
       return;
     }
+    // Com os dados 3D, o resultado aparece na bandeja, à direita: sem aviso repetido.
+    if (tray) return;
     toast(`${expression}: ${result.value.result.total}`, {
       description: describeRoll(result.value.result),
     });

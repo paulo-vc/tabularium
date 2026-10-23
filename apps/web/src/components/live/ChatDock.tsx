@@ -21,6 +21,24 @@ type Item = { kind: 'chat'; message: ChatMessage } | { kind: 'rolagem'; roll: Ro
 
 const atOf = (item: Item) => (item.kind === 'chat' ? item.message.at : item.roll.at);
 
+/** O painel mostra a conversa (com as rolagens no meio) ou só o histórico de rolagens. */
+type View = 'conversa' | 'rolagens';
+
+const OPEN_ROLLS = 'tabula:abrir-rolagens';
+const CHAT_OPEN = 'tabula:chat-aberto';
+
+/** Avisa quando o painel do chat abre ou fecha (a bandeja de dados sai da frente dele). */
+export function onChatOpen(listener: (open: boolean) => void): () => void {
+  const handle = (event: Event) => listener((event as CustomEvent<boolean>).detail);
+  window.addEventListener(CHAT_OPEN, handle);
+  return () => window.removeEventListener(CHAT_OPEN, handle);
+}
+
+/** Abre o chat no histórico de rolagens (ex.: ao tocar num resultado da bandeja de dados). */
+export function openRollHistory(): void {
+  window.dispatchEvent(new Event(OPEN_ROLLS));
+}
+
 /** Pessoa a quem dá para sussurrar. */
 interface Recipient {
   id: string;
@@ -41,6 +59,24 @@ function Dock({ live }: { live: Exclude<LiveSession, { kind: 'nenhuma' }> }) {
   const { session } = useServices();
   const [open, setOpen] = useState(false);
   const [unread, setUnread] = useState(0);
+  const [view, setView] = useState<View>('conversa');
+
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent(CHAT_OPEN, { detail: open }));
+  }, [open]);
+  useEffect(
+    () => () => void window.dispatchEvent(new CustomEvent(CHAT_OPEN, { detail: false })),
+    [],
+  );
+
+  useEffect(() => {
+    const show = () => {
+      setView('rolagens');
+      setOpen(true);
+    };
+    window.addEventListener(OPEN_ROLLS, show);
+    return () => window.removeEventListener(OPEN_ROLLS, show);
+  }, []);
 
   // Com o chat fechado, conta as novidades (e avisa dos sussurros).
   useEffect(() => {
@@ -72,14 +108,18 @@ function Dock({ live }: { live: Exclude<LiveSession, { kind: 'nenhuma' }> }) {
       </Button>
     );
   }
-  return <ChatPanel live={live} onClose={() => setOpen(false)} />;
+  return <ChatPanel live={live} view={view} onView={setView} onClose={() => setOpen(false)} />;
 }
 
 function ChatPanel({
   live,
+  view,
+  onView,
   onClose,
 }: {
   live: Exclude<LiveSession, { kind: 'nenhuma' }>;
+  view: View;
+  onView: (view: View) => void;
   onClose: () => void;
 }) {
   const { session, campaignRepository, sheetRepository } = useServices();
@@ -122,14 +162,17 @@ function ChatPanel({
       ...(messages ?? []).map((message): Item => ({ kind: 'chat', message })),
       ...(rolls ?? []).map((roll): Item => ({ kind: 'rolagem', roll })),
     ];
-    return all.sort((a, b) => atOf(a) - atOf(b)).slice(-SHOWN);
-  }, [messages, rolls]);
+    return all
+      .filter((item) => view === 'conversa' || item.kind === 'rolagem')
+      .sort((a, b) => atOf(a) - atOf(b))
+      .slice(-SHOWN);
+  }, [messages, rolls, view]);
 
   // Sempre mostra o mais recente.
   const feed = useRef<HTMLOListElement>(null);
   useEffect(() => {
     feed.current?.lastElementChild?.scrollIntoView?.({ block: 'end' });
-  }, [items.length]);
+  }, [items.length, view]);
 
   useEffect(() => {
     const onKey = (event: KeyboardEvent) => {
@@ -166,8 +209,31 @@ function ChatPanel({
       className="bg-background fixed right-4 bottom-4 z-40 flex h-[min(34rem,calc(100dvh-6rem))] w-[min(26rem,calc(100vw-2rem))] flex-col rounded-xl border shadow-xl"
     >
       <header className="flex items-center gap-2 border-b px-3 py-2">
-        <MessageCircleIcon className="size-4" />
-        <h2 className="text-sm font-semibold">Chat da sessão</h2>
+        <h2 className="sr-only">Chat da sessão</h2>
+        <div role="tablist" aria-label="O que mostrar" className="bg-muted flex rounded-lg p-0.5">
+          {(
+            [
+              ['conversa', 'Conversa', MessageCircleIcon],
+              ['rolagens', 'Rolagens', DicesIcon],
+            ] as const
+          ).map(([id, name, Icon]) => (
+            <button
+              key={id}
+              type="button"
+              role="tab"
+              aria-selected={view === id}
+              className={cn(
+                'flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
+                view === id
+                  ? 'bg-background text-foreground shadow-sm'
+                  : 'text-muted-foreground hover:text-foreground',
+              )}
+              onClick={() => onView(id)}
+            >
+              <Icon className="size-3.5" /> {name}
+            </button>
+          ))}
+        </div>
         <Button
           variant="ghost"
           size="icon"
@@ -181,13 +247,22 @@ function ChatPanel({
 
       {items.length === 0 ? (
         <p className="text-muted-foreground flex-1 p-4 text-sm">
-          Nada por aqui ainda. Escreva para a mesa, use <code>/me</code> para descrever uma ação ou{' '}
-          <code>/r 1d20+3</code> para rolar.
+          {view === 'rolagens' ? (
+            <>
+              Nenhuma rolagem nesta campanha ainda. As da mesa aparecem aqui; role pela ficha ou com{' '}
+              <code>/r 1d20+3</code>.
+            </>
+          ) : (
+            <>
+              Nada por aqui ainda. Escreva para a mesa, use <code>/me</code> para descrever uma ação
+              ou <code>/r 1d20+3</code> para rolar.
+            </>
+          )}
         </p>
       ) : (
         <ol
           ref={feed}
-          aria-label="Mensagens do chat"
+          aria-label={view === 'rolagens' ? 'Histórico de rolagens' : 'Mensagens do chat'}
           className="flex-1 space-y-2 overflow-y-auto p-3"
         >
           {items.map((item) =>
@@ -346,6 +421,9 @@ function RollLine({ roll }: { roll: RollEntry }) {
           {describeRoll(roll.result)}
         </p>
       </div>
+      <time className="text-muted-foreground text-xs" dateTime={new Date(roll.at).toISOString()}>
+        {time.format(roll.at)}
+      </time>
       <span className="text-lg font-bold tabular-nums">{roll.result.total}</span>
     </li>
   );

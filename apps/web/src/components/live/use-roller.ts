@@ -2,6 +2,7 @@ import { describeRoll, type CompiledTemplate } from '@tabula/domain';
 import { useMemo } from 'react';
 import { toast } from 'sonner';
 import { useServices } from '@/app/services-context';
+import { useDiceTray } from './DiceTray';
 import type { Roller } from '@/components/sheet/roll-context';
 
 /**
@@ -10,6 +11,8 @@ import type { Roller } from '@/components/sheet/roll-context';
  */
 export function useRoller(compiled: CompiledTemplate): Roller {
   const { session } = useServices();
+  // Com os dados 3D, o resultado aparece na bandeja, à direita: sem aviso repetido.
+  const { enabled: tray } = useDiceTray();
   const checkDice = compiled.template.checkDice ?? '1d20';
   const dice = compiled.template.dice;
   return useMemo(
@@ -19,6 +22,7 @@ export function useRoller(compiled: CompiledTemplate): Roller {
       roll: (label, expression) => {
         void session.roll({ label, expression, dice }).then((result) => {
           if (result.ok) {
+            if (tray) return;
             toast(`${label}: ${result.value.result.total}`, {
               description: describeRoll(result.value.result),
             });
@@ -42,6 +46,7 @@ export function useRoller(compiled: CompiledTemplate): Roller {
             }
             results.push({ name: roll.name, entry: result.value });
           }
+          if (tray) return;
           // "Espada longa: ataque 17 · dano 9", com a conta de cada um embaixo.
           toast(
             `${title}: ${results.map((r) => `${r.name} ${r.entry.result.total}`).join(' · ')}`,
@@ -52,6 +57,6 @@ export function useRoller(compiled: CompiledTemplate): Roller {
         })();
       },
     }),
-    [session, checkDice, dice],
+    [session, checkDice, dice, tray],
   );
 }

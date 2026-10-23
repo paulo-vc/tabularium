@@ -1,6 +1,6 @@
 import type { SystemTemplate } from '@tabula/domain';
 import { TabulaDatabase } from '@tabula/storage';
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { afterEach, beforeEach, describe, expect, it } from 'vitest';
 import { App } from './App';
@@ -58,15 +58,31 @@ async function openSheet() {
   return user;
 }
 
+/** Os resultados na coluna da bandeja de dados, à direita. */
+const lastRolls = () => screen.getByRole('list', { name: 'Últimas rolagens' });
+
 describe('ataques pela ficha', () => {
   it('"Ataque" rola o dado do sistema com o bônus', async () => {
     const user = await openSheet();
     await user.click(await screen.findByRole('button', { name: 'Atacar com Espada longa' }));
     // 1d20 (4) + 5.
-    expect(await screen.findByText('Espada longa: ataque 9')).toBeInTheDocument();
+    await waitFor(() => expect(lastRolls()).toHaveTextContent('Espada longa: ataque: 9'));
   });
 
-  it('"Ataque + dano" rola os dois num aviso só', async () => {
+  it('"Ataque + dano" rola os dois, e cada um aparece na bandeja', async () => {
+    const user = await openSheet();
+    await user.click(
+      await screen.findByRole('button', { name: 'Atacar com Espada longa e rolar o dano' }),
+    );
+    // Ataque 4 + 5; dano 1d8 (4) + 3.
+    await waitFor(() => {
+      expect(lastRolls()).toHaveTextContent('Espada longa: ataque: 9');
+      expect(lastRolls()).toHaveTextContent('Espada longa: dano: 7');
+    });
+  });
+
+  it('com os dados 3D desligados, "Ataque + dano" vem num aviso só', async () => {
+    await services.sounds.update({ dice3d: false });
     const user = await openSheet();
     await user.click(
       await screen.findByRole('button', { name: 'Atacar com Espada longa e rolar o dano' }),

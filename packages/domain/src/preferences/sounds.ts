@@ -15,6 +15,8 @@ export const SoundSettingsSchema = z.object({
   downloadMusic: z.boolean().optional(),
   /** Mostrar as rolagens com dados 3D (ligado quando nunca escolhido). */
   dice3d: z.boolean().optional(),
+  /** Os dados 3D giram ao cair (ligado quando nunca escolhido); desligado, aparecem parados. */
+  diceMotion: z.boolean().optional(),
   /** Cor dos dados 3D neste aparelho (#rrggbb). */
   diceColor: z
     .string()

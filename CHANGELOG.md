@@ -4,6 +4,8 @@ As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos
 
 ## Próxima versão
 
+- **Dados à direita, girando:** os dados 3D caem no lado direito da tela, logo abaixo do cabeçalho, e os resultados se empilham embaixo deles: os seus e os da mesa, com quem rolou, a conta e o total. Com o chat aberto, os dados ficam ao lado dele; no celular, aparece só o resultado mais recente. Os dados agora giram sempre, mesmo com as animações do sistema desligadas (era por isso que apareciam parados em alguns computadores); quem preferir pode desligar em "Animar os dados", no ícone de som.
+- **Histórico de rolagens:** o chat da sessão ganhou a aba **Rolagens**, com tudo o que a mesa rolou na campanha, com o horário. Tocar num resultado à direita abre o histórico direto.
 - **Dados do sistema:** um sistema pode ter dados com faces próprias, como o dado Fate (−, −, 0, 0, +, +) ou os dados de dualidade, com Esperança e Medo em cores diferentes. Rola-se com `d` e o nome do dado, com a quantidade na frente: `4dF`, `1dEsperanca+1dMedo`. Funciona na ficha, no chat (`/r 4dF+2`), no painel do Mestre e na iniciativa. Os dados 3D mostram as faces do sistema, e a mesa confere o resultado como nas outras rolagens. Por enquanto, os dados são definidos no arquivo do sistema (`dice`); no editor, fica para depois.
 
 ## v0.4.1
