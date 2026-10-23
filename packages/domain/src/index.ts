@@ -85,6 +85,7 @@ export * from './template/editing';
 
 export * from './dice/dice';
 export * from './dice/log';
+export * from './dice/visual';
 export * from './initiative/tracker';
 export * from './initiative/roll';
 export * from './journal/schema';
