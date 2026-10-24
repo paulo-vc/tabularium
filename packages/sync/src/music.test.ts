@@ -85,7 +85,7 @@ describe('música na sessão', () => {
     host.setMusic(null);
     await network.settle();
     expect(seen.slice(-2)).toEqual([{ ...playing(track, 42), playing: false }, null]);
-  });
+  }, 15_000); // Transfere uma trilha de verdade em partes: com a máquina ocupada, passa de 5 s.
 
   it('quem entra depois ouve a música que está tocando', async () => {
     const network = new MemoryNetwork();

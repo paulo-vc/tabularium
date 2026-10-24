@@ -7,6 +7,7 @@ import { CharacterPortrait } from '@/components/sheet/Portrait';
 import { useImport } from '@/components/use-import';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { BackupReminder } from '@/components/BackupSection';
 
 const dateFormat = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 
@@ -28,6 +29,8 @@ export function HomePage() {
           <NewSheetDialog />
         </div>
       </div>
+
+      <BackupReminder />
 
       {sheets?.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-16 text-center">

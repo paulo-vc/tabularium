@@ -755,7 +755,11 @@ export class LiveSessionManager {
       id: await this.device.getDeviceId(),
       name: (await this.device.getDisplayName()) ?? 'Você',
     };
-    const { diceColor } = await this.device.getSoundSettings();
+    // A cor dos dados é enfeite: sem acesso às preferências, a rolagem sai sem ela.
+    const diceColor = await this.device.getSoundSettings().then(
+      (settings) => settings.diceColor,
+      () => undefined,
+    );
     const entry: RollEntry = {
       id: this.newId(),
       at: this.clock.now(),
