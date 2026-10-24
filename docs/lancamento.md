@@ -170,3 +170,13 @@ Mesmo roteiro (tag `v0.4.1`, conferir o rascunho, publicar como versão normal).
 - [ ] No app desktop, rolar mostra os dados 3D (ou parados, com as animações do Windows desligadas).
 - [ ] Na sessão, a cor escolhida por um jogador aparece nos dados dele na tela do Mestre.
 - [ ] Desligar "Dados 3D nas rolagens" volta ao aviso de antes.
+
+## v0.4.2
+
+Mesmo roteiro (tag `v0.4.2`, conferir o rascunho, publicar como versão normal). Sem mudança no banco local. As rolagens com dados do sistema levam o dado inteiro (`custom`); versões anteriores recusam essas rolagens, então a mesa toda deve estar na v0.4.2 para usá-las. O tema escolhido fica no `localStorage`.
+
+- [ ] Na v0.4.1 instalada, a atualização chega.
+- [ ] No app desktop, os dados giram (mesmo com as animações do Windows desligadas) e caem à direita, com os resultados embaixo.
+- [ ] Na sessão, tocar num resultado abre a aba Rolagens do chat, com o histórico.
+- [ ] A engrenagem abre as Configurações; o tema escuro vale e continua depois de fechar e abrir o app.
+- [ ] Um sistema importado com dados próprios (ex.: `4dF`) rola pela ficha e pelo chat, e a mesa vê as faces do sistema.
