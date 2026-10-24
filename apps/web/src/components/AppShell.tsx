@@ -1,3 +1,4 @@
+import { SettingsIcon } from 'lucide-react';
 import type { ReactNode } from 'react';
 import { Link, useRoute } from 'wouter';
 import { cn } from '@/lib/utils';
@@ -9,12 +10,30 @@ import { GmChangeNotice } from './live/GmChangeNotice';
 import { LiveSessionIndicator } from './live/LiveSessionIndicator';
 import { RollNotice } from './live/RollNotice';
 import { SessionNotices } from './live/SessionNotices';
-import { SoundSettingsButton } from './SoundSettingsButton';
 import { UpdateNotice } from './UpdateNotice';
 import { newIssueUrl } from '@/app/updates';
 import { openExternal } from '@/lib/open-external';
 
 /** `also`: outras rotas que pertencem à mesma seção (ex.: uma ficha pertence a "Fichas"). */
+/** Engrenagem no cabeçalho: abre as Configurações (som, dados, música, tema…). */
+function SettingsLink() {
+  const [active] = useRoute('/configuracoes');
+  return (
+    <Link
+      href="/configuracoes"
+      aria-label="Configurações"
+      title="Configurações"
+      aria-current={active ? 'page' : undefined}
+      className={cn(
+        'hover:bg-accent grid size-8 shrink-0 place-items-center rounded-md transition-colors',
+        active && 'bg-accent',
+      )}
+    >
+      <SettingsIcon className="size-4" />
+    </Link>
+  );
+}
+
 function NavLink({ href, also, children }: { href: string; also?: string; children: ReactNode }) {
   const [exact] = useRoute(href);
   const [nested] = useRoute(also ?? href);
@@ -62,7 +81,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           </nav>
           <div className="ml-auto flex shrink-0 items-center gap-1 sm:gap-2">
             <LiveSessionIndicator />
-            <SoundSettingsButton />
+            <SettingsLink />
           </div>
         </div>
       </header>

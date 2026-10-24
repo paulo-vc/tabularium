@@ -229,5 +229,7 @@ export interface TrackRepository {
    * `maxBytes`. A biblioteca do Mestre e as trilhas em `keep` (hash) nunca saem.
    */
   pruneReceived(maxBytes: number, keep: readonly string[]): Promise<void>;
+  /** Quanto ocupam as trilhas recebidas, de todas as campanhas (bytes). */
+  receivedBytes(): Promise<number>;
   deleteCampaign(campaignId: string): Promise<void>;
 }
