@@ -2,7 +2,9 @@
 
 As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos ficam nos PRs e em [`docs/`](docs/).
 
-## Próxima versão
+## v0.4.2
+
+Configurações num lugar só, com tema claro ou escuro; dados à direita, girando, com histórico de rolagens; e dados com faces próprias do sistema.
 
 - **Configurações:** a engrenagem no cabeçalho abre uma página com as preferências deste aparelho, num lugar só: seu nome (o que vem preenchido nas próximas campanhas), o **tema** (do sistema, claro ou escuro, novo), sons e avisos, notificações fora do app, dados 3D (cor e animação), música da mesa (volume e "Baixar músicas") e o armazenamento, com quanto o app ocupa e um botão para apagar as músicas recebidas. O ícone de som do cabeçalho deu lugar à engrenagem.
 - **Dados à direita, girando:** os dados 3D caem no lado direito da tela, logo abaixo do cabeçalho, e os resultados se empilham embaixo deles: os seus e os da mesa, com quem rolou, a conta e o total. Com o chat aberto, os dados ficam ao lado dele; no celular, aparece só o resultado mais recente. Os dados agora giram sempre, mesmo com as animações do sistema desligadas (era por isso que apareciam parados em alguns computadores); quem preferir pode desligar em "Animar os dados", nas Configurações.
