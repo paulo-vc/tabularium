@@ -2,6 +2,40 @@
 
 O que está em andamento e as ideias para depois. As fases já entregues ficam em [`architecture.md`](architecture.md#roadmap); as mudanças de cada versão, no [CHANGELOG](../CHANGELOG.md).
 
+## Plano para a 1.0 (proposta)
+
+Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribuído, então o foco é chegar a uma 1.0 pronta para outras pessoas. Até lá, o `main` segue sempre funcionando (PRs, `pnpm check`, testes de ponta a ponta), o CHANGELOG acumula em "Próxima versão" e, para testar o app instalado, vale o instalador gerado pelo workflow "Desktop" em cada PR.
+
+**A 1.0 está pronta quando** um grupo que nunca viu o app consegue, sem ajuda: instalar (ou abrir no navegador), criar as fichas, entrar na mesa pelo convite, jogar uma sessão inteira e voltar na semana seguinte com tudo no lugar, inclusive trocando de computador.
+
+### Essencial
+
+1. **Não perder nada.** Hoje um navegador limpo ou um computador novo perde as fichas, e a campanha do Mestre não tem como mudar de aparelho (a chave do Mestre fica presa onde foi criada). Falta:
+   - cópia de segurança completa do aparelho num arquivo (fichas, campanhas com a chave do Mestre, sistemas, diário; imagens e trilhas opcionais) e restaurar a partir dela;
+   - levar uma campanha de Mestre para outro aparelho;
+   - lembrete discreto de fazer a cópia (ex.: depois de uma sessão, se a última tem mais de um mês).
+2. **Conectar sempre que der.** Sem retransmissão ([ADR 0008](adr/0008-lancar-sem-relay.md)), parte das conexões falha, sobretudo no 4G. Falta medir de verdade (a ferramenta `tools/conn-test` existe), deixar o diagnóstico claro para o usuário e decidir, numa ADR, se uma retransmissão gratuita cabe na restrição de custo zero.
+3. **Primeira experiência.** Quem abre o app pela primeira vez deveria entender o que fazer: um começo "Sou Mestre / Sou jogador", uma ficha de exemplo e ajuda curta nas telas principais (convite, sessão, combate).
+4. **Revisão de interface.** Uma passada geral, tela por tela: consistência, celular, tema escuro, teclado e leitor de tela, textos.
+5. **Formatos estáveis.** Depois da 1.0, arquivos, banco e protocolo não podem quebrar. Antes dela, aproveitar para limpar o que existe só por compatibilidade com versões antigas (convite em JSON, campanhas sem chave do Mestre, efeitos temporários) e fechar o formato v1 dos arquivos e do protocolo.
+6. **Segurança e privacidade.** Revisão geral do que vem de outros participantes e de arquivos importados, da política de segurança do app desktop e do convite; uma política de privacidade curta (o app não coleta nada; o que passa pela rede e por quem).
+
+### Importante
+
+- **Celular.** Hoje funciona no navegador do celular. Decidir se a 1.0 tem app instalável no celular (PWA melhor acabado ou Tauri para Android/iOS) e o que muda na interface.
+- **Criador de sistemas mais fácil** (ver abaixo), com os dados do sistema e o ícone pelo editor. Os sistemas estão em pausa; entra quando forem retomados.
+- **Guia de uso.** Curto e com imagens: para o Mestre, para o jogador e para quem cria sistemas. E uma página do projeto para quem chega pelo link.
+
+### Depois da 1.0
+
+Soundboard, YouTube ou Spotify na música, textura dos dados, resultado da dualidade e outras ideias abaixo.
+
+### Decisões em aberto
+
+- O celular entra na 1.0 ou fica para depois?
+- O criador de sistemas mais fácil entra na 1.0?
+- Uma retransmissão gratuita é aceitável, ou a 1.0 segue só com conexão direta?
+
 ## Depois (sem data)
 
 Ideias levantadas em 2026-10, ainda sem desenho. A ordem não é de prioridade.
