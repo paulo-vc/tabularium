@@ -4,6 +4,7 @@ As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos
 
 ## Próxima versão
 
+- **Primeira vez no app:** um aparelho vazio abre nas boas-vindas, com o que é o Tabularium e três caminhos: "Vou mestrar" (criar a campanha), "Vou jogar" (entrar com o convite) e "Só quero uma ficha". Também dá para abrir uma **ficha de exemplo** já preenchida (Thorin, anão guerreiro de nível 3, D&D 5e), para ver como uma ficha funciona; o link aparece também na tela de fichas vazia. Na campanha, uma dica curta explica como a mesa funciona, para o Mestre e para o jogador; fechada, não volta.
 - **Cópia de segurança:** em Configurações, "Fazer cópia" guarda tudo o que está no aparelho num arquivo: fichas, campanhas, sistemas criados, diário, preferências e, se quiser, as suas imagens e músicas. "Restaurar uma cópia" mostra o que o arquivo tem e, confirmado, substitui o conteúdo do aparelho por ele. É assim que se troca de computador ou de celular sem perder nada, inclusive sendo o Mestre das mesmas campanhas no aparelho novo. A tela inicial lembra, discretamente, de fazer a cópia quando faz mais de um mês (ou nunca houve); dá para adiar por um mês.
 
 ## v0.4.2

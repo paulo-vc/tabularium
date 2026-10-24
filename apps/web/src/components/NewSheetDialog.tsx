@@ -1,6 +1,6 @@
 import { useLiveQuery } from 'dexie-react-hooks';
 import { PlusIcon } from 'lucide-react';
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactElement } from 'react';
 import { toast } from 'sonner';
 import { useLocation } from 'wouter';
 import { useServices } from '@/app/services-context';
@@ -24,7 +24,8 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 
-export function NewSheetDialog() {
+/** Criar ficha. `trigger`: outro botão para abrir (ex.: nas boas-vindas). */
+export function NewSheetDialog({ trigger }: { trigger?: ReactElement }) {
   const { catalog, sheets } = useServices();
   const templates = useLiveQuery(() => catalog.list(), [catalog]);
   const [, navigate] = useLocation();
@@ -55,9 +56,11 @@ export function NewSheetDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <PlusIcon /> Nova ficha
-        </Button>
+        {trigger ?? (
+          <Button>
+            <PlusIcon /> Nova ficha
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={submit} className="space-y-4">

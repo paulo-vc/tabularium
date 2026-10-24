@@ -2,7 +2,7 @@ import { roleOf } from '@tabula/domain';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { DoorOpenIcon, LoaderCircleIcon, PlusIcon, UsersIcon } from 'lucide-react';
 import { parseShortInviteCode } from '@tabula/sync';
-import { useState, type FormEvent } from 'react';
+import { useState, type FormEvent, type ReactElement } from 'react';
 import { toast } from 'sonner';
 import { Link, useLocation } from 'wouter';
 import { INVITE_ROUTE, decodeInvite, encodeInvite } from '@/app/invite-link';
@@ -98,7 +98,8 @@ export function CampaignsPage() {
   );
 }
 
-function NewCampaignDialog() {
+/** Criar campanha. `trigger`: outro botão para abrir (ex.: nas boas-vindas). */
+export function NewCampaignDialog({ trigger }: { trigger?: ReactElement }) {
   const { catalog, campaigns } = useServices();
   const templates = useLiveQuery(() => catalog.list(), [catalog]);
   const savedName = useDisplayName();
@@ -133,9 +134,11 @@ function NewCampaignDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button>
-          <PlusIcon /> Nova campanha
-        </Button>
+        {trigger ?? (
+          <Button>
+            <PlusIcon /> Nova campanha
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={(event) => void submit(event)} className="space-y-4">
@@ -190,7 +193,8 @@ function NewCampaignDialog() {
   );
 }
 
-function JoinDialog() {
+/** Entrar com convite (link ou código curto). `trigger`: outro botão para abrir. */
+export function JoinDialog({ trigger }: { trigger?: ReactElement }) {
   const [, navigate] = useLocation();
   const [open, setOpen] = useState(false);
   const [text, setText] = useState('');
@@ -237,9 +241,11 @@ function JoinDialog() {
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline">
-          <DoorOpenIcon /> Entrar com convite
-        </Button>
+        {trigger ?? (
+          <Button variant="outline">
+            <DoorOpenIcon /> Entrar com convite
+          </Button>
+        )}
       </DialogTrigger>
       <DialogContent>
         <form onSubmit={submit} className="space-y-4">
