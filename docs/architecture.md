@@ -9,7 +9,7 @@ Aplicação para criar e gerenciar fichas de RPG de mesa, com foco na **mesa onl
 **Restrições inegociáveis**
 
 1. **Custo zero para todos**: nem o mantenedor nem os usuários pagam por infraestrutura, e nenhum usuário precisa configurar roteador ou instalar programas externos.
-2. **Um único programa**: instalador ou executável portátil. A mesma aplicação também roda no navegador, para quem não quer instalar nada.
+2. **Um único programa**: instalador para desktop e app no celular, com o mesmo código. (Até a v0.4.2 a aplicação também era publicada como site; desde 2026-10-24 o foco é desktop e celular, ver `roadmap.md`.)
 3. **Intuitivo para o usuário comum**: conexão, sincronização e formatos de arquivo são detalhes invisíveis.
 4. **Local-first**: os dados vivem no dispositivo do usuário. A rede serve apenas para sincronizar durante a sessão.
 

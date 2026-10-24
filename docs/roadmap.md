@@ -6,6 +6,8 @@ O que está em andamento e as ideias para depois. As fases já entregues ficam e
 
 Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribuído, então o foco é chegar a uma 1.0 pronta para outras pessoas. Até lá, o `main` segue sempre funcionando (PRs, `pnpm check`, testes de ponta a ponta), o CHANGELOG acumula em "Próxima versão" e, para testar o app instalado, vale o instalador gerado pelo workflow "Desktop" em cada PR.
 
+**Plataformas da 1.0** (decidido em 2026-10-24): **desktop e celular**. A versão de navegador deixa de ser distribuída; o app web continua sendo a base do desktop e do celular e é onde rodam os testes, mas não é publicado como site.
+
 **A 1.0 está pronta quando** um grupo que nunca viu o app consegue, sem ajuda: instalar (ou abrir no navegador), criar as fichas, entrar na mesa pelo convite, jogar uma sessão inteira e voltar na semana seguinte com tudo no lugar, inclusive trocando de computador.
 
 ### Essencial
@@ -22,8 +24,9 @@ Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribu
 
 ### Importante
 
-- **Celular.** Hoje funciona no navegador do celular. Decidir se a 1.0 tem app instalável no celular (PWA melhor acabado ou Tauri para Android/iOS) e o que muda na interface.
-- **Criador de sistemas mais fácil** (ver abaixo), com os dados do sistema e o ícone pelo editor. Os sistemas estão em pausa; entra quando forem retomados.
+- **App no celular** (decidido: entra na 1.0). Tauri 2 para Android e iOS, com o mesmo código do desktop; o que muda na interface (toques, telas pequenas, teclado) e a conexão no 4G (ver retransmissão). No iOS, publicar exige um Mac e a conta de desenvolvedor da Apple (US$ 99 por ano); no Android, dá para distribuir o APK de graça ou pela Play Store (US$ 25 uma vez).
+- **Criador de sistemas mais fácil** (decidido: entra na 1.0; ver abaixo), com os dados do sistema e o ícone pelo editor.
+- **Importar sistemas mais fácil.** Já dá para importar o arquivo `.json` de um sistema (Sistemas → Importar sistema), mas só no formato exportado pelo app (com o "envelope"). Falta aceitar também o sistema puro, colar o JSON direto e mostrar os erros de um jeito que quem escreve o arquivo entenda.
 - **Guia de uso.** Curto e com imagens: para o Mestre, para o jogador e para quem cria sistemas. E uma página do projeto para quem chega pelo link.
 
 ### Depois da 1.0
@@ -32,9 +35,8 @@ Soundboard, YouTube ou Spotify na música, textura dos dados, resultado da duali
 
 ### Decisões em aberto
 
-- O celular entra na 1.0 ou fica para depois?
-- O criador de sistemas mais fácil entra na 1.0?
-- Uma retransmissão gratuita é aceitável, ou a 1.0 segue só com conexão direta?
+- **Retransmissão (TURN).** Quando a conexão direta entre dois aparelhos falha (comum no 4G e em redes de empresa ou faculdade), um servidor de retransmissão passa os dados de um para o outro. Os dados continuam cifrados de ponta a ponta (o servidor não lê), mas alguém precisa manter o servidor. Opções: serviços públicos gratuitos com limite de uso, um servidor próprio num plano gratuito de nuvem, ou seguir sem retransmissão e só explicar a falha. Decidir com a medição do item 2.
+- **iOS.** Vale o custo da conta da Apple, ou a 1.0 sai com desktop e Android?
 
 ## Depois (sem data)
 
