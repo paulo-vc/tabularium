@@ -2,6 +2,10 @@
 
 As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos ficam nos PRs e em [`docs/`](docs/).
 
+## Próxima versão
+
+- **Cópia de segurança:** em Configurações, "Fazer cópia" guarda tudo o que está no aparelho num arquivo: fichas, campanhas, sistemas criados, diário, preferências e, se quiser, as suas imagens e músicas. "Restaurar uma cópia" mostra o que o arquivo tem e, confirmado, substitui o conteúdo do aparelho por ele. É assim que se troca de computador ou de celular sem perder nada, inclusive sendo o Mestre das mesmas campanhas no aparelho novo. A tela inicial lembra, discretamente, de fazer a cópia quando faz mais de um mês (ou nunca houve); dá para adiar por um mês.
+
 ## v0.4.2
 
 Configurações num lugar só, com tema claro ou escuro; dados à direita, girando, com histórico de rolagens; e dados com faces próprias do sistema.

@@ -12,7 +12,7 @@ Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribu
 
 ### Essencial
 
-1. **Não perder nada.** Hoje um navegador limpo ou um computador novo perde as fichas, e a campanha do Mestre não tem como mudar de aparelho (a chave do Mestre fica presa onde foi criada). Falta:
+1. **Não perder nada.** Feito: a cópia de segurança completa (Configurações → Cópia de segurança), que também leva as campanhas do Mestre a outro aparelho, e o lembrete na tela inicial. O que era:
    - cópia de segurança completa do aparelho num arquivo (fichas, campanhas com a chave do Mestre, sistemas, diário; imagens e trilhas opcionais) e restaurar a partir dela;
    - levar uma campanha de Mestre para outro aparelho;
    - lembrete discreto de fazer a cópia (ex.: depois de uma sessão, se a última tem mais de um mês).

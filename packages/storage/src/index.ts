@@ -24,3 +24,14 @@ export {
   DexieTemplateRepository,
   InvalidDataError,
 } from './repositories';
+export {
+  BACKUP_FORMAT,
+  MAX_BACKUP_BYTES,
+  createBackup,
+  ownMediaBytes,
+  readBackup,
+  restoreBackup,
+  summarize,
+  type Backup,
+  type BackupSummary,
+} from './backup';

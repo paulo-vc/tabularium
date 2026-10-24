@@ -31,6 +31,7 @@ import { processImage as browserProcessImage, type ImageProcessor } from '@/lib/
 import { randomSecret } from './invite-link';
 import { LiveSessionManager, type TransportFactory } from './live-session';
 import { RegistryService, type RegistrySource, type Sha256 } from './registry';
+import { BackupService } from './backup';
 import { HttpRegistrySource, webSha256 } from './registry-http';
 import { SheetService, type Clock, type IdGenerator } from './sheets';
 
@@ -60,6 +61,8 @@ export interface Services {
   /** Diário da campanha (notas do Mestre e entradas compartilhadas). */
   journal: JournalService;
   music: MusicService;
+  /** Cópia de segurança do aparelho (fazer, conferir e restaurar). */
+  backup: BackupService;
   sounds: SoundService;
   /** Avisa fora do app (título piscando, barra de tarefas, notificação do sistema). */
   attention: Attention;
@@ -126,6 +129,26 @@ export function createServices(
   const chat = new DexieChatRepository(db);
   const tracks = new DexieTrackRepository(db);
   const files = new FileService(sheetRepository, templateRepository, catalog, clock, ids);
+  const session = new LiveSessionManager(
+    campaignRepository,
+    sheetRepository,
+    sessionStates,
+    device,
+    createTransport,
+    clock,
+    catalog,
+    files,
+    secrets,
+    rollLog,
+    dieRoller,
+    ids.newId,
+    gmKeys,
+    newGmKey,
+    journal,
+    images,
+    chat,
+    tracks,
+  );
   return {
     catalog,
     device,
@@ -141,26 +164,8 @@ export function createServices(
       ids,
     ),
     registry: new RegistryService(registrySource, catalog, files, sha256, appVersion),
-    session: new LiveSessionManager(
-      campaignRepository,
-      sheetRepository,
-      sessionStates,
-      device,
-      createTransport,
-      clock,
-      catalog,
-      files,
-      secrets,
-      rollLog,
-      dieRoller,
-      ids.newId,
-      gmKeys,
-      newGmKey,
-      journal,
-      images,
-      chat,
-      tracks,
-    ),
+    session,
+    backup: new BackupService(db, session, clock),
     journal: new JournalService(journal, clock, ids),
     sounds: new SoundService(device, soundPlayer ?? createWebAudioPlayer()),
     attention: attention ?? createBrowserAttention(),
