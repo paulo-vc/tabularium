@@ -128,6 +128,18 @@ export function SoundSettingsButton() {
                   <p className="text-muted-foreground text-xs">
                     Na sessão, a mesa vê seus dados nesta cor.
                   </p>
+                  <div className="flex items-center gap-2 pt-1">
+                    <Checkbox
+                      id={`${base}-girar`}
+                      checked={settings.diceMotion !== false}
+                      onCheckedChange={(checked) =>
+                        void sounds.update({ diceMotion: checked === true })
+                      }
+                    />
+                    <Label htmlFor={`${base}-girar`} className="text-xs font-normal">
+                      Animar os dados (desligado, aparecem já parados)
+                    </Label>
+                  </div>
                 </div>
               )}
             </div>

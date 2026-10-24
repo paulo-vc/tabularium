@@ -18,6 +18,10 @@ Os dados 3D e os dados com faces do sistema já existem. Faltam: criar os dados 
 
 O retrato do personagem e a capa da campanha já existem (v0.3.2). Falta o ícone do sistema, que iria junto do arquivo do sistema (e do catálogo da comunidade).
 
+### Página de Configurações
+
+Uma página só para as preferências do app, que hoje ficam espalhadas: som, avisos e dados no ícone do cabeçalho, volume e download da música no selo da música, notificações. Também seria o lugar de tema (claro ou escuro), nome de exibição e dados do aparelho (espaço usado, apagar trilhas e imagens recebidas).
+
 ### Ferramentas do Mestre
 
 - **Soundboard:** efeitos curtos disparados pelo Mestre, no mesmo esquema da música (que já existe).

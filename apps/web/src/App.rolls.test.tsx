@@ -118,12 +118,15 @@ describe('rolagens pela ficha', () => {
     const user = renderApp(player, `#/fichas/${sheet.id}`);
 
     await user.click(await screen.findByRole('button', { name: 'Rolar Teste de Agilidade' }));
-    // 2d12 + 2 com dados sempre 4.
-    expect(await screen.findByText('Teste de Agilidade: 10')).toBeInTheDocument();
-    expect(screen.getByText('2d12 + 2 → [4, 4] + 2 = 10')).toBeInTheDocument();
+    // 2d12 + 2 com dados sempre 4: o resultado cai na bandeja, à direita.
+    const lastRolls = () => screen.getByRole('list', { name: 'Últimas rolagens' });
+    await waitFor(() => {
+      expect(lastRolls()).toHaveTextContent('Teste de Agilidade: 10');
+      expect(lastRolls()).toHaveTextContent('2d12 + 2 → [4, 4] + 2 = 10');
+    });
 
     await user.click(screen.getByRole('button', { name: 'Rolar Dano' }));
-    expect(await screen.findByText('Dano: 6')).toBeInTheDocument();
+    await waitFor(() => expect(lastRolls()).toHaveTextContent('Dano: 6'));
 
     await waitLong(async () => {
       await network.settle();
@@ -153,6 +156,7 @@ describe('rolagens pela ficha', () => {
           .getAllByRole('status')
           .find((status) => status.textContent?.startsWith('Ana · Furtividade'));
         expect(tray).toHaveTextContent('Ana · Furtividade: 7');
+        expect(tray).toHaveTextContent('1d20 + 3 → [4] + 3 = 7');
       },
       { timeout: 8000 },
     );
@@ -193,6 +197,31 @@ describe('rolagens pela ficha', () => {
       expect(received?.label).toBe('Atletismo');
       expect(received && describeRoll(received.result)).toBe('4dF + 1 → [0, 0, 0, 0] + 1 = 1');
     });
+  });
+
+  it('a jogadora vê o histórico de rolagens: as dela e as da mesa', async () => {
+    const { campaign } = await setUpLiveTable();
+    await gm.session.roll({ label: 'Emboscada', expression: '1d6' });
+    await waitLong(async () => {
+      await network.settle();
+      expect(await player.session.rolls(campaign.id)).toHaveLength(1);
+    });
+    const user = renderApp(player, `#/campanhas/${campaign.id}`);
+    await player.session.roll({ label: 'Furtividade', expression: '1d20+3' });
+
+    // Tocar no resultado da bandeja abre o histórico, no chat.
+    const result = await screen.findByRole('button', { name: /Furtividade/ });
+    await user.click(result);
+    const history = await screen.findByRole('list', { name: 'Histórico de rolagens' });
+    expect(
+      within(history)
+        .getAllByRole('listitem')
+        .map((item) => item.textContent),
+    ).toEqual([
+      expect.stringContaining('Paulo · Emboscada'),
+      expect.stringContaining('Ana · Furtividade'),
+    ]);
+    expect(screen.getByRole('tab', { name: /Rolagens/ })).toHaveAttribute('aria-selected', 'true');
   });
 
   it('rolagem secreta do Mestre aparece marcada só para ele', async () => {
