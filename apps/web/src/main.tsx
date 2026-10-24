@@ -4,14 +4,12 @@ import { App } from './App';
 import { createWebRtcTransport } from '@tabula/sync/webrtc';
 import { createServices } from './app/services';
 import { keepSessionAcrossReloads } from './lib/session-resume';
+import { startTheme } from './lib/theme';
 import { createRelayTransport } from './testing/relay-transport';
 import './index.css';
 
-// Tema claro/escuro acompanha o sistema operacional.
-const darkQuery = window.matchMedia('(prefers-color-scheme: dark)');
-const applyTheme = () => document.documentElement.classList.toggle('dark', darkQuery.matches);
-applyTheme();
-darkQuery.addEventListener('change', applyTheme);
+// Tema claro/escuro: o escolhido em Configurações, ou o do sistema operacional.
+startTheme();
 
 // Só os testes de ponta a ponta definem `VITE_E2E_RELAY` (relay local em vez de WebRTC). No
 // build normal a condição é constante e o transporte de teste nem entra no pacote.

@@ -13,6 +13,7 @@ import { HomePage } from '@/pages/HomePage';
 import { InvitePage } from '@/pages/InvitePage';
 import { PlayerSheetPage } from '@/pages/PlayerSheetPage';
 import { SheetPage } from '@/pages/SheetPage';
+import { SettingsPage } from '@/pages/SettingsPage';
 import { SheetPrintPage } from '@/pages/SheetPrintPage';
 import { SystemsPage } from '@/pages/SystemsPage';
 
@@ -34,6 +35,7 @@ export function App({ services }: { services: Services }) {
                 {(params) => <EditorPage key={params.id} id={params.id} />}
               </Route>
               <Route path="/campanhas" component={CampaignsPage} />
+              <Route path="/configuracoes" component={SettingsPage} />
               <Route path="/campanhas/:id/jogadores/:sheetId">
                 {(params) => (
                   <PlayerSheetPage

@@ -144,14 +144,15 @@ describe('sons', () => {
     expect(heard.every(([, volume]) => volume === 0.5)).toBe(true);
   });
 
-  it('desligar os sons no cabeçalho silencia os avisos; "Testar" toca mesmo assim', async () => {
+  it('desligar os sons nas Configurações silencia os avisos; "Testar" toca mesmo assim', async () => {
     const { campaign } = await setUpLiveTable();
     const user = renderApp(player, '#/');
 
-    await user.click(await screen.findByRole('button', { name: 'Sons' }));
+    await user.click(await screen.findByRole('link', { name: 'Configurações' }));
     await user.click(await screen.findByRole('checkbox', { name: 'Tocar sons' }));
-    expect(await screen.findByRole('button', { name: 'Sons desligados' })).toBeInTheDocument();
-    expect(await player.sounds.settings()).toEqual({ enabled: false, volume: 0.5 });
+    await waitFor(async () =>
+      expect(await player.sounds.settings()).toEqual({ enabled: false, volume: 0.5 }),
+    );
 
     await gm.session.say({ text: 'Alguém aí?' });
     await until(async () => expect(await player.session.chat(campaign.id)).toHaveLength(1));
@@ -173,7 +174,7 @@ describe('sons', () => {
     await setUpLiveTable();
     await player.sounds.update({ volume: 0.2 });
     renderApp(player, '#/');
-    await screen.findByRole('button', { name: 'Sons' });
+    await screen.findByRole('link', { name: 'Configurações' });
     await gm.session.say({ text: 'Mais baixo.' });
     await until(() => expect(heard).toEqual([['mensagem', 0.2]]));
   });

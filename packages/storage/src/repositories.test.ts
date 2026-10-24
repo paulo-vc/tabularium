@@ -688,8 +688,12 @@ describe('DexieTrackRepository', () => {
     await tracks.save('c1', { meta: meta('c', 300, 'recebida'), data: mp3(300) });
     await tracks.save('c1', { meta: meta('d', 400), data: mp3(400) }); // biblioteca
 
+    // Só as recebidas contam (a da biblioteca, não).
+    expect(await tracks.receivedBytes()).toBe(600);
+
     // 600 recebidos, limite 500: sai a mais antiga ("a"), e já cabe. "b" está tocando.
     await tracks.pruneReceived(500, [meta('b', 200).hash]);
+    expect(await tracks.receivedBytes()).toBe(500);
     expect((await tracks.list('c1', 'recebida')).map((t) => t.id)).toEqual(['c']);
     expect((await tracks.list('c2', 'recebida')).map((t) => t.id)).toEqual(['b']);
     expect((await tracks.list('c1', 'biblioteca')).map((t) => t.id)).toEqual(['d']);

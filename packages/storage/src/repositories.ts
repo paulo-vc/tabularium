@@ -526,6 +526,11 @@ export class DexieTrackRepository implements TrackRepository {
     await this.db.tracks.delete([campaignId, trackId]);
   }
 
+  async receivedBytes(): Promise<number> {
+    const received = await this.db.tracks.filter((t) => t.origin === 'recebida').toArray();
+    return received.reduce((sum, t) => sum + t.meta.size, 0);
+  }
+
   async pruneReceived(maxBytes: number, keep: readonly string[]): Promise<void> {
     await this.db.transaction('rw', this.db.tracks, async () => {
       const received = (await this.db.tracks.filter((t) => t.origin === 'recebida').toArray())

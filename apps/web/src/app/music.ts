@@ -76,6 +76,16 @@ export class MusicService {
     await this.tracks.save(campaignId, { meta: { ...track.meta, title: next }, data: track.data });
   }
 
+  /** Quanto ocupam as trilhas recebidas dos Mestres, neste aparelho (bytes). */
+  receivedBytes(): Promise<number> {
+    return this.tracks.receivedBytes();
+  }
+
+  /** Apaga as trilhas recebidas, menos as de `keep` (ex.: a que está tocando). */
+  clearReceived(keep: readonly string[] = []): Promise<void> {
+    return this.tracks.pruneReceived(0, keep);
+  }
+
   async delete(campaignId: string, trackId: string): Promise<void> {
     await this.tracks.delete(campaignId, trackId);
   }
