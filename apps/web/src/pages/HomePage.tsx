@@ -1,6 +1,8 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { FileUpIcon, ScrollTextIcon } from 'lucide-react';
-import { Link } from 'wouter';
+import { FileUpIcon, ScrollTextIcon, SparklesIcon } from 'lucide-react';
+import { useState } from 'react';
+import { Link, useLocation } from 'wouter';
+import { Welcome, welcomeSeen } from './Welcome';
 import { useServices } from '@/app/services-context';
 import { NewSheetDialog } from '@/components/NewSheetDialog';
 import { CharacterPortrait } from '@/components/sheet/Portrait';
@@ -9,14 +11,40 @@ import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BackupReminder } from '@/components/BackupSection';
 
+/** Cria a ficha de exemplo e a abre. */
+function ExampleButton() {
+  const { sheets } = useServices();
+  const [, navigate] = useLocation();
+  return (
+    <Button
+      variant="link"
+      onClick={() =>
+        void sheets.createExample().then((sheet) => sheet && navigate(`/fichas/${sheet.id}`))
+      }
+    >
+      <SparklesIcon /> Ver uma ficha de exemplo
+    </Button>
+  );
+}
+
 const dateFormat = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeStyle: 'short' });
 
 export function HomePage() {
-  const { catalog, sheetRepository } = useServices();
+  const { catalog, sheetRepository, campaignRepository } = useServices();
   const sheets = useLiveQuery(() => sheetRepository.list(), [sheetRepository]);
+  const campaignCount = useLiveQuery(
+    () => campaignRepository.list().then((all) => all.length),
+    [campaignRepository],
+  );
+  const [skipped, setSkipped] = useState(welcomeSeen);
   const templates = useLiveQuery(() => catalog.list(), [catalog]);
   const importFile = useImport();
   const templateName = (id: string) => templates?.find((t) => t.id === id)?.name ?? id;
+
+  // Primeira vez: aparelho vazio e as boas-vindas ainda não vistas.
+  if (!skipped && sheets?.length === 0 && campaignCount === 0) {
+    return <Welcome onSkip={() => setSkipped(true)} />;
+  }
 
   return (
     <div className="space-y-6">
@@ -38,6 +66,7 @@ export function HomePage() {
           <p className="text-muted-foreground">
             Você ainda não tem fichas. Crie uma nova ou importe um arquivo.
           </p>
+          <ExampleButton />
         </div>
       )}
 

@@ -36,6 +36,9 @@ export type OpenedSheet =
   | { status: 'nao-encontrada' };
 
 /** Casos de uso das fichas. */
+/** Sistema da ficha de exemplo. */
+const EXAMPLE_TEMPLATE = 'dnd5e-srd';
+
 export class SheetService {
   constructor(
     private readonly sheets: SheetRepository,
@@ -63,6 +66,61 @@ export class SheetService {
    * Carrega a ficha e a reconcilia com o template instalado. Atualizações compatíveis
    * (mesma versão MAJOR) são aplicadas automaticamente, sem perda de dados.
    */
+  /**
+   * Ficha de exemplo, já preenchida (D&D 5e): um anão guerreiro de nível 3, para quem abre o
+   * app pela primeira vez ver como uma ficha funciona. `undefined` sem o sistema.
+   */
+  async createExample(): Promise<CharacterSheet | undefined> {
+    const template = await this.catalog.get(EXAMPLE_TEMPLATE);
+    if (!template) return undefined;
+    const sheet = await this.create({ name: 'Thorin (exemplo)', templateId: EXAMPLE_TEMPLATE });
+    const item = (values: Record<string, string | number | boolean>) => ({
+      id: this.ids.newId(),
+      values,
+    });
+    const values: Record<string, FieldValue> = {
+      nome: 'Thorin',
+      classe: 'Guerreiro',
+      nivel: 3,
+      raca: 'Anão da montanha',
+      antecedente: 'Soldado',
+      alinhamento: 'lb',
+      for: 16,
+      des: 12,
+      con: 15,
+      int: 10,
+      sab: 13,
+      car: 8,
+      prof_salv_for: true,
+      prof_salv_con: true,
+      prof_atletismo: true,
+      prof_intimidacao: true,
+      prof_percepcao: true,
+      ca: 16,
+      hp: { current: 31, max: 31 },
+      dados_vida: '3d10',
+      dados_vida_restantes: { current: 3, max: 3 },
+      ataques: [
+        item({ nome: 'Machado de batalha', bonus: 5, dano: '1d8+3', tipo: 'Cortante' }),
+        item({ nome: 'Machadinha (arremesso)', bonus: 5, dano: '1d6+3', tipo: 'Cortante' }),
+      ],
+      equipamento: [
+        item({ nome: 'Cota de malha', qtd: 1, peso: 27, equipado: true }),
+        item({ nome: 'Escudo', qtd: 1, peso: 3, bonus_ca: 2, equipado: true }),
+        item({ nome: 'Machadinha', qtd: 2, peso: 1 }),
+        item({ nome: 'Mochila de aventureiro', qtd: 1, peso: 15 }),
+      ],
+      po: 15,
+      personalidade: 'Fala pouco e cumpre o que promete. Desconfia de magia que não entende.',
+      ideais: 'Lealdade. Quem luta ao meu lado é da família.',
+      anotacoes:
+        'Ficha de exemplo: mude o que quiser, role pelos botões ao lado dos valores ou apague-a no menu da ficha.',
+    };
+    const filled = { ...sheet, values: { ...sheet.values, ...values } };
+    await this.sheets.save(filled);
+    return filled;
+  }
+
   async open(id: string): Promise<OpenedSheet> {
     const sheet = await this.sheets.get(id);
     if (!sheet) return { status: 'nao-encontrada' };

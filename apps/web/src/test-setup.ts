@@ -2,9 +2,17 @@ import './testing/structured-clone';
 import '@testing-library/jest-dom/vitest';
 import 'fake-indexeddb/auto';
 import { configure } from '@testing-library/react';
+import { beforeEach } from 'vitest';
 
 // Esperas da tela (`findBy…`, `waitFor`): 1 s ficava apertado com a suíte em paralelo.
 configure({ asyncUtilTimeout: 3000 });
+
+// Boas-vindas e dicas da primeira vez: os testes partem de um app já conhecido (os testes
+// delas limpam isto).
+beforeEach(() => {
+  localStorage.setItem('tabula:boas-vindas', '1');
+  localStorage.setItem('tabula:dicas-vistas', JSON.stringify(['mestre-sessao', 'jogador-sessao']));
+});
 
 // APIs ausentes no jsdom e usadas pelos componentes Radix (Select, Dialog…).
 Element.prototype.scrollIntoView ??= function scrollIntoView() {};

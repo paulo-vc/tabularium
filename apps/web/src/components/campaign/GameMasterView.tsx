@@ -29,6 +29,7 @@ import { GameMasterPlayers, GameMasterSessionBar } from '@/components/live/Sessi
 import { useLiveSession } from '@/components/live/use-live-session';
 import { TabBar, type TabItem } from '@/components/TabBar';
 import { Badge } from '@/components/ui/badge';
+import { Tip } from '@/components/Tip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -136,6 +137,20 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
         <div role="tabpanel" className={cn('min-w-0 space-y-4', side && 'max-lg:hidden')}>
           {main === 'jogadores' && (
             <>
+              <Tip id="mestre-sessao" title="Como funciona a mesa">
+                <p>
+                  1. Mande o convite (link ou código curto) para os jogadores. Cada um entra na
+                  campanha e escolhe a ficha.
+                </p>
+                <p>
+                  2. Quando o jogo começar, toque em <strong>Iniciar sessão</strong>. Os jogadores
+                  entram pela campanha deles, e você vê as fichas mudando ao vivo aqui.
+                </p>
+                <p>
+                  3. Na sessão: combate, rolagens, chat, imagens e música, nas abas e no painel ao
+                  lado.
+                </p>
+              </Tip>
               <InviteCard campaign={campaign} compact={online > 0} />
               <GameMasterPlayers campaign={campaign} />
             </>

@@ -29,6 +29,7 @@ import { DangerZone } from '@/components/campaign/DangerZone';
 import { GameMasterView } from '@/components/campaign/GameMasterView';
 import { useImport } from '@/components/use-import';
 import { Badge } from '@/components/ui/badge';
+import { Tip } from '@/components/Tip';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -118,6 +119,15 @@ function PlayerView({ campaign, userId }: { campaign: Campaign; userId: string }
 
   return (
     <div className="grid gap-4 lg:grid-cols-2">
+      <div className="lg:col-span-2">
+        <Tip id="jogador-sessao" title="Como entrar na mesa">
+          <p>
+            Escolha (ou crie) a sua ficha aqui. Quando o Mestre iniciar a sessão, toque em{' '}
+            <strong>Entrar na sessão</strong>: a ficha vai junto, e o que você mudar nela aparece
+            para ele na hora.
+          </p>
+        </Tip>
+      </div>
       <Card>
         <CardHeader>
           <CardTitle>
