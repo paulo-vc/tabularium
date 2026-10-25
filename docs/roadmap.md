@@ -26,7 +26,7 @@ Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribu
 
 - **App no celular** (decidido: entra na 1.0, só Android). Tauri 2 para Android, com o mesmo código do desktop; o que muda na interface (toques, telas pequenas, teclado). Distribuído de graça, como instalador (APK) nas releases do GitHub, sem Play Store. iOS fica de fora: publicar exige um Mac e a conta paga da Apple, e o projeto não tem custos.
 - **Criador de sistemas mais fácil** (decidido: entra na 1.0; ver abaixo), com os dados do sistema e o ícone pelo editor.
-- **Importar sistemas mais fácil.** Já dá para importar o arquivo `.json` de um sistema (Sistemas → Importar sistema), mas só no formato exportado pelo app (com o "envelope"). Falta aceitar também o sistema puro, colar o JSON direto e mostrar os erros de um jeito que quem escreve o arquivo entenda.
+- **Importar sistemas mais fácil.** Feito: "Importar sistema" aceita o arquivo exportado e o sistema puro, por arquivo ou colando o JSON, e lista os problemas em português, com o lugar de cada um.
 - **Guia de uso.** Curto e com imagens: para o Mestre, para o jogador e para quem cria sistemas. E uma página do projeto para quem chega pelo link.
 
 ### Depois da 1.0

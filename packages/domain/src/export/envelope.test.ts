@@ -35,6 +35,26 @@ describe('parseExport', () => {
     expect(parseExport(serializeExport(envelope))).toEqual({ ok: true, value: envelope });
   });
 
+  it('aceita o sistema puro (sem o envelope), como local se não disser a origem', () => {
+    const { source: _source, ...bare } = miniTemplate();
+    const result = parseExport(JSON.stringify(bare));
+    expect(result.ok && result.value.kind).toBe('tabula/template');
+    expect(result.ok && result.value.kind === 'tabula/template' && result.value.payload).toEqual({
+      ...miniTemplate(),
+      source: 'local',
+    });
+  });
+
+  it('explica os erros em português, com o caminho', () => {
+    const { source: _source, ...bare } = miniTemplate();
+    const result = parseExport(JSON.stringify({ ...bare, name: 42 }));
+    expect(result.ok).toBe(false);
+    if (!result.ok) {
+      expect(result.error[0]).toMatchObject({ path: ['payload', 'name'] });
+      expect(result.error[0]?.message).toContain('esperava um texto');
+    }
+  });
+
   it('descarta propriedades desconhecidas', () => {
     const text = JSON.stringify({
       ...templateEnvelope(),

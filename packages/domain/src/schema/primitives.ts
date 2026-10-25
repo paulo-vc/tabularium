@@ -1,5 +1,9 @@
 import { z } from 'zod';
 
+// Mensagens de validação em português: aparecem para quem importa um arquivo ou cria um
+// sistema ("Entrada inválida: esperava um texto…").
+z.config(z.locales.ptBR());
+
 /**
  * Limites de tamanho. Protegem o app contra arquivos importados degenerados ou maliciosos
  * (o import é a principal fronteira de confiança do sistema).
