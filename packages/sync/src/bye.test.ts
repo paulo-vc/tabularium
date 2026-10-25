@@ -3,11 +3,17 @@ import { SessionClient } from './client';
 import { SessionHost } from './host';
 import { generateGmKeyPair } from './identity';
 import { MemoryNetwork } from './memory-transport';
-import { newSheet, TEMPLATE } from './test-helpers';
+import { newSheet, TEMPLATE, GM_IDENTITY } from './test-helpers';
 import type { SyncTransport } from './transport';
 
 const gm = generateGmKeyPair();
-const CAMPAIGN = { id: 'campanha', gmId: 'mestre', gmName: 'Paulo', templateId: TEMPLATE.id };
+const CAMPAIGN = {
+  id: 'campanha',
+  gmId: 'mestre',
+  gmName: 'Paulo',
+  templateId: TEMPLATE.id,
+  identity: GM_IDENTITY,
+};
 
 /** Transporte que continua na sala ao "sair" (como o app faz, para reentrar na hora). */
 function keptOpen(transport: SyncTransport): SyncTransport {

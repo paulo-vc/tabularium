@@ -80,7 +80,8 @@ export const CampaignInviteSchema = z.object({
   name: LabelSchema,
   gmId: IdSchema,
   gmName: LabelSchema,
-  gmKey: GmKeySchema.optional(),
+  /** Chave pública do Mestre: o jogador só aceita como Mestre quem provar que tem a privada. */
+  gmKey: GmKeySchema,
   templateRef: TemplateRefSchema,
   templateName: LabelSchema,
   secret: CampaignSecretSchema,

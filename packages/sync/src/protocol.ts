@@ -101,8 +101,9 @@ const ProofSchema = z.string().regex(/^[A-Za-z0-9_-]{86}$/);
 
 /**
  * Identidade do Mestre: o jogador manda um `challenge` aleatório; o Mestre responde com a
- * chave pública (`gmKey`) e a assinatura do desafio (`proof`). Os campos são opcionais para
- * continuar falando com a v0.1, que não os conhece (e ignora).
+ * chave pública (`gmKey`) e a assinatura do desafio (`proof`). Do lado do Mestre, os dois só
+ * vêm na resposta a um desafio (o HELLO de quando alguém entra na sala ainda não tem um); o
+ * jogador só aceita o Mestre que prova.
  */
 export const HelloSchema = z.discriminatedUnion('role', [
   z.object({
@@ -116,9 +117,9 @@ export const HelloSchema = z.discriminatedUnion('role', [
     role: z.literal('jogador'),
     sheetId: IdSchema,
     templateId: IdSchema,
-    challenge: ChallengeSchema.optional(),
-    /** Chave pública para sussurros entre jogadores (versões antigas não mandam). */
-    whisperKey: WhisperKeySchema.optional(),
+    challenge: ChallengeSchema,
+    /** Chave pública para sussurros entre jogadores. */
+    whisperKey: WhisperKeySchema,
   }),
 ]);
 export type Hello = z.infer<typeof HelloSchema>;

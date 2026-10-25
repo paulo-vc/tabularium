@@ -6,10 +6,16 @@ import { generateGmKeyPair } from './identity';
 import { chunkImage, hashImage, ImageAssembler } from './image-transfer';
 import { MemoryNetwork } from './memory-transport';
 import { encodeCutscene } from './protocol';
-import { newSheet, TEMPLATE } from './test-helpers';
+import { newSheet, TEMPLATE, GM_IDENTITY } from './test-helpers';
 
 const gm = generateGmKeyPair();
-const CAMPAIGN = { id: 'campanha', gmId: 'mestre', gmName: 'Paulo', templateId: TEMPLATE.id };
+const CAMPAIGN = {
+  id: 'campanha',
+  gmId: 'mestre',
+  gmName: 'Paulo',
+  templateId: TEMPLATE.id,
+  identity: GM_IDENTITY,
+};
 
 /** "PNG" de ~600 KB (3 partes): cabeçalho de PNG e o resto pseudoaleatório. */
 function fakePng(size = 600_000, seed = 7): Uint8Array {

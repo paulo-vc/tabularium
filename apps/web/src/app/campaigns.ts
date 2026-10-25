@@ -33,6 +33,7 @@ import { embedImage, type ImageProcessor } from '@/lib/image-processing';
 import type { TemplateCatalog } from './catalog';
 import { inviteUrl } from './invite-link';
 import type { Clock, IdGenerator, SheetService } from './sheets';
+import { ensureGmIdentity } from './gm-identity';
 
 const failure = (code: string, message: string): { ok: false; error: Issue } =>
   err({ code, path: [], message });
@@ -78,6 +79,24 @@ export class CampaignService {
     await this.gmKeys.save({ campaignId: campaign.id, secretKey: identity.secretKey });
     await this.campaigns.save(campaign);
     return campaign;
+  }
+
+  /**
+   * Campanhas do Mestre criadas antes de a chave nascer com a campanha ganham a chave agora:
+   * todo convite leva a chave, e o jogador só aceita o Mestre que prova quem é.
+   */
+  async ensureGmKeys(): Promise<void> {
+    const deviceId = await this.device.getDeviceId();
+    for (const campaign of await this.campaigns.list()) {
+      if (campaign.gmKey !== undefined || campaign.gmId !== deviceId) continue;
+      await ensureGmIdentity(
+        this.campaigns,
+        this.gmKeys,
+        this.newGmKey,
+        campaign,
+        this.clock.now(),
+      );
+    }
   }
 
   inviteLink(campaign: Campaign, baseUrl: string): string {

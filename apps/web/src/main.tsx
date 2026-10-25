@@ -18,6 +18,10 @@ const services = createServices(undefined, {
   createTransport: e2eRelay ? createRelayTransport(e2eRelay) : createWebRtcTransport,
 });
 keepSessionAcrossReloads(services.session);
+// Campanhas antigas do Mestre ganham a chave (todo convite leva a chave do Mestre).
+void services.campaigns
+  .ensureGmKeys()
+  .catch((error: unknown) => console.error('Falha ao criar a chave do Mestre', error));
 // Guarda o estado da sessão ao vivo se a aba for fechada ou escondida.
 window.addEventListener('pagehide', () => void services.session.flush());
 document.addEventListener('visibilitychange', () => {

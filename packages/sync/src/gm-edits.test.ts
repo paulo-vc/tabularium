@@ -4,9 +4,15 @@ import { describe, expect, it } from 'vitest';
 import { SessionClient, type RemoteChanges } from './client';
 import { SessionHost, type SavedSheetState } from './host';
 import { MemoryNetwork, type MemoryTransport } from './memory-transport';
-import { newSheet, TEMPLATE, withValue } from './test-helpers';
+import { newSheet, TEMPLATE, withValue, GM_IDENTITY } from './test-helpers';
 
-const CAMPAIGN = { id: 'campanha', gmId: 'mestre', gmName: 'Paulo', templateId: TEMPLATE.id };
+const CAMPAIGN = {
+  id: 'campanha',
+  gmId: 'mestre',
+  gmName: 'Paulo',
+  templateId: TEMPLATE.id,
+  identity: GM_IDENTITY,
+};
 
 function startHost(network: MemoryNetwork, saved?: Map<string, SavedSheetState>) {
   const host = new SessionHost(network.join(), CAMPAIGN, saved);
@@ -242,7 +248,7 @@ describe('convergência com edições dos dois lados', () => {
       }),
       { numRuns: 400 },
     );
-  });
+  }, 30_000); // Centenas de sequências, cada uma com o Mestre provando quem é (assinatura).
 
   it('com o jogador conectado, a última alteração do Mestre sempre chega', async () => {
     await fc.assert(
