@@ -1,3 +1,4 @@
+import { STARTERS } from '@tabula/domain';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { PlusIcon } from 'lucide-react';
 import { useId, useState, type FormEvent } from 'react';
@@ -25,8 +26,12 @@ import {
 } from '@/components/ui/select';
 
 const BLANK = '__branco';
+const STARTER = 'modelo:';
 
-/** Começa um sistema novo: em branco ou como cópia de outro (ex.: uma variante do D&D). */
+/**
+ * Começa um sistema novo: de um modelo pronto (o jeito mais fácil), em branco ou como cópia de
+ * outro (ex.: uma variante do D&D).
+ */
 export function NewSystemDialog() {
   const { catalog, editor } = useServices();
   const templates = useLiveQuery(() => catalog.list(), [catalog]);
@@ -34,16 +39,24 @@ export function NewSystemDialog() {
   const base = useId();
   const [open, setOpen] = useState(false);
   const [name, setName] = useState('');
-  const [from, setFrom] = useState(BLANK);
+  const [from, setFrom] = useState(`${STARTER}d20`);
+  const starter = from.startsWith(STARTER)
+    ? STARTERS.find((s) => s.id === from.slice(STARTER.length))
+    : undefined;
+  // Cópia leva o nome do original; em branco e modelos pedem um nome.
+  const needsName = from === BLANK || starter !== undefined;
   const [busy, setBusy] = useState(false);
 
   const submit = async (event: FormEvent) => {
     event.preventDefault();
-    if (busy || (from === BLANK && !name.trim())) return;
+    if (busy || (needsName && !name.trim())) return;
     setBusy(true);
     try {
-      const draft =
-        from === BLANK ? await editor.createBlank(name.trim()) : await editor.createCopy(from);
+      const draft = starter
+        ? await editor.createFromStarter(starter.id, name.trim())
+        : from === BLANK
+          ? await editor.createBlank(name.trim())
+          : await editor.createCopy(from);
       setOpen(false);
       navigate(`/sistemas/editor/${draft.id}`);
     } catch (error) {
@@ -65,7 +78,8 @@ export function NewSystemDialog() {
           <DialogHeader>
             <DialogTitle>Criar sistema</DialogTitle>
             <DialogDescription>
-              Comece do zero ou a partir de um sistema que você já tem.
+              Um modelo pronto já vem com campos, fórmulas e seções que funcionam: é só mudar o que
+              quiser. Ou comece do zero, ou de um sistema que você já tem.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-1.5">
@@ -75,6 +89,11 @@ export function NewSystemDialog() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
+                {STARTERS.map((item) => (
+                  <SelectItem key={item.id} value={`${STARTER}${item.id}`}>
+                    Modelo: {item.name}
+                  </SelectItem>
+                ))}
                 <SelectItem value={BLANK}>Em branco</SelectItem>
                 {templates?.map((template) => (
                   <SelectItem key={template.id} value={template.id}>
@@ -84,7 +103,8 @@ export function NewSystemDialog() {
               </SelectContent>
             </Select>
           </div>
-          {from === BLANK && (
+          {starter && <p className="text-muted-foreground text-sm">{starter.description}</p>}
+          {needsName && (
             <div className="space-y-1.5">
               <Label htmlFor={`${base}-nome`}>Nome do sistema</Label>
               <Input
@@ -98,7 +118,7 @@ export function NewSystemDialog() {
             </div>
           )}
           <DialogFooter>
-            <Button type="submit" disabled={busy || (from === BLANK && !name.trim())}>
+            <Button type="submit" disabled={busy || (needsName && !name.trim())}>
               Começar a editar
             </Button>
           </DialogFooter>

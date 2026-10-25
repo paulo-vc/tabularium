@@ -12,6 +12,7 @@ configure({ asyncUtilTimeout: 3000 });
 beforeEach(() => {
   localStorage.setItem('tabula:boas-vindas', '1');
   localStorage.setItem('tabula:dicas-vistas', JSON.stringify(['mestre-sessao', 'jogador-sessao']));
+  localStorage.setItem('tabula:editor-etapas', '1');
 });
 
 // APIs ausentes no jsdom e usadas pelos componentes Radix (Select, Dialog…).

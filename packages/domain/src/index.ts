@@ -6,6 +6,7 @@ export * from './formula';
 
 export * from './template/schema';
 export * from './template/icon';
+export * from './template/starters';
 export { compileTemplate, type CompiledFormula, type CompiledTemplate } from './template/compile';
 export { validateTemplate } from './template/validate';
 
