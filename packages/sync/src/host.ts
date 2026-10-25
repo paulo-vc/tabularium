@@ -46,6 +46,7 @@ import {
 } from './protocol';
 import { deepEqual, readSheet, VALUES, writeBonuses, type SheetSnapshot } from './sheet-doc';
 import type { ConnectionInfo, SyncTransport } from './transport';
+import { RateLimiter } from './rate-limit';
 import type { SealedWhisper } from './whisper';
 
 export interface HostCampaign {
@@ -61,6 +62,13 @@ export interface HostCampaign {
    */
   identity?: GmKeyPair;
 }
+
+/**
+ * Quanto cada jogador pode mandar à mesa: mensagens e sussurros, e rolagens, por janela de
+ * 10 s. Muito acima de uma mesa animada; só barra quem tenta inundar.
+ */
+export const TALK_LIMIT = { max: 20, windowMs: 10_000 };
+export const ROLL_LIMIT = { max: 40, windowMs: 10_000 };
 
 /** Quantas vezes um participante pode pedir a mesma imagem numa conexão. */
 const MAX_IMAGE_REQUESTS = 3;
@@ -102,6 +110,8 @@ interface Entry {
  */
 export class SessionHost {
   private readonly entries = new Map<string, Entry>();
+  private readonly talk = new RateLimiter(TALK_LIMIT.max, TALK_LIMIT.windowMs);
+  private readonly rolling = new RateLimiter(ROLL_LIMIT.max, ROLL_LIMIT.windowMs);
   private readonly sheetOfPeer = new Map<string, string>();
   /** Quem já recebeu o sistema nesta conexão (evita reenviar sem parar a quem insiste). */
   private readonly templateSent = new Set<string>();
@@ -364,6 +374,7 @@ export class SessionHost {
       if (message.authorId !== entry.userId || message.authorName !== entry.displayName) continue;
       if (known.has(message.id)) continue;
       if (message.to !== undefined && message.to !== this.campaign.gmId) continue;
+      if (!this.talk.allow(peerId)) continue;
       known.add(message.id);
       this.rememberChat(message);
       this.deliverChat(message, peerId);
@@ -397,6 +408,7 @@ export class SessionHost {
     for (const roll of entries) {
       // Cada jogador só registra rolagens próprias, públicas e novas.
       if (roll.authorId !== entry.userId || roll.secret || known.has(roll.id)) continue;
+      if (!this.rolling.allow(peerId)) continue;
       known.add(roll.id);
       this.remember(roll);
       this.broadcast(roll, peerId);
@@ -597,6 +609,8 @@ export class SessionHost {
   }
 
   private detach(peerId: string): void {
+    this.talk.forget(peerId);
+    this.rolling.forget(peerId);
     const sheetId = this.sheetOfPeer.get(peerId);
     if (sheetId === undefined) return;
     this.sheetOfPeer.delete(peerId);
@@ -636,6 +650,7 @@ export class SessionHost {
     const sender = sheetId === undefined ? undefined : this.entries.get(sheetId);
     if (!sender || whisper.authorId !== sender.userId) return;
     if (whisper.authorName !== sender.displayName) return;
+    if (!this.talk.allow(peerId)) return;
     const recipient = [...this.entries.values()].find(
       (entry) => entry.userId === whisper.to && entry.peerId !== null,
     );

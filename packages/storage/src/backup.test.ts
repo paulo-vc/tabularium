@@ -138,6 +138,17 @@ describe('cópia de segurança', () => {
     (altered.tables.sheets[0] as { name: unknown }).name = 42;
     expect(readBackup(JSON.stringify(altered), fresh.verno).ok).toBe(false);
 
+    // Um registro de chat ou uma trilha que não confere também derruba a cópia inteira.
+    const badChat = JSON.parse(text) as { tables: Record<string, unknown[]> };
+    badChat.tables.chat = [{ campaignId: 'c1', id: 'm1', at: 1, message: { text: 42 } }];
+    expect(readBackup(JSON.stringify(badChat), fresh.verno).ok).toBe(false);
+    const media = await createBackup(old, { media: true });
+    const badTrack = JSON.parse(media) as {
+      tables: { tracks: { meta: { size: number } }[] };
+    };
+    (badTrack.tables.tracks[0] as { meta: { size: number } }).meta.size = 999;
+    expect(readBackup(JSON.stringify(badTrack), fresh.verno).ok).toBe(false);
+
     const newer = readBackup(text, fresh.verno - 1);
     expect(newer.ok).toBe(false);
     if (!newer.ok) expect(newer.error.message).toContain('versão mais nova');

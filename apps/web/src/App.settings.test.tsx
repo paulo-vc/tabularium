@@ -38,6 +38,8 @@ describe('configurações', () => {
       expect(await screen.findByRole('heading', { name: section })).toBeInTheDocument();
     }
     expect(screen.getByRole('heading', { name: 'Armazenamento' })).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Privacidade' })).toBeInTheDocument();
+    expect(screen.getByRole('link', { name: /política de privacidade/ })).toBeInTheDocument();
   });
 
   it('o tema escuro vale na hora e fica guardado', async () => {
