@@ -21,7 +21,7 @@ import { useLiveSession } from './use-live-session';
 
 /** Mensagem para quando a conexão direta falha (sem relay, ADR 0008). */
 const DIRECT_FAILURE =
-  'A conexão direta não abriu. Isso costuma acontecer em redes de empresa ou escola, ou quando os dois lados estão no 4G. Tentem outra rede (por exemplo, Wi-Fi de casa).';
+  'A conexão direta não abriu. Isso costuma acontecer em redes de empresa ou escola, ou quando os dois lados estão no 4G. Tentem outra rede (por exemplo, Wi-Fi de casa). Em Configurações → Conexão, cada um pode testar a própria rede.';
 
 function useBusy() {
   const [busy, setBusy] = useState(false);

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { describeConnection, type StatsEntry } from './connection';
-import { diagnoseNat, type GatheredCandidate } from './nat';
+import { diagnoseNat, type GatheredCandidate } from '@tabula/sync/network';
 import { formatReport, newRoomCode, normalizeRoomCode } from './report';
 
 const host = (address: string, port = 50000): GatheredCandidate => ({

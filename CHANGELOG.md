@@ -4,6 +4,7 @@ As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos
 
 ## Próxima versão
 
+- **Testar minha rede:** em Configurações → Conexão, um botão testa em alguns segundos se a rede em que você está deixa a conexão direta abrir, sem conectar a ninguém, e diz o que fazer: rede comum (deve conectar), restritiva (comum no 4G: conecta com quem está numa rede comum; se falhar, tente um Wi-Fi) ou bloqueada (rede de empresa ou faculdade: use outra). Quando a conexão da sessão falha, o aviso aponta para esse teste.
 - **Guia de uso:** um guia curto, com imagens, para quem mestra, quem joga e quem cria sistemas, mais o que fazer quando a conexão não abre. Fica no link "Guia de uso", no rodapé do app. A página do projeto foi refeita, com os downloads de Windows, Linux e Android.
 - Ao rolar a iniciativa no combate (as criaturas do Mestre ou a do jogador), o resultado aparece só na bandeja dos dados, sem um aviso repetido embaixo.
 - **App para Android:** o Tabularium passa a ter um instalador (APK) para Android, o mesmo app do computador, publicado de graça junto de cada versão. No celular, a atualização não é automática: o app avisa quando há versão nova e leva à página para baixar o APK.

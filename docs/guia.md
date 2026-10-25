@@ -77,7 +77,7 @@ Tudo fica no aparelho. Em **Configurações → Cópia de segurança**, "Fazer c
 
 ## Quando a conexão não abre
 
-Os aparelhos da mesa se conectam direto, sem servidor no meio. Na maioria das redes funciona; em algumas (redes de empresa, faculdade e, às vezes, o 4G) a conexão direta é bloqueada. Se alguém ficar em "procurando o Mestre":
+Os aparelhos da mesa se conectam direto, sem servidor no meio. Na maioria das redes funciona; em algumas (redes de empresa, faculdade e, às vezes, o 4G) a conexão direta é bloqueada. Para saber antes do jogo, use **Configurações → Conexão → Testar minha rede**: em alguns segundos o app diz se a sua rede conecta direto, se é restritiva (comum no 4G) ou se bloqueia a conexão. Se alguém ficar em "procurando o Mestre":
 
 - troque de rede (o Wi-Fi de casa costuma funcionar);
 - no 4G, quem estiver nele pode tentar compartilhar a internet do celular com o computador;
