@@ -1,0 +1,18 @@
+{
+  "$schema": "../gen/schemas/desktop-schema.json",
+  "identifier": "desktop",
+  "description": "Só no computador: atualização automática (e reiniciar depois de instalar) e o aviso na barra de tarefas. O Android não tem esses recursos.",
+  "platforms": [
+    "linux",
+    "macOS",
+    "windows"
+  ],
+  "windows": [
+    "main"
+  ],
+  "permissions": [
+    "updater:default",
+    "process:allow-restart",
+    "core:window:allow-request-user-attention"
+  ]
+}
