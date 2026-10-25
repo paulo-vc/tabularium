@@ -4,6 +4,7 @@ As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos
 
 ## Próxima versão
 
+- **Feito para o dedo:** em telas de toque (celular e tablet), botões, campos, caixas de marcar, abas e controles deslizantes ficam maiores, assim como as bolinhas de marcar da ficha (como Exaustão), as etiquetas de estado e as alças de arrastar do criador de sistemas. No computador, nada muda. No celular, o cabeçalho cabe inteiro com a sessão aberta, o nome do sistema aparece completo no editor e o botão do chat não cobre mais o rodapé.
 - **Testar minha rede:** em Configurações → Conexão, um botão testa em alguns segundos se a rede em que você está deixa a conexão direta abrir, sem conectar a ninguém, e diz o que fazer: rede comum (deve conectar), restritiva (comum no 4G: conecta com quem está numa rede comum; se falhar, tente um Wi-Fi) ou bloqueada (rede de empresa ou faculdade: use outra). Quando a conexão da sessão falha, o aviso aponta para esse teste.
 - **Guia de uso:** um guia curto, com imagens, para quem mestra, quem joga e quem cria sistemas, mais o que fazer quando a conexão não abre. Fica no link "Guia de uso", no rodapé do app. A página do projeto foi refeita, com os downloads de Windows, Linux e Android.
 - Ao rolar a iniciativa no combate (as criaturas do Mestre ou a do jogador), o resultado aparece só na bandeja dos dados, sem um aviso repetido embaixo.

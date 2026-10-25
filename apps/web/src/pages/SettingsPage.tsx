@@ -297,7 +297,7 @@ function DiceSection() {
                     aria-label={name}
                     title={name}
                     className={cn(
-                      'size-8 rounded-full border shadow-sm transition-transform hover:scale-110',
+                      'size-8 rounded-full border shadow-sm transition-transform hover:scale-110 pointer-coarse:size-10',
                       chosen && 'ring-primary ring-offset-background ring-2 ring-offset-2',
                     )}
                     style={{ backgroundColor: value }}

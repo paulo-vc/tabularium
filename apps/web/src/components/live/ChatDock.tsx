@@ -223,7 +223,7 @@ function ChatPanel({
               role="tab"
               aria-selected={view === id}
               className={cn(
-                'flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors',
+                'flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition-colors pointer-coarse:py-2',
                 view === id
                   ? 'bg-background text-foreground shadow-sm'
                   : 'text-muted-foreground hover:text-foreground',
@@ -317,7 +317,7 @@ function ChatPanel({
               id={`${base}-para`}
               value={recipient ? to : ''}
               onChange={(event) => setTo(event.target.value)}
-              className="border-input dark:bg-input/30 h-7 rounded-md border bg-transparent px-2 text-xs"
+              className="border-input dark:bg-input/30 h-7 rounded-md border bg-transparent px-2 text-xs pointer-coarse:h-9"
             >
               <option value="">A mesa</option>
               {recipients.map((r) => (

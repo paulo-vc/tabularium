@@ -10,6 +10,7 @@ import { GmChangeNotice } from './live/GmChangeNotice';
 import { LiveSessionIndicator } from './live/LiveSessionIndicator';
 import { RollNotice } from './live/RollNotice';
 import { SessionNotices } from './live/SessionNotices';
+import { useLiveSession } from './live/use-live-session';
 import { UpdateNotice } from './UpdateNotice';
 import { guideUrl, newIssueUrl } from '@/app/updates';
 import { openExternal } from '@/lib/open-external';
@@ -25,7 +26,7 @@ function SettingsLink() {
       title="Configurações"
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'hover:bg-accent grid size-8 shrink-0 place-items-center rounded-md transition-colors',
+        'hover:bg-accent grid size-8 shrink-0 pointer-coarse:size-9 place-items-center rounded-md transition-colors',
         active && 'bg-accent',
       )}
     >
@@ -43,7 +44,7 @@ function NavLink({ href, also, children }: { href: string; also?: string; childr
       href={href}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'rounded-md px-2 py-1.5 text-sm font-medium transition-colors sm:px-3',
+        'rounded-md px-1.5 py-1.5 text-sm font-medium transition-colors pointer-coarse:py-2.5 sm:px-3',
         active ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground',
       )}
     >
@@ -53,10 +54,12 @@ function NavLink({ href, also, children }: { href: string; also?: string; childr
 }
 
 export function AppShell({ children }: { children: ReactNode }) {
+  // Na sessão, o botão do chat fica fixo no canto: o rodapé ganha espaço para não ficar embaixo dele.
+  const inSession = useLiveSession().kind !== 'nenhuma';
   return (
     <div className="bg-background text-foreground min-h-dvh print:bg-white">
       <header className="bg-background/95 sticky top-0 z-10 border-b backdrop-blur print:hidden">
-        <div className="mx-auto flex h-14 max-w-6xl items-center gap-2 px-4 sm:gap-4">
+        <div className="mx-auto flex h-14 max-w-6xl items-center gap-1.5 px-4 sm:gap-4">
           <Link
             href="/"
             aria-label="Tabularium RPG"
@@ -68,7 +71,7 @@ export function AppShell({ children }: { children: ReactNode }) {
               Tabularium RPG
             </span>
           </Link>
-          <nav aria-label="Principal" className="flex min-w-0 gap-1">
+          <nav aria-label="Principal" className="flex min-w-0 gap-0.5 sm:gap-1">
             <NavLink href="/" also="/fichas/*">
               Fichas
             </NavLink>
@@ -86,7 +89,12 @@ export function AppShell({ children }: { children: ReactNode }) {
         </div>
       </header>
       <main className="mx-auto max-w-6xl px-4 py-6 print:max-w-none print:p-0">{children}</main>
-      <footer className="text-muted-foreground mx-auto flex max-w-6xl flex-wrap gap-x-4 gap-y-1 px-4 pb-6 text-xs print:hidden">
+      <footer
+        className={cn(
+          'text-muted-foreground mx-auto flex max-w-6xl flex-wrap gap-x-4 gap-y-1 px-4 pb-6 text-xs print:hidden',
+          inSession && 'pb-20',
+        )}
+      >
         <span>Tabularium RPG {__APP_VERSION__}</span>
         <a
           href={guideUrl}

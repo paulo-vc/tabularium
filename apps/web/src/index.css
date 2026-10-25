@@ -147,6 +147,12 @@
   html {
     @apply font-sans;
   }
+  /* No toque, o controle deslizante ganha altura para o dedo (o desenho continua o mesmo). */
+  @media (pointer: coarse) {
+    input[type='range'] {
+      height: 2rem;
+    }
+  }
   /* Títulos de página: a fonte condensada, em caixa alta, como um letreiro. */
   main h1 {
     @apply font-heading tracking-wide uppercase;

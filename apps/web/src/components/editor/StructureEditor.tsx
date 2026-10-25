@@ -477,7 +477,7 @@ function FieldRow({
         type="button"
         ref={setActivatorNodeRef}
         aria-label={`Arrastar ${name}`}
-        className="text-muted-foreground hover:text-foreground cursor-grab touch-none rounded p-1"
+        className="text-muted-foreground hover:text-foreground cursor-grab touch-none rounded p-1 pointer-coarse:p-2.5"
         {...attributes}
         {...listeners}
       >
@@ -610,7 +610,7 @@ function SectionCard({
           type="button"
           ref={setActivatorNodeRef}
           aria-label={`Arrastar seção ${title}`}
-          className="text-muted-foreground hover:text-foreground cursor-grab touch-none rounded p-1"
+          className="text-muted-foreground hover:text-foreground cursor-grab touch-none rounded p-1 pointer-coarse:p-2.5"
           {...attributes}
           {...listeners}
         >
