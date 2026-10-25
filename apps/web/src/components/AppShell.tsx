@@ -64,7 +64,7 @@ export function AppShell({ children }: { children: ReactNode }) {
           >
             <img src="icon.svg" alt="" className="size-6" />
             {/* Em telas estreitas, só o ícone: o menu e o indicador de sessão precisam do espaço. */}
-            <span className="font-brand hidden text-lg tracking-wide sm:inline">
+            <span className="font-brand hidden text-xl font-bold tracking-[0.14em] uppercase sm:inline">
               Tabularium RPG
             </span>
           </Link>

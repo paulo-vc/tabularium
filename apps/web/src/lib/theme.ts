@@ -1,9 +1,12 @@
-/** Tema do app neste aparelho: acompanha o sistema operacional, ou sempre claro ou escuro. */
+/**
+ * Tema do app neste aparelho: escuro (o padrão, a "Noite arcana"), claro, ou o do sistema
+ * operacional.
+ */
 export type ThemeChoice = 'sistema' | 'claro' | 'escuro';
 
 /**
  * Fica no `localStorage` (não no banco): é lido antes de o app abrir, para não piscar o tema
- * errado. Se o armazenamento falhar, vale o do sistema.
+ * errado. Se o armazenamento falhar, vale o escuro.
  */
 const KEY = 'tabula:tema';
 
@@ -15,9 +18,9 @@ const systemQuery = () =>
 export function storedTheme(): ThemeChoice {
   try {
     const value = localStorage.getItem(KEY);
-    return value === 'claro' || value === 'escuro' ? value : 'sistema';
+    return value === 'claro' || value === 'sistema' ? value : 'escuro';
   } catch {
-    return 'sistema';
+    return 'escuro';
   }
 }
 
@@ -28,7 +31,7 @@ export function applyTheme(choice: ThemeChoice = storedTheme()): void {
 
 export function setTheme(choice: ThemeChoice): void {
   try {
-    if (choice === 'sistema') localStorage.removeItem(KEY);
+    if (choice === 'escuro') localStorage.removeItem(KEY);
     else localStorage.setItem(KEY, choice);
   } catch {
     // Sem armazenamento: o tema vale até fechar o app.
