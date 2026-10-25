@@ -27,7 +27,7 @@ Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribu
 - **App no celular** (só Android). Em andamento: o APK já é gerado pelo workflow Android e anexado às releases (assinado com a chave dos segredos do repositório). Falta testar no aparelho e ajustar a interface para toque e tela pequena onde for preciso. iOS fica de fora (exige um Mac e a conta paga da Apple).
 - **Criador de sistemas mais fácil.** Feito: modelos prontos (d20 e 2d6), etapas no editor, exemplos de fórmula com os campos do sistema, dados do sistema e ícone pelo editor.
 - **Importar sistemas mais fácil.** Feito: "Importar sistema" aceita o arquivo exportado e o sistema puro, por arquivo ou colando o JSON, e lista os problemas em português, com o lugar de cada um.
-- **Guia de uso.** Curto e com imagens: para o Mestre, para o jogador e para quem cria sistemas. E uma página do projeto para quem chega pelo link.
+- **Guia de uso.** Feito: [`guia.md`](guia.md), com imagens, para o Mestre, o jogador e quem cria sistemas; e o README refeito como página do projeto.
 
 ### Depois da 1.0
 

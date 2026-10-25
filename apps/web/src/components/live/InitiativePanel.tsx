@@ -35,6 +35,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { useDiceTray } from './DiceTray';
 import { useLiveSession } from './use-live-session';
 
 /** Quantas criaturas iguais o Mestre adiciona de uma vez. */
@@ -112,6 +113,8 @@ export function GameMasterInitiative({
   dice?: readonly CustomDie[] | undefined;
 }) {
   const { session } = useServices();
+  // Com os dados 3D, as rolagens já aparecem na bandeja: sem aviso repetido.
+  const { enabled: tray } = useDiceTray();
   const live = useLiveSession();
   const base = useId();
   const [name, setName] = useState('');
@@ -176,7 +179,7 @@ export function GameMasterInitiative({
         });
       }
       change((current) => current && created.reduce(addCombatant, current));
-      if (parsedInitiative.kind === 'rolar') {
+      if (parsedInitiative.kind === 'rolar' && !tray) {
         toast(created.map((c) => `${c.name}: ${c.initiative}`).join(' · '), {
           description: `Iniciativa (${parsedInitiative.expression})`,
         });
@@ -439,6 +442,8 @@ export function PlayerInitiative({
   initiativeRoll?: string | null | undefined;
 }) {
   const { session } = useServices();
+  // Com os dados 3D, as rolagens já aparecem na bandeja: sem aviso repetido.
+  const { enabled: tray } = useDiceTray();
   const live = useLiveSession();
   const tracker: PublicTracker | null =
     live.kind === 'jogador' && live.campaignId === campaignId ? live.initiative : null;
@@ -473,8 +478,10 @@ export function PlayerInitiative({
               void session
                 .roll({ label: 'Iniciativa', expression: initiativeRoll, purpose: 'iniciativa' })
                 .then((result) => {
-                  if (result.ok) toast(`Iniciativa: ${result.value.result.total}`);
-                  else toast.error('Não foi possível rolar', { description: result.error.message });
+                  if (result.ok) {
+                    if (!tray) toast(`Iniciativa: ${result.value.result.total}`);
+                  } else
+                    toast.error('Não foi possível rolar', { description: result.error.message });
                 })
             }
           >
