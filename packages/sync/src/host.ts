@@ -56,11 +56,8 @@ export interface HostCampaign {
   templateId: string;
   /** O sistema da campanha, enviado a quem pedir (jogador que ainda não o tem instalado). */
   template?: SystemTemplate;
-  /**
-   * Par de chaves do Mestre. Com ele, o Mestre prova sua identidade a cada jogador
-   * (desafio-resposta). Sem ele (campanhas da v0.1), apenas se declara.
-   */
-  identity?: GmKeyPair;
+  /** Par de chaves do Mestre: ele prova sua identidade a cada jogador (desafio-resposta). */
+  identity: GmKeyPair;
 }
 
 /**
@@ -442,11 +439,10 @@ export class SessionHost {
       campaignId: this.campaign.id,
       userId: this.campaign.gmId,
       displayName: this.campaign.gmName,
-      ...(identity &&
-        challenge !== undefined && {
-          gmKey: identity.publicKey,
-          proof: signChallenge(identity.secretKey, this.campaign.id, challenge, this.campaign.gmId),
-        }),
+      ...(challenge !== undefined && {
+        gmKey: identity.publicKey,
+        proof: signChallenge(identity.secretKey, this.campaign.id, challenge, this.campaign.gmId),
+      }),
     };
   }
 

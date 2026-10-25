@@ -5,10 +5,16 @@ import { SessionHost } from './host';
 import { generateGmKeyPair } from './identity';
 import { MemoryNetwork } from './memory-transport';
 import { decodeMessage, encodeJournalPut } from './protocol';
-import { newSheet, TEMPLATE } from './test-helpers';
+import { newSheet, TEMPLATE, GM_IDENTITY } from './test-helpers';
 
 const gm = generateGmKeyPair();
-const CAMPAIGN = { id: 'campanha', gmId: 'mestre', gmName: 'Paulo', templateId: TEMPLATE.id };
+const CAMPAIGN = {
+  id: 'campanha',
+  gmId: 'mestre',
+  gmName: 'Paulo',
+  templateId: TEMPLATE.id,
+  identity: GM_IDENTITY,
+};
 
 const entry = (id: string, changes: Partial<JournalEntry> = {}): JournalEntry => ({
   id,

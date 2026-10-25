@@ -33,9 +33,9 @@ const DICE_COLORS = [
 ];
 
 const THEMES: { id: ThemeChoice; name: string; icon: typeof SunIcon }[] = [
-  { id: 'sistema', name: 'Do sistema', icon: MonitorIcon },
-  { id: 'claro', name: 'Claro', icon: SunIcon },
   { id: 'escuro', name: 'Escuro', icon: MoonIcon },
+  { id: 'claro', name: 'Claro', icon: SunIcon },
+  { id: 'sistema', name: 'Do sistema', icon: MonitorIcon },
 ];
 
 const megabytes = (bytes: number) =>

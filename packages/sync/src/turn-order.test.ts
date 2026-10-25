@@ -11,10 +11,16 @@ import { SessionHost } from './host';
 import { generateGmKeyPair } from './identity';
 import { MemoryNetwork } from './memory-transport';
 import { encodeTurn } from './protocol';
-import { newSheet, TEMPLATE } from './test-helpers';
+import { newSheet, TEMPLATE, GM_IDENTITY } from './test-helpers';
 
 const gm = generateGmKeyPair();
-const CAMPAIGN = { id: 'campanha', gmId: 'mestre', gmName: 'Paulo', templateId: TEMPLATE.id };
+const CAMPAIGN = {
+  id: 'campanha',
+  gmId: 'mestre',
+  gmName: 'Paulo',
+  templateId: TEMPLATE.id,
+  identity: GM_IDENTITY,
+};
 
 function startHost(network: MemoryNetwork) {
   const host = new SessionHost(network.join(), { ...CAMPAIGN, identity: gm });

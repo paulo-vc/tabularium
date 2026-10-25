@@ -4,8 +4,12 @@ import {
   type CharacterSheet,
   type SystemTemplate,
 } from '@tabula/domain';
+import { generateGmKeyPair } from './identity';
 
 /** Template mínimo para os testes de sincronização. */
+/** Chave do Mestre para os testes (todo Mestre prova quem é). */
+export const GM_IDENTITY = generateGmKeyPair();
+
 export const TEMPLATE: SystemTemplate = {
   id: 'teste',
   version: '1.0.0',

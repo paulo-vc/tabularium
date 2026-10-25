@@ -34,7 +34,6 @@ describe('código curto do convite', () => {
     expect(shortInviteCode(base)).toBe(code);
     expect(shortInviteCode({ ...base, secret: secret() })).not.toBe(code);
     expect(shortInviteCode({ ...base, gmKey: generateGmKeyPair().publicKey })).not.toBe(code);
-    expect(shortInviteCode(invite({ gmKey: undefined }))).toBeNull();
   });
 
   it('aceita o código digitado de qualquer jeito', () => {

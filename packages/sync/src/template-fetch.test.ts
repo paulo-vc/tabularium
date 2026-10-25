@@ -5,9 +5,15 @@ import { SessionHost } from './host';
 import { MemoryNetwork } from './memory-transport';
 import { decodeMessage, encodeHello, encodeTemplateRequest, PROTOCOL_VERSION } from './protocol';
 import { fetchTemplate } from './template-fetch';
-import { TEMPLATE } from './test-helpers';
+import { TEMPLATE, GM_IDENTITY } from './test-helpers';
 
-const CAMPAIGN = { id: 'campanha', gmId: 'mestre', gmName: 'Paulo', templateId: TEMPLATE.id };
+const CAMPAIGN = {
+  id: 'campanha',
+  gmId: 'mestre',
+  gmName: 'Paulo',
+  templateId: TEMPLATE.id,
+  identity: GM_IDENTITY,
+};
 
 /** `null`: Mestre sem o sistema disponível. */
 function startHost(network: MemoryNetwork, template: SystemTemplate | null = TEMPLATE) {

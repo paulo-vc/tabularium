@@ -62,9 +62,8 @@ function toBase32(bytes: Uint8Array): string {
   return out.slice(0, 20);
 }
 
-/** Código curto do convite, em grupos de 4. `null` sem a chave do Mestre (campanha antiga). */
+/** Código curto do convite, em grupos de 4. `null` se a chave do Mestre for inválida. */
 export function shortInviteCode(invite: CampaignInvite): string | null {
-  if (invite.gmKey === undefined) return null;
   const bytes = codeBytes(invite.secret, invite.gmKey);
   return bytes ? (toBase32(bytes).match(/.{4}/g) ?? []).join('-') : null;
 }
@@ -136,10 +135,10 @@ function verifiedInvite(code: string, data: Uint8Array): CampaignInvite | null {
     };
     if (typeof message.invite !== 'string' || typeof message.signature !== 'string') return null;
     const parsed = CampaignInviteSchema.safeParse(JSON.parse(message.invite));
-    if (!parsed.success || parsed.data.gmKey === undefined) return null;
+    if (!parsed.success) return null;
     const invite = parsed.data;
     if (shortInviteCode(invite) !== code) return null;
-    const key = fromBase64Url(invite.gmKey as string);
+    const key = fromBase64Url(invite.gmKey);
     const signature = fromBase64Url(message.signature);
     if (key?.length !== 32 || signature?.length !== 64) return null;
     return ed25519.verify(signature, signed(code, message.invite), key) ? invite : null;

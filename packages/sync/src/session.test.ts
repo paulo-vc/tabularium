@@ -5,12 +5,18 @@ import { SessionClient } from './client';
 import { SessionHost, type SavedSheetState } from './host';
 import { MemoryNetwork, type MemoryTransport } from './memory-transport';
 import { encodeHello, PROTOCOL_VERSION, syncEncoder } from './protocol';
-import { newSheet, TEMPLATE, withValue } from './test-helpers';
+import { newSheet, TEMPLATE, withValue, GM_IDENTITY } from './test-helpers';
 import * as encoding from 'lib0/encoding';
 import * as Y from 'yjs';
 import { readSheet } from './sheet-doc';
 
-const CAMPAIGN = { id: 'campanha', gmId: 'mestre', gmName: 'Paulo', templateId: TEMPLATE.id };
+const CAMPAIGN = {
+  id: 'campanha',
+  gmId: 'mestre',
+  gmName: 'Paulo',
+  templateId: TEMPLATE.id,
+  identity: GM_IDENTITY,
+};
 
 function startHost(network: MemoryNetwork, saved?: Map<string, SavedSheetState>) {
   const transport = network.join();
@@ -373,5 +379,5 @@ describe('convergência (propriedade)', () => {
       ),
       { numRuns: 500 },
     );
-  });
+  }, 30_000); // Centenas de sequências, cada uma com o Mestre provando quem é (assinatura).
 });

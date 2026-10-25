@@ -6,10 +6,16 @@ import { SessionHost } from './host';
 import { generateGmKeyPair } from './identity';
 import { MemoryNetwork } from './memory-transport';
 import { encodeMusic, encodeTrackPart } from './protocol';
-import { newSheet, TEMPLATE } from './test-helpers';
+import { newSheet, TEMPLATE, GM_IDENTITY } from './test-helpers';
 
 const gm = generateGmKeyPair();
-const CAMPAIGN = { id: 'campanha', gmId: 'mestre', gmName: 'Paulo', templateId: TEMPLATE.id };
+const CAMPAIGN = {
+  id: 'campanha',
+  gmId: 'mestre',
+  gmName: 'Paulo',
+  templateId: TEMPLATE.id,
+  identity: GM_IDENTITY,
+};
 
 /** "MP3" de ~1 MB (4 partes): marca ID3 e o resto pseudoaleatório. */
 function fakeMp3(size = 1_000_000, seed = 7): Uint8Array {

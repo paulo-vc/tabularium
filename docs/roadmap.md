@@ -2,13 +2,13 @@
 
 O que está em andamento e as ideias para depois. As fases já entregues ficam em [`architecture.md`](architecture.md#roadmap); as mudanças de cada versão, no [CHANGELOG](../CHANGELOG.md).
 
-## Plano para a 1.0 (proposta)
+## Plano para a 1.0
 
 Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribuído, então o foco é chegar a uma 1.0 pronta para outras pessoas. Até lá, o `main` segue sempre funcionando (PRs, `pnpm check`, testes de ponta a ponta), o CHANGELOG acumula em "Próxima versão" e, para testar o app instalado, vale o instalador gerado pelo workflow "Desktop" em cada PR.
 
-**Plataformas da 1.0** (decidido em 2026-10-24): **desktop e celular**. A versão de navegador deixa de ser distribuída; o app web continua sendo a base do desktop e do celular e é onde rodam os testes, mas não é publicado como site.
+**Plataformas da 1.0** (decidido em 2026-10-24): **desktop e Android**. A versão de navegador deixa de ser distribuída; o app web continua sendo a base do desktop e do celular e é onde rodam os testes, mas não é publicado como site.
 
-**A 1.0 está pronta quando** um grupo que nunca viu o app consegue, sem ajuda: instalar (ou abrir no navegador), criar as fichas, entrar na mesa pelo convite, jogar uma sessão inteira e voltar na semana seguinte com tudo no lugar, inclusive trocando de computador.
+**A 1.0 está pronta quando** um grupo que nunca viu o app consegue, sem ajuda: instalar no computador ou no Android, criar as fichas, entrar na mesa pelo convite, jogar uma sessão inteira e voltar na semana seguinte com tudo no lugar, inclusive trocando de aparelho.
 
 ### Essencial
 
@@ -16,15 +16,15 @@ Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribu
    - cópia de segurança completa do aparelho num arquivo (fichas, campanhas com a chave do Mestre, sistemas, diário; imagens e trilhas opcionais) e restaurar a partir dela;
    - levar uma campanha de Mestre para outro aparelho;
    - lembrete discreto de fazer a cópia (ex.: depois de uma sessão, se a última tem mais de um mês).
-2. **Conectar sempre que der.** Sem retransmissão ([ADR 0008](adr/0008-lancar-sem-relay.md)), parte das conexões falha, sobretudo no 4G. Falta medir de verdade (a ferramenta `tools/conn-test` existe), deixar o diagnóstico claro para o usuário e decidir, numa ADR, se uma retransmissão gratuita cabe na restrição de custo zero.
+2. **Conectar sempre que der, sem retransmissão** (decidido: a 1.0 segue só com conexão direta, [ADR 0008](adr/0008-lancar-sem-relay.md); nada de servidor para manter). Falta medir de verdade, sobretudo no 4G do Android (a ferramenta `tools/conn-test` existe), aproveitar tudo o que a conexão direta permite e, quando ela falhar, explicar com clareza o que fazer (ex.: trocar para o Wi-Fi, usar o celular como roteador para os outros).
 3. **Primeira experiência.** Feito: boas-vindas no aparelho vazio (mestrar, jogar ou só uma ficha), ficha de exemplo e dicas na campanha, para o Mestre e para o jogador. O convite e o combate já se explicam na própria tela.
-4. **Revisão de interface.** Uma passada geral, tela por tela: consistência, celular, tema escuro, teclado e leitor de tela, textos.
-5. **Formatos estáveis.** Depois da 1.0, arquivos, banco e protocolo não podem quebrar. Antes dela, aproveitar para limpar o que existe só por compatibilidade com versões antigas (convite em JSON, campanhas sem chave do Mestre, efeitos temporários) e fechar o formato v1 dos arquivos e do protocolo.
+4. **Revisão de interface.** Feito: identidade visual "Noite arcana" (escuro como padrão, cobalto, títulos condensados, números em mono) e uma passada tela por tela, nos dois temas e no celular, com prints reais.
+5. **Formatos estáveis.** Feito: saíram o convite em JSON e o Mestre sem prova, todo convite leva a chave do Mestre, e os formatos da 1.0 e as regras para mudá-los estão em [`formatos.md`](formatos.md), com testes que travam os bytes do convite. Os efeitos temporários antigos dos sistemas ficam para quando os sistemas forem retomados.
 6. **Segurança e privacidade.** Feito: revisão do que vem de outros participantes, de arquivos e cópias, do app desktop e do convite; limite por jogador no que ele manda à mesa; conferência completa da cópia de segurança; e a [política de privacidade](privacidade.md), resumida em Configurações.
 
 ### Importante
 
-- **App no celular** (decidido: entra na 1.0). Tauri 2 para Android e iOS, com o mesmo código do desktop; o que muda na interface (toques, telas pequenas, teclado) e a conexão no 4G (ver retransmissão). No iOS, publicar exige um Mac e a conta de desenvolvedor da Apple (US$ 99 por ano); no Android, dá para distribuir o APK de graça ou pela Play Store (US$ 25 uma vez).
+- **App no celular** (decidido: entra na 1.0, só Android). Tauri 2 para Android, com o mesmo código do desktop; o que muda na interface (toques, telas pequenas, teclado). Distribuído de graça, como instalador (APK) nas releases do GitHub, sem Play Store. iOS fica de fora: publicar exige um Mac e a conta paga da Apple, e o projeto não tem custos.
 - **Criador de sistemas mais fácil** (decidido: entra na 1.0; ver abaixo), com os dados do sistema e o ícone pelo editor.
 - **Importar sistemas mais fácil.** Já dá para importar o arquivo `.json` de um sistema (Sistemas → Importar sistema), mas só no formato exportado pelo app (com o "envelope"). Falta aceitar também o sistema puro, colar o JSON direto e mostrar os erros de um jeito que quem escreve o arquivo entenda.
 - **Guia de uso.** Curto e com imagens: para o Mestre, para o jogador e para quem cria sistemas. E uma página do projeto para quem chega pelo link.
@@ -33,10 +33,12 @@ Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribu
 
 Soundboard, YouTube ou Spotify na música, textura dos dados, resultado da dualidade e outras ideias abaixo.
 
-### Decisões em aberto
+### Decisões tomadas
 
-- **Retransmissão (TURN).** Quando a conexão direta entre dois aparelhos falha (comum no 4G e em redes de empresa ou faculdade), um servidor de retransmissão passa os dados de um para o outro. Os dados continuam cifrados de ponta a ponta (o servidor não lê), mas alguém precisa manter o servidor. Opções: serviços públicos gratuitos com limite de uso, um servidor próprio num plano gratuito de nuvem, ou seguir sem retransmissão e só explicar a falha. Decidir com a medição do item 2.
-- **iOS.** Vale o custo da conta da Apple, ou a 1.0 sai com desktop e Android?
+- Desktop e Android; o site deixa de ser distribuído; sem iOS.
+- Sem retransmissão (TURN): só conexão direta, com a falha bem explicada.
+- Custo zero também para o projeto: Android pelo APK nas releases, sem Play Store.
+- O criador de sistemas mais fácil e a importação de sistemas entram na 1.0.
 
 ## Depois (sem data)
 

@@ -54,17 +54,17 @@ export interface ClientCampaign {
   gmId: string;
   /**
    * Chave pública do Mestre (do convite). Com ela, só é Mestre quem provar que a possui.
-   * Sem ela (campanha da v0.1), a primeira chave provada é fixada (`onGmKeyLearned`).
+   * Sem ela (campanha em que a pessoa entrou antes da 1.0, com convite sem chave), a primeira
+   * chave provada é fixada (`onGmKeyLearned`).
    */
   gmKey?: string;
 }
 
 /**
- * Como o Mestre foi reconhecido nesta conexão:
- * - `verificada`: provou possuir a chave do Mestre;
- * - `declarada`: apenas se apresentou com o ID dele (Mestre de uma versão sem assinatura).
+ * Como o Mestre foi reconhecido nesta conexão: `verificada`, provou possuir a chave do Mestre.
+ * Um Mestre que não prova nunca é aceito.
  */
-export type GmIdentity = 'verificada' | 'declarada';
+export type GmIdentity = 'verificada';
 
 const LOCAL = Symbol('alteração local');
 
@@ -364,11 +364,8 @@ export class SessionClient {
         return;
       }
       const isNew = this.gmPeer !== peerId;
-      // Uma prova válida vale mais que uma simples declaração anterior.
-      if (isNew || identity === 'verificada') {
-        this.gmPeer = peerId;
-        this.gmIdentity = identity;
-      }
+      this.gmPeer = peerId;
+      this.gmIdentity = identity;
       if (isNew) {
         this.setStatus({ state: this.ready ? 'conectado' : 'sincronizando' });
         const step1 = syncEncoder(this.latest.id);
@@ -500,10 +497,9 @@ export class SessionClient {
   }
 
   /**
-   * Confere quem se apresenta como Mestre. Devolve `null` se não deve ser aceito.
-   * Com a chave do Mestre conhecida, só a prova do desafio desta conexão vale. Sem chave
-   * (campanha da v0.1), uma declaração sem prova ainda é aceita, e a primeira chave
-   * provada passa a ser a da campanha.
+   * Confere quem se apresenta como Mestre. Devolve `null` se não deve ser aceito: só a prova
+   * do desafio desta conexão vale, com a chave do convite. Sem chave conhecida (convite de
+   * antes da 1.0), a primeira chave provada passa a ser a da campanha.
    */
   private authenticate(hello: Extract<Hello, { role: 'mestre' }>): GmIdentity | null {
     const { gmKey, proof } = hello;
@@ -522,7 +518,7 @@ export class SessionClient {
       }
       return 'verificada';
     }
-    return this.gmKey === undefined ? 'declarada' : null;
+    return null;
   }
 
   private setStatus(status: ClientStatus): void {

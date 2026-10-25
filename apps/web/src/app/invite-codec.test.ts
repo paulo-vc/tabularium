@@ -22,25 +22,22 @@ const invite = (changes: Partial<CampaignInvite> = {}): CampaignInvite => ({
   ...changes,
 });
 
-/** O formato antigo (v0.1/v0.2): JSON em base64url. */
-const legacyCode = (value: CampaignInvite) =>
+/** JSON em base64url: o formato da v0.1/v0.2, que não vale mais. */
+const jsonCode = (value: CampaignInvite) =>
   btoa(String.fromCharCode(...new TextEncoder().encode(JSON.stringify(value))))
     .replace(/\+/g, '-')
     .replace(/\//g, '_')
     .replace(/=+$/, '');
 
 describe('convite compacto', () => {
-  it('fica com menos da metade do tamanho do formato antigo', () => {
+  it('cabe num link curto', () => {
     const value = invite();
-    const code = encodeInvite(value);
-    expect(code.length).toBeLessThan(200);
-    expect(legacyCode(value).length).toBeGreaterThan(440);
+    expect(encodeInvite(value).length).toBeLessThan(200);
     expect(inviteUrl(value, 'https://paulo-vc.github.io/tabularium/').length).toBeLessThan(250);
   });
 
   it.each([
     ['com chave do Mestre', invite()],
-    ['sem chave (campanha da v0.1)', (({ gmKey: _k, ...rest }) => rest)(invite())],
     ['IDs que não são UUID', invite({ campaignId: 'campanha_antiga-1', gmId: 'mestre' })],
     ['versão grande', invite({ templateRef: { id: 'meu', version: '300.12.4', source: 'local' } })],
     ['nomes com acento e emoji', invite({ name: 'Crônicas 🐉 de Ébano', gmName: 'Zoë' })],
@@ -52,13 +49,8 @@ describe('convite compacto', () => {
     expect(decodeInvite(encodeInvite(value))).toEqual({ ok: true, value });
   });
 
-  it('convites no formato antigo (v0.1/v0.2) continuam valendo', () => {
-    const value = invite();
-    expect(decodeInvite(legacyCode(value))).toEqual({ ok: true, value });
-    expect(decodeInvite(`https://x.dev/#/convite/${legacyCode(value)}`)).toEqual({
-      ok: true,
-      value,
-    });
+  it('o formato antigo (JSON, v0.1/v0.2) não vale mais', () => {
+    expect(decodeInvite(jsonCode(invite()))).toMatchObject({ ok: false });
   });
 
   it('cortado, com bytes sobrando ou de um formato futuro: mensagem clara', () => {
