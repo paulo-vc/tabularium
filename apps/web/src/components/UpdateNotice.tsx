@@ -3,17 +3,18 @@ import { toast } from 'sonner';
 import { findUpdate, tauriUpdater, type PendingUpdate, type Updater } from '@/app/desktop-updates';
 import { useServices } from '@/app/services-context';
 import { releasesUrl } from '@/app/updates';
-import { isDesktopApp, openExternal } from '@/lib/open-external';
+import { isAndroidApp, isTauriApp, openExternal } from '@/lib/open-external';
 
 /**
- * No app desktop, oferece a versão nova: "Atualizar e reiniciar" baixa, confere a
- * assinatura, instala e reabre. (A versão web se atualiza sozinha pelo service worker.)
+ * No app instalado, oferece a versão nova. No computador, "Atualizar e reiniciar" baixa,
+ * confere a assinatura, instala e reabre; no Android (sem atualização automática), leva à
+ * página da versão para baixar o APK novo. (A versão web se atualiza sozinha.)
  */
 export function UpdateNotice() {
   const { session } = useServices();
 
   useEffect(() => {
-    if (!isDesktopApp()) return;
+    if (!isTauriApp()) return;
     let active = true;
 
     const install = async (updater: Updater, update: PendingUpdate) => {
@@ -37,7 +38,7 @@ export function UpdateNotice() {
     };
 
     void (async () => {
-      const updater = await tauriUpdater().catch(() => null);
+      const updater = isAndroidApp() ? null : await tauriUpdater().catch(() => null);
       const offer = await findUpdate(updater, __APP_VERSION__);
       if (!active || !offer) return;
       if (offer.kind === 'automatica' && updater) {

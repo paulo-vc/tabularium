@@ -1,0 +1,107 @@
+name: Android
+
+# Gera o APK do Android (Tauri). Em cada PR que mexe no shell, confere que o build passa;
+# numa tag `v*`, anexa o APK à release (o rascunho é criado pelo workflow Release).
+#
+# Assinatura: com os segredos ANDROID_KEYSTORE (base64 do .jks), ANDROID_KEY_ALIAS e
+# ANDROID_KEY_PASSWORD, sai o APK de release assinado. Sem eles, sai um APK de depuração
+# (assinado com a chave de testes do Android): instala para testar, mas não serve para
+# distribuir, porque uma versão nova com outra chave não instala por cima.
+on:
+  pull_request:
+    paths:
+      - apps/desktop/**
+      - .github/workflows/android.yml
+      - .github/scripts/android-signing.py
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
+permissions:
+  contents: write
+
+jobs:
+  apk:
+    name: APK
+    runs-on: ubuntu-latest
+    env:
+      NDK_VERSION: 27.2.12479018
+      HAS_KEY: ${{ secrets.ANDROID_KEYSTORE != '' }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+      - name: NDK do Android
+        run: |
+          yes | "$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager" --install "ndk;$NDK_VERSION" > /dev/null
+          echo "NDK_HOME=$ANDROID_HOME/ndk/$NDK_VERSION" >> "$GITHUB_ENV"
+      - uses: pnpm/action-setup@v6
+      - uses: actions/setup-node@v7
+        with:
+          node-version-file: .nvmrc
+          cache: pnpm
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: aarch64-linux-android,armv7-linux-androideabi
+      - uses: Swatinem/rust-cache@v2
+        with:
+          workspaces: apps/desktop/src-tauri
+      - run: pnpm install --frozen-lockfile
+      - name: Projeto Android (gerado a cada build)
+        working-directory: apps/desktop
+        run: |
+          pnpm tauri android init --ci
+          pnpm tauri icon src-tauri/icons/icon.png
+      - name: Assinatura de release
+        if: env.HAS_KEY == 'true'
+        working-directory: apps/desktop/src-tauri/gen/android
+        env:
+          ANDROID_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: |
+          echo "$ANDROID_KEYSTORE" | base64 --decode > "$RUNNER_TEMP/tabularium.jks"
+          {
+            echo "keyAlias=$ANDROID_KEY_ALIAS"
+            echo "password=$ANDROID_KEY_PASSWORD"
+            echo "storeFile=$RUNNER_TEMP/tabularium.jks"
+          } > keystore.properties
+          python3 "$GITHUB_WORKSPACE/.github/scripts/android-signing.py" app/build.gradle.kts
+      - name: Build do APK
+        working-directory: apps/desktop
+        run: |
+          if [ "$HAS_KEY" = "true" ]; then
+            pnpm tauri android build --apk --target aarch64 armv7
+          else
+            pnpm tauri android build --apk --debug --target aarch64
+          fi
+      - name: Nome do arquivo
+        id: apk
+        run: |
+          VERSION=$(node -p "require('./apps/web/package.json').version")
+          KIND=$([ "$HAS_KEY" = "true" ] && echo "" || echo "_teste")
+          FILE="Tabularium_${VERSION}_android${KIND}.apk"
+          SOURCE=$(find apps/desktop/src-tauri/gen/android/app/build/outputs/apk -name '*.apk' | head -1)
+          cp "$SOURCE" "$FILE"
+          echo "file=$FILE" >> "$GITHUB_OUTPUT"
+      - uses: actions/upload-artifact@v5
+        with:
+          name: ${{ steps.apk.outputs.file }}
+          path: ${{ steps.apk.outputs.file }}
+      - name: Anexar à release
+        if: startsWith(github.ref, 'refs/tags/v') && env.HAS_KEY == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          # O rascunho da release é criado pelo workflow Release, que roda ao mesmo tempo.
+          for attempt in $(seq 1 40); do
+            gh release view "$GITHUB_REF_NAME" > /dev/null 2>&1 && break
+            sleep 30
+          done
+          gh release upload "$GITHUB_REF_NAME" "${{ steps.apk.outputs.file }}" --clobber
