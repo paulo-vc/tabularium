@@ -11,7 +11,7 @@ import { LiveSessionIndicator } from './live/LiveSessionIndicator';
 import { RollNotice } from './live/RollNotice';
 import { SessionNotices } from './live/SessionNotices';
 import { UpdateNotice } from './UpdateNotice';
-import { newIssueUrl } from '@/app/updates';
+import { guideUrl, newIssueUrl } from '@/app/updates';
 import { openExternal } from '@/lib/open-external';
 
 /** `also`: outras rotas que pertencem à mesma seção (ex.: uma ficha pertence a "Fichas"). */
@@ -88,6 +88,16 @@ export function AppShell({ children }: { children: ReactNode }) {
       <main className="mx-auto max-w-6xl px-4 py-6 print:max-w-none print:p-0">{children}</main>
       <footer className="text-muted-foreground mx-auto flex max-w-6xl flex-wrap gap-x-4 gap-y-1 px-4 pb-6 text-xs print:hidden">
         <span>Tabularium RPG {__APP_VERSION__}</span>
+        <a
+          href={guideUrl}
+          className="hover:text-foreground underline-offset-2 hover:underline"
+          onClick={(event) => {
+            event.preventDefault();
+            void openExternal(guideUrl);
+          }}
+        >
+          Guia de uso
+        </a>
         <a
           href={newIssueUrl}
           className="hover:text-foreground underline-offset-2 hover:underline"

@@ -7,6 +7,8 @@ export const APP_REPO = { owner: 'paulo-vc', name: 'tabularium' };
 export const releasesUrl = `https://github.com/${APP_REPO.owner}/${APP_REPO.name}/releases`;
 /** Política de privacidade (`docs/privacidade.md`), aberta no navegador. */
 export const privacyUrl = `https://github.com/${APP_REPO.owner}/${APP_REPO.name}/blob/main/docs/privacidade.md`;
+/** Guia de uso (`docs/guia.md`), aberto no navegador. */
+export const guideUrl = `https://github.com/${APP_REPO.owner}/${APP_REPO.name}/blob/main/docs/guia.md`;
 export const newIssueUrl = `https://github.com/${APP_REPO.owner}/${APP_REPO.name}/issues/new/choose`;
 
 const ReleaseSchema = z.object({
