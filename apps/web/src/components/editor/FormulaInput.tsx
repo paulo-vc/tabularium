@@ -20,6 +20,19 @@ function references(fields: readonly FieldDef[], selfId: string): string[] {
   });
 }
 
+/**
+ * Fórmulas prontas para os casos mais comuns. `A` e `B` viram os primeiros campos do sistema
+ * (ex.: `@for`), para o exemplo já sair perto do que se quer.
+ */
+const EXAMPLES: { name: string; formula: string }[] = [
+  { name: 'Modificador (d20)', formula: 'floor((A - 10) / 2)' },
+  { name: 'Soma de dois', formula: 'A + B' },
+  { name: 'Soma se marcado', formula: 'A + if(B, 2, 0)' },
+  { name: 'Cresce com o nível', formula: 'ceil(A / 4) + 1' },
+  { name: 'Metade, para cima', formula: 'ceil(A / 2)' },
+  { name: 'Nunca abaixo de 0', formula: 'max(0, A)' },
+];
+
 export function FormulaInput({
   id,
   value,
@@ -54,6 +67,10 @@ export function FormulaInput({
   };
 
   const available = references(fields, selfId);
+  const fill = (formula: string) =>
+    formula
+      .replace(/\bA\b/g, available[0] ?? '@valor')
+      .replace(/\bB\b/g, available[1] ?? available[0] ?? '@outro');
 
   return (
     <div className="space-y-2">
@@ -84,6 +101,28 @@ export function FormulaInput({
           </div>
         </div>
       )}
+      <div className="space-y-1">
+        <p className="text-muted-foreground text-xs">Exemplos (clique para usar e ajuste):</p>
+        <div className="flex flex-wrap gap-1">
+          {EXAMPLES.map((example) => {
+            const formula = fill(example.formula);
+            return (
+              <button
+                key={example.name}
+                type="button"
+                title={formula}
+                className="hover:bg-accent rounded border px-1.5 py-0.5 text-xs"
+                onClick={() => {
+                  onChange(formula);
+                  requestAnimationFrame(() => ref.current?.focus());
+                }}
+              >
+                {example.name}
+              </button>
+            );
+          })}
+        </div>
+      </div>
       <details className="text-muted-foreground text-xs">
         <summary className="cursor-pointer">Como escrever fórmulas</summary>
         <ul className="mt-1 list-disc space-y-0.5 pl-4">

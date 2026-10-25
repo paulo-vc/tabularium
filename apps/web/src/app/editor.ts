@@ -9,7 +9,9 @@ import {
   SYSTEM_ICON_MAX_CHARS,
   SYSTEM_ICON_MAX_SIDE,
   SystemIconSchema,
+  starterTemplate,
   templateIdFromName,
+  type StarterId,
   type Result,
   type SystemIcon,
   type DraftRepository,
@@ -86,6 +88,16 @@ export class TemplateEditorService {
   async createBlank(name: string, author?: string): Promise<TemplateDraft> {
     const id = templateIdFromName(name, await this.takenIds());
     return this.create(blankTemplate({ id, name, ...(author && { author }) }));
+  }
+
+  /** Novo sistema a partir de um modelo pronto (campos, fórmulas e seções que funcionam). */
+  async createFromStarter(
+    starter: StarterId,
+    name: string,
+    author?: string,
+  ): Promise<TemplateDraft> {
+    const id = templateIdFromName(name, await this.takenIds());
+    return this.create(starterTemplate(starter, { id, name, ...(author && { author }) }));
   }
 
   /** Novo sistema a partir de outro (ex.: uma variante do D&D). */

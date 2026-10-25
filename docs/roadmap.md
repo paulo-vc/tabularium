@@ -25,7 +25,7 @@ Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribu
 ### Importante
 
 - **App no celular** (decidido: entra na 1.0, só Android). Tauri 2 para Android, com o mesmo código do desktop; o que muda na interface (toques, telas pequenas, teclado). Distribuído de graça, como instalador (APK) nas releases do GitHub, sem Play Store. iOS fica de fora: publicar exige um Mac e a conta paga da Apple, e o projeto não tem custos.
-- **Criador de sistemas mais fácil** (decidido: entra na 1.0; ver abaixo). Os dados do sistema e o ícone já se fazem pelo editor; falta o resto (modelos prontos, etapas, exemplos).
+- **Criador de sistemas mais fácil.** Feito: modelos prontos (d20 e 2d6), etapas no editor, exemplos de fórmula com os campos do sistema, dados do sistema e ícone pelo editor.
 - **Importar sistemas mais fácil.** Feito: "Importar sistema" aceita o arquivo exportado e o sistema puro, por arquivo ou colando o JSON, e lista os problemas em português, com o lugar de cada um.
 - **Guia de uso.** Curto e com imagens: para o Mestre, para o jogador e para quem cria sistemas. E uma página do projeto para quem chega pelo link.
 
@@ -43,10 +43,6 @@ Soundboard, YouTube ou Spotify na música, textura dos dados, resultado da duali
 ## Depois (sem data)
 
 Ideias levantadas em 2026-10, ainda sem desenho. A ordem não é de prioridade.
-
-### Criador de sistemas mais fácil
-
-O criador está completo, mas ainda é difícil para quem não está acostumado com campos, fórmulas e seções. Caminhos possíveis: começar de um modelo pronto (atributos, perícias, recursos), assistentes por etapa e exemplos ao lado das fórmulas.
 
 ### Dados 3D: o que falta
 

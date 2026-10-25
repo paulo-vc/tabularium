@@ -15,6 +15,7 @@ import { Link, useLocation } from 'wouter';
 import { useServices } from '@/app/services-context';
 import { EditorPreview } from '@/components/editor/EditorPreview';
 import { FieldDialog } from '@/components/editor/FieldDialog';
+import { EditorSteps } from '@/components/editor/EditorSteps';
 import { InfoEditor } from '@/components/editor/InfoEditor';
 import { describeIssue } from '@/components/editor/issues';
 import { StructureEditor } from '@/components/editor/StructureEditor';
@@ -205,6 +206,8 @@ export function EditorPage({ id }: { id: string }) {
           Rascunho salvo automaticamente neste aparelho.
         </p>
       )}
+
+      <EditorSteps template={template} saved={saved !== undefined} onGo={setTab} />
 
       <div role="tablist" aria-label="Partes do editor" className="flex gap-1 border-b">
         {TABS.map((item) => (
