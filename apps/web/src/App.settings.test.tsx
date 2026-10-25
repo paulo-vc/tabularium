@@ -34,7 +34,14 @@ describe('configurações', () => {
     const user = renderSettings();
     await user.click(await screen.findByRole('link', { name: 'Configurações' }));
     expect(await screen.findByRole('heading', { name: 'Configurações' })).toBeInTheDocument();
-    for (const section of ['Você', 'Aparência', 'Sons e avisos', 'Dados 3D', 'Música da mesa']) {
+    for (const section of [
+      'Você',
+      'Aparência',
+      'Sons e avisos',
+      'Dados 3D',
+      'Música da mesa',
+      'Conexão',
+    ]) {
       expect(await screen.findByRole('heading', { name: section })).toBeInTheDocument();
     }
     expect(screen.getByRole('heading', { name: 'Armazenamento' })).toBeInTheDocument();

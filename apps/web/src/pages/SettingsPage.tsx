@@ -14,6 +14,7 @@ import { privacyUrl } from '@/app/updates';
 import { cn } from '@/lib/utils';
 import { useServices } from '@/app/services-context';
 import { BackupSection } from '@/components/BackupSection';
+import { NetworkSection } from '@/components/NetworkSection';
 import { useLiveSession } from '@/components/live/use-live-session';
 import { useDisplayName } from '@/components/use-device';
 import { Button } from '@/components/ui/button';
@@ -55,6 +56,7 @@ export function SettingsPage() {
       <SoundSection />
       <DiceSection />
       <MusicSection />
+      <NetworkSection />
       <StorageSection />
       <PrivacySection />
     </div>

@@ -1,5 +1,5 @@
 import { CONNECTION_LABEL, type ConnectionInfo } from './connection';
-import { NAT_DESCRIPTION, type NatDiagnosis } from './nat';
+import { NAT_DESCRIPTION, type NatDiagnosis } from '@tabula/sync/network';
 
 /** Caracteres sem ambiguidade (sem 0/O, 1/I/L). */
 const ALPHABET = 'ABCDEFGHJKMNPQRSTUVWXYZ23456789';

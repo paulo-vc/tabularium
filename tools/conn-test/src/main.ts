@@ -1,7 +1,6 @@
 import './style.css';
 import { CONNECTION_LABEL } from './connection';
-import { diagnoseNetwork } from './gather';
-import { NAT_DESCRIPTION, type NatDiagnosis } from './nat';
+import { diagnoseNetwork, NAT_DESCRIPTION, type NatDiagnosis } from '@tabula/sync/network';
 import { formatReport, newRoomCode, normalizeRoomCode, type PeerResult } from './report';
 import { joinTestRoom, type PeerState } from './room';
 

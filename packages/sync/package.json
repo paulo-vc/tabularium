@@ -6,7 +6,8 @@
   "type": "module",
   "exports": {
     ".": "./src/index.ts",
-    "./webrtc": "./src/webrtc-transport.ts"
+    "./webrtc": "./src/webrtc-transport.ts",
+    "./network": "./src/network/index.ts"
   },
   "scripts": {
     "typecheck": "tsc -p tsconfig.json",
