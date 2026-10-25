@@ -20,7 +20,7 @@ Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribu
 3. **Primeira experiência.** Feito: boas-vindas no aparelho vazio (mestrar, jogar ou só uma ficha), ficha de exemplo e dicas na campanha, para o Mestre e para o jogador. O convite e o combate já se explicam na própria tela.
 4. **Revisão de interface.** Feito: identidade visual "Noite arcana" (escuro como padrão, cobalto, títulos condensados, números em mono) e uma passada tela por tela, nos dois temas e no celular, com prints reais.
 5. **Formatos estáveis.** Feito: saíram o convite em JSON e o Mestre sem prova, todo convite leva a chave do Mestre, e os formatos da 1.0 e as regras para mudá-los estão em [`formatos.md`](formatos.md), com testes que travam os bytes do convite. Os efeitos temporários antigos dos sistemas ficam para quando os sistemas forem retomados.
-6. **Segurança e privacidade.** Revisão geral do que vem de outros participantes e de arquivos importados, da política de segurança do app desktop e do convite; uma política de privacidade curta (o app não coleta nada; o que passa pela rede e por quem).
+6. **Segurança e privacidade.** Feito: revisão do que vem de outros participantes, de arquivos e cópias, do app desktop e do convite; limite por jogador no que ele manda à mesa; conferência completa da cópia de segurança; e a [política de privacidade](privacidade.md), resumida em Configurações.
 
 ### Importante
 

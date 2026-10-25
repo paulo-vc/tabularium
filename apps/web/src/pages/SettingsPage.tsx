@@ -8,7 +8,9 @@ import {
   notificationState,
   type NotificationState,
 } from '@/lib/attention';
+import { openExternal } from '@/lib/open-external';
 import { setTheme, storedTheme, type ThemeChoice } from '@/lib/theme';
+import { privacyUrl } from '@/app/updates';
 import { cn } from '@/lib/utils';
 import { useServices } from '@/app/services-context';
 import { BackupSection } from '@/components/BackupSection';
@@ -54,6 +56,7 @@ export function SettingsPage() {
       <DiceSection />
       <MusicSection />
       <StorageSection />
+      <PrivacySection />
     </div>
   );
 }
@@ -352,6 +355,37 @@ function MusicSection() {
         Baixar músicas neste aparelho
         <Hint>Desligue no 4G para economizar dados: aparece só o título do que toca.</Hint>
       </Toggle>
+    </Section>
+  );
+}
+
+/** O essencial da política de privacidade, com o link para a completa. */
+function PrivacySection() {
+  return (
+    <Section
+      title="Privacidade"
+      description="Sem conta, sem servidor próprio, sem anúncios e sem rastreamento."
+    >
+      <ul className="text-muted-foreground list-disc space-y-1.5 pl-5 text-sm">
+        <li>Tudo o que você cria fica neste aparelho.</li>
+        <li>
+          Na sessão, os aparelhos da mesa se falam direto, numa conexão cifrada. Para se acharem,
+          usam serviços públicos (relays Nostr e servidores STUN), e os participantes veem o
+          endereço de internet uns dos outros.
+        </li>
+        <li>Sussurros entre jogadores são cifrados de ponta a ponta: o Mestre não lê.</li>
+        <li>O app só fala com o GitHub para ver atualizações e o catálogo da comunidade.</li>
+      </ul>
+      <a
+        href={privacyUrl}
+        className="text-primary inline-block text-sm underline-offset-2 hover:underline"
+        onClick={(event) => {
+          event.preventDefault();
+          void openExternal(privacyUrl);
+        }}
+      >
+        Ler a política de privacidade completa
+      </a>
     </Section>
   );
 }

@@ -1,8 +1,15 @@
 import {
   CampaignSchema,
   CharacterSheetSchema,
+  ChatMessageSchema,
   err,
+  JournalEntrySchema,
   ok,
+  RollEntrySchema,
+  sniffAudioMime,
+  sniffImageMime,
+  StoredImageSchema,
+  StoredTrackSchema,
   SystemTemplateSchema,
   type Issue,
   type Result,
@@ -158,18 +165,68 @@ export function readBackup(text: string, databaseVersion: number): Result<Backup
       return invalid('A cópia está incompleta ou foi alterada.');
     }
   }
-  const checks = [
-    ['templates', SystemTemplateSchema],
-    ['sheets', CharacterSheetSchema],
-    ['campaigns', CampaignSchema],
-  ] as const;
-  for (const [name, schema] of checks) {
-    if ((backup.tables[name] ?? []).some((record) => !schema.safeParse(record).success)) {
+  for (const [name, records] of Object.entries(backup.tables)) {
+    const valid = RECORD_CHECKS[name as TableName];
+    if (records.some((record) => !valid(record as Row))) {
       return invalid('A cópia está incompleta ou foi alterada.');
     }
   }
   return ok(backup as Backup);
 }
+
+type Row = Record<string, unknown>;
+
+const isText = (value: unknown) => typeof value === 'string' && value.length > 0;
+/** Registro de uma campanha: `campaignId` e `id` de texto, mais o que cada tabela pede. */
+const inCampaign = (record: Row) => isText(record.campaignId) && isText(record.id);
+const bytes = (record: Row) => (record.data instanceof Uint8Array ? record.data : null);
+
+/**
+ * O que cada tabela da cópia precisa ter para ser restaurada. Fichas, campanhas, sistemas,
+ * diário, chat e rolagens passam pelos mesmos schemas de quando chegam pela sessão; imagens e
+ * trilhas conferem o tipo pelos primeiros bytes. Uma cópia é escolhida pela própria pessoa,
+ * mas pode ter vindo de outro lugar: nada entra no banco sem conferência.
+ */
+const RECORD_CHECKS: Record<TableName, (record: Row) => boolean> = {
+  templates: (record) => SystemTemplateSchema.safeParse(record).success,
+  sheets: (record) => CharacterSheetSchema.safeParse(record).success,
+  campaigns: (record) => CampaignSchema.safeParse(record).success,
+  settings: (record) => isText(record.key),
+  drafts: (record) => isText(record.id),
+  sessionStates: (record) =>
+    isText(record.campaignId) && isText(record.key) && record.state instanceof Uint8Array,
+  secretValues: (record) =>
+    isText(record.campaignId) &&
+    isText(record.sheetId) &&
+    typeof record.values === 'object' &&
+    record.values !== null,
+  gmKeys: (record) => isText(record.campaignId) && isText(record.secretKey),
+  journal: (record) => inCampaign(record) && JournalEntrySchema.safeParse(record.entry).success,
+  chat: (record) => inCampaign(record) && ChatMessageSchema.safeParse(record.message).success,
+  rollLog: (record) => inCampaign(record) && RollEntrySchema.safeParse(record.entry).success,
+  images: (record) => {
+    const data = bytes(record);
+    const meta = StoredImageSchema.safeParse(record.meta);
+    return (
+      inCampaign(record) &&
+      data !== null &&
+      meta.success &&
+      meta.data.size === data.byteLength &&
+      sniffImageMime(data) === meta.data.mime
+    );
+  },
+  tracks: (record) => {
+    const data = bytes(record);
+    const meta = StoredTrackSchema.safeParse(record.meta);
+    return (
+      inCampaign(record) &&
+      data !== null &&
+      meta.success &&
+      meta.data.size === data.byteLength &&
+      sniffAudioMime(data) === meta.data.mime
+    );
+  },
+};
 
 export function summarize(backup: Backup): BackupSummary {
   const count = (name: TableName) => backup.tables[name]?.length ?? 0;

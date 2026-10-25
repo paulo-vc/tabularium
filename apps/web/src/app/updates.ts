@@ -5,6 +5,8 @@ import { z } from 'zod';
 export const APP_REPO = { owner: 'paulo-vc', name: 'tabularium' };
 
 export const releasesUrl = `https://github.com/${APP_REPO.owner}/${APP_REPO.name}/releases`;
+/** Política de privacidade (`docs/privacidade.md`), aberta no navegador. */
+export const privacyUrl = `https://github.com/${APP_REPO.owner}/${APP_REPO.name}/blob/main/docs/privacidade.md`;
 export const newIssueUrl = `https://github.com/${APP_REPO.owner}/${APP_REPO.name}/issues/new/choose`;
 
 const ReleaseSchema = z.object({

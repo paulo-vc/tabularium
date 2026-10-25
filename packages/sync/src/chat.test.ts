@@ -1,7 +1,7 @@
 import type { ChatMessage } from '@tabula/domain';
 import { describe, expect, it } from 'vitest';
 import { SessionClient } from './client';
-import { SessionHost } from './host';
+import { SessionHost, TALK_LIMIT } from './host';
 import { MemoryNetwork } from './memory-transport';
 import { encodeChat } from './protocol';
 import { newSheet, TEMPLATE, GM_IDENTITY } from './test-helpers';
@@ -171,5 +171,24 @@ describe('chat da sessão', () => {
     client.start();
     await network.settle();
     expect(client.chat(message('ana'))).toBe(false);
+  });
+});
+
+describe('limite contra quem inunda a mesa', () => {
+  it('passando do limite, as mensagens são descartadas; a mesa e o resto da sessão seguem', async () => {
+    const { network, fromPlayers, join } = setUp();
+    const ana = join('ana', 's1');
+    const bia = join('bia', 's2');
+    await network.settle();
+    for (let i = 0; i < TALK_LIMIT.max + 15; i++) ana.client.chat(message('ana'));
+    await network.settle();
+    expect(fromPlayers).toHaveLength(TALK_LIMIT.max);
+    expect(bia.received).toHaveLength(TALK_LIMIT.max);
+
+    // A Bia tem o limite dela: continua falando normalmente.
+    const hello = message('bia');
+    bia.client.chat(hello);
+    await network.settle();
+    expect(fromPlayers.at(-1)).toEqual(hello);
   });
 });
