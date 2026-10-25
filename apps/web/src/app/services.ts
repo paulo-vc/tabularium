@@ -162,6 +162,7 @@ export function createServices(
       catalog,
       clock,
       ids,
+      processImage,
     ),
     registry: new RegistryService(registrySource, catalog, files, sha256, appVersion),
     session,

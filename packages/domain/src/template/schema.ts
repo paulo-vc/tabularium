@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { MAX_FORMULA_LENGTH } from '../formula';
 import { CustomDieSchema } from '../dice/custom';
+import { SystemIconSchema } from './icon';
 import {
   DescriptionSchema,
   FiniteNumberSchema,
@@ -241,6 +242,8 @@ export const SystemTemplateSchema = z.object({
    * dela. Sem isso, os bônus ficam num botão no topo da ficha.
    */
   bonusTab: z.string().trim().min(1).max(40).optional(),
+  /** Ícone do sistema (imagem pequena, embutida), nas listas de sistemas, fichas e campanhas. */
+  icon: SystemIconSchema.optional(),
   /** Versão mínima do app capaz de abrir este template. */
   minAppVersion: SemVerSchema.optional(),
   fields: z.array(FieldDefSchema).min(1).max(LIMITS.fields),

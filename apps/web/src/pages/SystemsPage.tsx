@@ -36,6 +36,7 @@ import {
   CardTitle,
 } from '@/components/ui/card';
 import { downloadFile } from '@/lib/browser-files';
+import { SystemIcon } from '@/components/SystemIcon';
 
 const SOURCE_LABEL: Record<SystemTemplate['source'], string> = {
   builtin: 'Nativo',
@@ -97,7 +98,10 @@ export function SystemsPage() {
           <li key={template.id}>
             <Card className="h-full">
               <CardHeader>
-                <CardTitle>{template.name}</CardTitle>
+                <CardTitle className="flex items-center gap-2">
+                  <SystemIcon icon={template.icon} name={template.name} className="size-7" />
+                  {template.name}
+                </CardTitle>
                 <CardDescription>
                   Versão {template.version}
                   {template.author && ` · ${template.author}`}
