@@ -2,7 +2,6 @@ import type { SystemTemplate } from '@tabula/domain';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   DownloadIcon,
-  FileUpIcon,
   GlobeIcon,
   PencilIcon,
   PencilRulerIcon,
@@ -15,7 +14,7 @@ import { Link, useLocation } from 'wouter';
 import { useServices } from '@/app/services-context';
 import { NewSystemDialog } from '@/components/editor/NewSystemDialog';
 import { PublishDialog } from '@/components/PublishDialog';
-import { useImport } from '@/components/use-import';
+import { ImportSystemDialog } from '@/components/ImportSystemDialog';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -49,7 +48,6 @@ export function SystemsPage() {
   const templates = useLiveQuery(() => catalog.list(), [catalog]);
   const drafts = useLiveQuery(() => editor.list(), [editor]);
   const [, navigate] = useLocation();
-  const importFile = useImport();
   const [toDelete, setToDelete] = useState<{ template: SystemTemplate; inUse: number } | null>(
     null,
   );
@@ -66,9 +64,7 @@ export function SystemsPage() {
       <div className="flex flex-wrap items-center justify-between gap-3">
         <h1 className="text-2xl font-bold tracking-tight">Sistemas</h1>
         <div className="flex flex-wrap gap-2">
-          <Button variant="outline" onClick={importFile}>
-            <FileUpIcon /> Importar sistema
-          </Button>
+          <ImportSystemDialog />
           <Button variant="outline" asChild>
             <Link href="/sistemas/comunidade">
               <GlobeIcon /> Explorar comunidade

@@ -52,6 +52,7 @@ export function parseExport(text: string): Result<ExportEnvelope, Issue[]> {
     return err([issue('json-invalido', 'O arquivo não é um JSON válido')]);
   }
 
+  json = asEnvelope(json);
   const version = (json as { formatVersion?: unknown } | null)?.formatVersion;
   if (typeof version === 'number' && version > FORMAT_VERSION) {
     return err([
@@ -94,6 +95,22 @@ export function parseExport(text: string): Result<ExportEnvelope, Issue[]> {
     }
   }
   return ok(envelope);
+}
+
+/**
+ * Um sistema "puro" (o JSON do template, sem o envelope de exportação), como quem escreve um
+ * sistema à mão costuma ter: vira um envelope de sistema. Sem `source`, é um sistema local.
+ */
+function asEnvelope(json: unknown): unknown {
+  if (!json || typeof json !== 'object' || Array.isArray(json)) return json;
+  const value = json as Record<string, unknown>;
+  if ('kind' in value || !('fields' in value) || !('layouts' in value)) return json;
+  return {
+    formatVersion: FORMAT_VERSION,
+    exportedAt: new Date().toISOString(),
+    kind: 'tabula/template',
+    payload: { source: 'local', ...value },
+  };
 }
 
 /** Serializa um envelope para salvar em arquivo. */
