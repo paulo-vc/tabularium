@@ -33,7 +33,10 @@ export function LiveSessionIndicator() {
     >
       <RadioIcon className={cn('size-3.5', !connected && 'animate-pulse')} />
       <span className="hidden md:inline">{label}</span>
-      <span className="md:hidden">{short}</span>
+      {/* No celular, o jogador vê só o ícone: o menu precisa do espaço. */}
+      <span className={live.kind === 'mestre' ? 'md:hidden' : 'hidden sm:inline md:hidden'}>
+        {short}
+      </span>
     </Link>
   );
 }

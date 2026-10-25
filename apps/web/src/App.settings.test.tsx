@@ -40,15 +40,23 @@ describe('configurações', () => {
     expect(screen.getByRole('heading', { name: 'Armazenamento' })).toBeInTheDocument();
   });
 
-  it('o tema escuro vale na hora e fica guardado', async () => {
+  it('o escuro é o padrão; claro e "do sistema" valem na hora e ficam guardados', async () => {
     const user = renderSettings();
     const themes = await screen.findByRole('radiogroup', { name: 'Tema' });
-    await user.click(within(themes).getByRole('radio', { name: /Escuro/ }));
-    expect(document.documentElement).toHaveClass('dark');
-    expect(localStorage.getItem('tabula:tema')).toBe('escuro');
-
+    expect(within(themes).getByRole('radio', { name: /Escuro/ })).toHaveAttribute(
+      'aria-checked',
+      'true',
+    );
     await user.click(within(themes).getByRole('radio', { name: /Claro/ }));
     expect(document.documentElement).not.toHaveClass('dark');
+    expect(localStorage.getItem('tabula:tema')).toBe('claro');
+
+    await user.click(within(themes).getByRole('radio', { name: /Escuro/ }));
+    expect(document.documentElement).toHaveClass('dark');
+    expect(localStorage.getItem('tabula:tema')).toBeNull();
+
+    await user.click(within(themes).getByRole('radio', { name: /Do sistema/ }));
+    expect(localStorage.getItem('tabula:tema')).toBe('sistema');
   });
 
   it('o nome salvo vem preenchido nas próximas campanhas', async () => {

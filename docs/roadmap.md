@@ -18,7 +18,7 @@ Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribu
    - lembrete discreto de fazer a cópia (ex.: depois de uma sessão, se a última tem mais de um mês).
 2. **Conectar sempre que der.** Sem retransmissão ([ADR 0008](adr/0008-lancar-sem-relay.md)), parte das conexões falha, sobretudo no 4G. Falta medir de verdade (a ferramenta `tools/conn-test` existe), deixar o diagnóstico claro para o usuário e decidir, numa ADR, se uma retransmissão gratuita cabe na restrição de custo zero.
 3. **Primeira experiência.** Feito: boas-vindas no aparelho vazio (mestrar, jogar ou só uma ficha), ficha de exemplo e dicas na campanha, para o Mestre e para o jogador. O convite e o combate já se explicam na própria tela.
-4. **Revisão de interface.** Uma passada geral, tela por tela: consistência, celular, tema escuro, teclado e leitor de tela, textos.
+4. **Revisão de interface.** Feito: identidade visual "Noite arcana" (escuro como padrão, cobalto, títulos condensados, números em mono) e uma passada tela por tela, nos dois temas e no celular, com prints reais.
 5. **Formatos estáveis.** Depois da 1.0, arquivos, banco e protocolo não podem quebrar. Antes dela, aproveitar para limpar o que existe só por compatibilidade com versões antigas (convite em JSON, campanhas sem chave do Mestre, efeitos temporários) e fechar o formato v1 dos arquivos e do protocolo.
 6. **Segurança e privacidade.** Revisão geral do que vem de outros participantes e de arquivos importados, da política de segurança do app desktop e do convite; uma política de privacidade curta (o app não coleta nada; o que passa pela rede e por quem).
 
