@@ -233,6 +233,14 @@ async function copy(text: string, what: string) {
 
 /** Convite da campanha. `compact`: com jogadores na mesa, fica recolhido numa linha. */
 function InviteCard({ campaign, compact }: { campaign: Campaign; compact: boolean }) {
+  // Campanha antiga, ainda sem a chave do Mestre: o app a cria ao abrir (`ensureGmKeys`).
+  if (campaign.gmKey === undefined) {
+    return <p className="text-muted-foreground text-sm">Preparando o convite…</p>;
+  }
+  return <InviteDetails campaign={campaign} compact={compact} />;
+}
+
+function InviteDetails({ campaign, compact }: { campaign: Campaign; compact: boolean }) {
   const { campaigns } = useServices();
   const [open, setOpen] = useState(false);
   const baseUrl = publicAppUrl();

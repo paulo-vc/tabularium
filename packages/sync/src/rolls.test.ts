@@ -4,9 +4,15 @@ import { SessionClient } from './client';
 import { SessionHost } from './host';
 import { MemoryNetwork } from './memory-transport';
 import { encodeLog } from './protocol';
-import { newSheet, TEMPLATE } from './test-helpers';
+import { newSheet, TEMPLATE, GM_IDENTITY } from './test-helpers';
 
-const CAMPAIGN = { id: 'campanha', gmId: 'mestre', gmName: 'Paulo', templateId: TEMPLATE.id };
+const CAMPAIGN = {
+  id: 'campanha',
+  gmId: 'mestre',
+  gmName: 'Paulo',
+  templateId: TEMPLATE.id,
+  identity: GM_IDENTITY,
+};
 
 let nextRoll = 0;
 function entry(authorId: string, change: Partial<RollEntry> = {}): RollEntry {

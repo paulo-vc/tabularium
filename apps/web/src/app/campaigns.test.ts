@@ -90,7 +90,8 @@ describe('link de convite', () => {
 
   it('pede atualização para convites de versão futura', async () => {
     const { invite } = await inviteFromGm();
-    const future = encodeInvite({ ...invite, v: 2 } as never);
+    // Um formato futuro muda o primeiro byte (o número do formato): "Aw" = 3.
+    const future = `Aw${encodeInvite(invite).slice(2)}`;
     expect(decodeInvite(future)).toMatchObject({
       ok: false,
       error: { message: expect.stringContaining('versão mais nova') },

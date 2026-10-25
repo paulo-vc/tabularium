@@ -37,14 +37,19 @@ export function createCampaign(input: NewCampaignInput): Campaign {
   };
 }
 
+/**
+ * O convite da campanha. Exige a chave do Mestre (as campanhas a ganham ao nascer, e as
+ * antigas, ao abrir o app).
+ */
 export function inviteFor(campaign: Campaign): CampaignInvite {
+  if (campaign.gmKey === undefined) throw new Error('Campanha sem a chave do Mestre');
   return {
     v: INVITE_VERSION,
     campaignId: campaign.id,
     name: campaign.name,
     gmId: campaign.gmId,
     gmName: campaign.gmName,
-    ...(campaign.gmKey !== undefined && { gmKey: campaign.gmKey }),
+    gmKey: campaign.gmKey,
     templateRef: campaign.templateRef,
     templateName: campaign.templateName,
     secret: campaign.secret,

@@ -15,10 +15,31 @@ import { newSheet, TEMPLATE } from './test-helpers';
 const HOST_CAMPAIGN = { id: 'campanha', gmId: 'mestre', gmName: 'Paulo', templateId: TEMPLATE.id };
 const gm = generateGmKeyPair();
 
-function startHost(network: MemoryNetwork, identity?: typeof gm) {
-  const host = new SessionHost(network.join(), { ...HOST_CAMPAIGN, ...(identity && { identity }) });
+function startHost(network: MemoryNetwork, identity: typeof gm) {
+  const host = new SessionHost(network.join(), { ...HOST_CAMPAIGN, identity });
   host.start();
   return host;
+}
+
+/**
+ * Quem só se declara Mestre: conhece campanha e ID do Mestre (estão no convite), mas não tem
+ * a chave privada, então se apresenta sem prova.
+ */
+function startDeclaringImpostor(network: MemoryNetwork) {
+  const transport = network.join();
+  const hello = encodeHello({
+    protocol: PROTOCOL_VERSION,
+    role: 'mestre',
+    campaignId: 'campanha',
+    userId: 'mestre',
+    displayName: 'Paulo',
+  });
+  transport.setHandlers({
+    onPeerJoin: (peerId) => transport.send(peerId, hello),
+    onPeerLeave: () => {},
+    // Responde a todo HELLO, como o Mestre faria, mas nunca com prova.
+    onMessage: (peerId) => transport.send(peerId, hello),
+  });
 }
 
 function startPlayer(
@@ -88,7 +109,7 @@ describe('sessão com identidade do Mestre', () => {
     const network = new MemoryNetwork();
     const client = startPlayer(network, INVITE);
     // O impostor conhece campanha, ID do Mestre e segredo, mas não a chave privada.
-    startHost(network);
+    startDeclaringImpostor(network);
     await network.settle();
     expect(client.status()).toEqual({ state: 'procurando-mestre' });
     expect(client.identity()).toBeNull();
@@ -164,7 +185,7 @@ describe('sessão com identidade do Mestre', () => {
   });
 });
 
-describe('compatibilidade com campanhas da v0.1 (sem chave)', () => {
+describe('campanhas com convite sem chave (de antes da 1.0)', () => {
   const LEGACY: ClientCampaign = { id: 'campanha', gmId: 'mestre' };
 
   it('fixa a chave do Mestre na primeira prova e avisa para gravá-la', async () => {
@@ -197,46 +218,21 @@ describe('compatibilidade com campanhas da v0.1 (sem chave)', () => {
     expect(learned).toHaveLength(1);
   });
 
-  it('um Mestre da v0.1 (que não assina) ainda funciona, como identidade declarada', async () => {
+  it('quem só se declara Mestre, sem prova, nunca é aceito', async () => {
     const network = new MemoryNetwork();
-    startHost(network);
+    startDeclaringImpostor(network);
     const client = startPlayer(network, LEGACY);
     await network.settle();
-    expect(client.status()).toEqual({ state: 'conectado' });
-    expect(client.identity()).toBe('declarada');
+    expect(client.status()).toEqual({ state: 'procurando-mestre' });
+    expect(client.identity()).toBeNull();
   });
 
-  it('com a chave no convite, um Mestre que não assina é recusado (sem rebaixamento)', async () => {
+  it('com a chave no convite, também não', async () => {
     const network = new MemoryNetwork();
-    startHost(network);
+    startDeclaringImpostor(network);
     const client = startPlayer(network, INVITE);
     await network.settle();
     expect(client.status()).toEqual({ state: 'procurando-mestre' });
-  });
-
-  it('um jogador da v0.1 (sem desafio) entra normalmente num Mestre com identidade', async () => {
-    const network = new MemoryNetwork();
-    const host = startHost(network, gm);
-    const legacyPlayer = network.join();
-    legacyPlayer.setHandlers({
-      onPeerJoin: (peerId) =>
-        legacyPlayer.send(
-          peerId,
-          encodeHello({
-            protocol: PROTOCOL_VERSION,
-            role: 'jogador',
-            campaignId: 'campanha',
-            userId: 'bia',
-            displayName: 'Bia',
-            sheetId: 's9',
-            templateId: TEMPLATE.id,
-          }),
-        ),
-      onPeerLeave: () => {},
-      onMessage: () => {},
-    });
-    await network.settle();
-    expect(host.players().find((p) => p.userId === 'bia')?.online).toBe(true);
   });
 });
 

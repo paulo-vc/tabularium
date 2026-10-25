@@ -3,10 +3,16 @@ import { describe, expect, it, vi } from 'vitest';
 import { SessionClient } from './client';
 import { SessionHost } from './host';
 import { MemoryNetwork } from './memory-transport';
-import { newSheet, TEMPLATE } from './test-helpers';
+import { newSheet, TEMPLATE, GM_IDENTITY } from './test-helpers';
 import { generateWhisperKeys, openWhisper, sealWhisper } from './whisper';
 
-const CAMPAIGN = { id: 'campanha', gmId: 'mestre', gmName: 'Paulo', templateId: TEMPLATE.id };
+const CAMPAIGN = {
+  id: 'campanha',
+  gmId: 'mestre',
+  gmName: 'Paulo',
+  templateId: TEMPLATE.id,
+  identity: GM_IDENTITY,
+};
 
 const secret = (
   to: string,

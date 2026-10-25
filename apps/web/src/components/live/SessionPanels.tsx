@@ -249,15 +249,6 @@ export function PlayerSession({ campaign, hasSheet }: { campaign: Campaign; hasS
               </span>
             </p>
           )}
-          {active && live.gmIdentity === 'declarada' && (
-            <p className="mt-2 flex items-start gap-2 text-sm text-muted-foreground">
-              <TriangleAlertIcon className="mt-0.5 size-4 shrink-0" />
-              <span>
-                Não foi possível verificar a identidade de {campaign.gmName}: o app do Mestre é de
-                uma versão antiga do Tabularium RPG. Peça para atualizar.
-              </span>
-            </p>
-          )}
         </CardContent>
       )}
     </Card>

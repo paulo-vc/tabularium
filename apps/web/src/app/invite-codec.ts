@@ -1,12 +1,12 @@
 import type { CampaignInvite } from '@tabula/domain';
 
 /**
- * Formato compacto do convite (binário, depois em base64url). O JSON da v0.1/v0.2 tinha
- * ~460 caracteres; este, ~190. O conteúdo é o mesmo `CampaignInvite`: IDs no formato UUID
- * viram 16 bytes, o segredo e a chave do Mestre vão em bytes crus, e os textos levam o
- * tamanho na frente.
+ * Formato do convite (binário, depois em base64url, ~190 caracteres). O conteúdo é o
+ * `CampaignInvite`: IDs no formato UUID viram 16 bytes, o segredo e a chave do Mestre vão em
+ * bytes crus, e os textos levam o tamanho na frente. É o formato estável da 1.0 (ver
+ * `docs/formatos.md`); o bit `GmKey` das flags vem sempre ligado.
  *
- *   [2] [flags] campanha Mestre segredo(16) chave?(32) origem sistema versão nome mestre nomeSistema
+ *   [2] [flags] campanha Mestre segredo(16) chave(32) origem sistema versão nome mestre nomeSistema
  *
  * Quem decodifica valida o resultado com `CampaignInviteSchema`, como no formato antigo.
  */

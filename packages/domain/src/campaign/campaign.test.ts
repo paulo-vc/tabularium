@@ -24,6 +24,7 @@ const newCampaign = () =>
     template: miniTemplate(),
     gm,
     secret: SECRET,
+    gmKey: 'A'.repeat(43),
     now: 10,
   });
 
@@ -62,7 +63,17 @@ describe('convite', () => {
   it('leva só o necessário para entrar na sala (sem membros nem datas)', () => {
     const invite = inviteFor(newCampaign());
     expect(Object.keys(invite).sort()).toEqual(
-      ['campaignId', 'gmId', 'gmName', 'name', 'secret', 'templateName', 'templateRef', 'v'].sort(),
+      [
+        'campaignId',
+        'gmId',
+        'gmKey',
+        'gmName',
+        'name',
+        'secret',
+        'templateName',
+        'templateRef',
+        'v',
+      ].sort(),
     );
     expect(CampaignInviteSchema.safeParse(invite).success).toBe(true);
   });
@@ -144,6 +155,11 @@ describe('linkSheet', () => {
 describe('chave do Mestre', () => {
   const KEY = 'A'.repeat(43);
   const OTHER = 'B'.repeat(43);
+  /** Campanha de antes de a chave nascer com ela. */
+  const keyless = () => {
+    const { gmKey: _key, ...campaign } = newCampaign();
+    return campaign;
+  };
   const withKey = () =>
     createCampaign({
       id: 'c1',
@@ -162,11 +178,11 @@ describe('chave do Mestre', () => {
     expect(joined.ok && joined.value.gmKey).toBe(KEY);
   });
 
-  it('é opcional: campanhas e convites da v0.1 continuam válidos', () => {
-    const invite = inviteFor(newCampaign());
-    expect('gmKey' in invite).toBe(false);
-    expect(CampaignInviteSchema.safeParse(invite).success).toBe(true);
-    expect(CampaignSchema.safeParse(newCampaign()).success).toBe(true);
+  it('o convite exige a chave; a campanha antiga sem chave continua válida, mas não gera convite', () => {
+    const { gmKey: _key, ...invite } = inviteFor(withKey());
+    expect(CampaignInviteSchema.safeParse(invite).success).toBe(false);
+    expect(CampaignSchema.safeParse(keyless()).success).toBe(true);
+    expect(() => inviteFor(keyless())).toThrow();
   });
 
   it('recusa chave malformada no convite e na campanha', () => {
@@ -179,7 +195,7 @@ describe('chave do Mestre', () => {
   });
 
   it('withGmKey fixa a primeira chave e nunca troca uma já fixada', () => {
-    const pinned = withGmKey(newCampaign(), KEY, 50);
+    const pinned = withGmKey(keyless(), KEY, 50);
     expect(pinned).toMatchObject({ gmKey: KEY, updatedAt: 50 });
     expect(withGmKey(pinned, OTHER, 60)).toBe(pinned);
   });
