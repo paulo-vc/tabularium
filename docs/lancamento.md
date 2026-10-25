@@ -65,6 +65,29 @@ Mudar estes nomes tem efeito em quem já instalou:
 - `productName`: no Windows, define a pasta de instalação e a entrada em "Aplicativos instalados". Ao mudar de "Tabula RPG" para "Tabularium", a versão nova passou a se instalar **ao lado** da antiga, com os mesmos dados; o gancho `src-tauri/windows/hooks.nsh` remove a instalação antiga.
 - Nome do pacote Rust (`Cargo.toml`): é o nome do executável. O instalador do Windows troca o executável e os atalhos sozinho; no Linux, o pacote `.deb`/`.rpm` (chamado `tabularium`) remove o arquivo antigo.
 
+## Android: chave de assinatura (uma vez)
+
+O APK das releases é assinado com uma chave que fica só nos segredos do repositório. Todas as versões precisam da **mesma** chave: um APK assinado com outra não instala por cima do anterior. Guarde o arquivo `.jks` e a senha em lugar seguro, fora do repositório.
+
+1. Gere a chave (o `keytool` vem com o Java). Use a **mesma senha** para o arquivo e para a chave:
+
+   ```
+   keytool -genkey -v -keystore tabularium.jks -keyalg RSA -keysize 2048 -validity 10000 -alias tabularium
+   ```
+
+2. Converta o arquivo para base64 (PowerShell):
+
+   ```
+   [Convert]::ToBase64String([IO.File]::ReadAllBytes("tabularium.jks")) | Set-Content tabularium.jks.base64
+   ```
+
+3. Cadastre os segredos no repositório (Settings → Secrets and variables → Actions):
+   - `ANDROID_KEYSTORE`: o conteúdo de `tabularium.jks.base64`;
+   - `ANDROID_KEY_ALIAS`: `tabularium`;
+   - `ANDROID_KEY_PASSWORD`: a senha.
+
+Sem os segredos, o workflow Android gera só um APK de teste (artefato do build), que não é anexado à release.
+
 ## v0.2.0
 
 1. Mesclar o PR da versão (números de versão em `apps/web/package.json`, `tauri.conf.json` e `Cargo.toml`, e o [CHANGELOG](../CHANGELOG.md)).
