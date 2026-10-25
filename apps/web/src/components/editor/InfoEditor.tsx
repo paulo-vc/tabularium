@@ -1,5 +1,9 @@
 import { bumpVersion, type SystemTemplate, type VersionBump } from '@tabula/domain';
-import { useId } from 'react';
+import { ImageIcon } from 'lucide-react';
+import { useId, useRef } from 'react';
+import { toast } from 'sonner';
+import { useServices } from '@/app/services-context';
+import { SystemIcon } from '@/components/SystemIcon';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -11,6 +15,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
+import { DiceEditor } from './DiceEditor';
 import type { ApplyChange } from './use-template-editor';
 
 type Apply = ApplyChange;
@@ -25,6 +30,62 @@ function setOptional<
 >(template: SystemTemplate, key: K, value: string): SystemTemplate {
   const { [key]: _, ...rest } = template;
   return (value ? { ...rest, [key]: value } : rest) as SystemTemplate;
+}
+
+/** Ícone do sistema: escolher uma imagem (reduzida a 128 px) ou tirar. */
+function IconPicker({ template, apply }: { template: SystemTemplate; apply: Apply }) {
+  const { editor } = useServices();
+  const input = useRef<HTMLInputElement>(null);
+  const choose = async (file: File | undefined) => {
+    if (!file) return;
+    const icon = await editor.makeIcon(file);
+    if (input.current) input.current.value = '';
+    if (!icon.ok) {
+      toast.error('Não foi possível usar a imagem', { description: icon.error.message });
+      return;
+    }
+    apply((t) => ({ ...t, icon: icon.value }), 'ícone');
+  };
+  return (
+    <div className="flex items-center gap-3">
+      <SystemIcon icon={template.icon} name={template.name} className="size-14 text-2xl" />
+      <div className="space-y-1">
+        <p className="text-sm font-medium">Ícone</p>
+        <div className="flex flex-wrap gap-2">
+          <input
+            ref={input}
+            type="file"
+            accept="image/png,image/jpeg,image/webp"
+            aria-label="Imagem do ícone"
+            className="sr-only"
+            tabIndex={-1}
+            onChange={(event) => void choose(event.target.files?.[0])}
+          />
+          <Button type="button" size="sm" variant="outline" onClick={() => input.current?.click()}>
+            <ImageIcon /> {template.icon ? 'Trocar' : 'Escolher imagem'}
+          </Button>
+          {template.icon && (
+            <Button
+              type="button"
+              size="sm"
+              variant="ghost"
+              onClick={() =>
+                apply((t) => {
+                  const { icon: _icon, ...rest } = t;
+                  return rest;
+                }, 'ícone')
+              }
+            >
+              Remover
+            </Button>
+          )}
+        </div>
+        <p className="text-muted-foreground text-xs">
+          Aparece nas listas de sistemas, fichas e campanhas. Sem ícone, vale a inicial do nome.
+        </p>
+      </div>
+    </div>
+  );
 }
 
 export function InfoEditor({
@@ -45,6 +106,7 @@ export function InfoEditor({
 
   return (
     <div className="space-y-4">
+      <IconPicker template={template} apply={apply} />
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor={`${base}-nome`}>Nome do sistema</Label>
@@ -137,6 +199,8 @@ export function InfoEditor({
           Rolado com os modificadores (campos calculados com sinal). Ex.: 1d20, 2d12, 3d6, 1d100.
         </p>
       </div>
+
+      <DiceEditor template={template} apply={apply} />
 
       <div className="space-y-1.5">
         <Label htmlFor={`${base}-iniciativa`}>Iniciativa</Label>

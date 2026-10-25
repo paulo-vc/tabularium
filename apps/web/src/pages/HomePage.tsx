@@ -10,6 +10,7 @@ import { useImport } from '@/components/use-import';
 import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BackupReminder } from '@/components/BackupSection';
+import { SystemIcon } from '@/components/SystemIcon';
 
 /** Cria a ficha de exemplo e a abre. */
 function ExampleButton() {
@@ -39,7 +40,8 @@ export function HomePage() {
   const [skipped, setSkipped] = useState(welcomeSeen);
   const templates = useLiveQuery(() => catalog.list(), [catalog]);
   const importFile = useImport();
-  const templateName = (id: string) => templates?.find((t) => t.id === id)?.name ?? id;
+  const templateOf = (id: string) => templates?.find((t) => t.id === id);
+  const templateName = (id: string) => templateOf(id)?.name ?? id;
 
   // Primeira vez: aparelho vazio e as boas-vindas ainda não vistas.
   if (!skipped && sheets?.length === 0 && campaignCount === 0) {
@@ -85,8 +87,14 @@ export function HomePage() {
                     <span className="min-w-0 truncate">{sheet.name}</span>
                   </CardTitle>
                   <CardDescription>
-                    {templateName(sheet.templateRef.id)}
-                    <br />
+                    <span className="flex items-center gap-1.5">
+                      <SystemIcon
+                        icon={templateOf(sheet.templateRef.id)?.icon}
+                        name={templateName(sheet.templateRef.id)}
+                        className="size-4 text-[0.65rem]"
+                      />
+                      {templateName(sheet.templateRef.id)}
+                    </span>
                     Alterada em {dateFormat.format(sheet.updatedAt)}
                   </CardDescription>
                 </CardHeader>

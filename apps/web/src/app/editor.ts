@@ -4,7 +4,14 @@ import {
   compareVersions,
   contentChanged,
   copyTemplate,
+  err,
+  ok,
+  SYSTEM_ICON_MAX_CHARS,
+  SYSTEM_ICON_MAX_SIDE,
+  SystemIconSchema,
   templateIdFromName,
+  type Result,
+  type SystemIcon,
   type DraftRepository,
   type Issue,
   type SystemTemplate,
@@ -12,6 +19,7 @@ import {
   type TemplateRepository,
   validateTemplate,
 } from '@tabula/domain';
+import { embedImage, type ImageProcessor } from '@/lib/image-processing';
 import type { TemplateCatalog } from './catalog';
 import type { Clock, IdGenerator } from './sheets';
 
@@ -34,7 +42,25 @@ export class TemplateEditorService {
     private readonly catalog: TemplateCatalog,
     private readonly clock: Clock,
     private readonly ids: IdGenerator,
+    private readonly processImage: ImageProcessor,
   ) {}
+
+  /** Reduz a imagem escolhida a ícone do sistema (PNG, JPEG ou WebP, até 128 px). */
+  async makeIcon(file: Blob): Promise<Result<SystemIcon, Issue>> {
+    const invalid = (message: string) => err({ code: 'icone-invalido', path: ['icon'], message });
+    try {
+      const embedded = await embedImage(this.processImage, file, {
+        maxSide: SYSTEM_ICON_MAX_SIDE,
+        maxChars: SYSTEM_ICON_MAX_CHARS,
+      });
+      const icon = SystemIconSchema.safeParse(embedded);
+      return icon.success
+        ? ok(icon.data)
+        : invalid('Não foi possível usar esta imagem. Tente outra.');
+    } catch (error) {
+      return invalid(error instanceof Error ? error.message : 'Não foi possível usar a imagem.');
+    }
+  }
 
   /** IDs ocupados por sistemas instalados e por outros rascunhos. */
   private async takenIds(exceptDraft?: string): Promise<Set<string>> {

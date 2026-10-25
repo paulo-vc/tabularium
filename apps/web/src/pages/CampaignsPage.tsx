@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import { Link, useLocation } from 'wouter';
 import { INVITE_ROUTE, decodeInvite, encodeInvite } from '@/app/invite-link';
 import { useServices } from '@/app/services-context';
+import { SystemIcon } from '@/components/SystemIcon';
 import { useDeviceId, useDisplayName } from '@/components/use-device';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -32,7 +33,8 @@ import {
 import { Textarea } from '@/components/ui/textarea';
 
 export function CampaignsPage() {
-  const { campaignRepository } = useServices();
+  const { campaignRepository, catalog } = useServices();
+  const templates = useLiveQuery(() => catalog.list(), [catalog]);
   const campaigns = useLiveQuery(() => campaignRepository.list(), [campaignRepository]);
   const deviceId = useDeviceId();
 
@@ -75,8 +77,14 @@ export function CampaignsPage() {
                 <CardHeader>
                   <CardTitle>{campaign.name}</CardTitle>
                   <CardDescription>
-                    {campaign.templateName}
-                    <br />
+                    <span className="flex items-center gap-1.5">
+                      <SystemIcon
+                        icon={templates?.find((t) => t.id === campaign.templateRef.id)?.icon}
+                        name={campaign.templateName}
+                        className="size-4 text-[0.65rem]"
+                      />
+                      {campaign.templateName}
+                    </span>
                     Mestre: {campaign.gmName}
                   </CardDescription>
                   {deviceId && (
