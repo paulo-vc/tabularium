@@ -25,7 +25,7 @@ export function LiveSessionIndicator() {
       aria-label={label}
       title={label}
       className={cn(
-        'flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium',
+        'flex shrink-0 items-center gap-1.5 rounded-full border px-2.5 py-1 text-xs font-medium pointer-coarse:py-2',
         connected
           ? 'border-emerald-500/40 text-emerald-600 dark:text-emerald-400'
           : 'border-amber-500/40 text-amber-600 dark:text-amber-400',
@@ -33,10 +33,8 @@ export function LiveSessionIndicator() {
     >
       <RadioIcon className={cn('size-3.5', !connected && 'animate-pulse')} />
       <span className="hidden md:inline">{label}</span>
-      {/* No celular, o jogador vê só o ícone: o menu precisa do espaço. */}
-      <span className={live.kind === 'mestre' ? 'md:hidden' : 'hidden sm:inline md:hidden'}>
-        {short}
-      </span>
+      {/* No celular, só o ícone: o menu precisa do espaço. */}
+      <span className="hidden sm:inline md:hidden">{short}</span>
     </Link>
   );
 }

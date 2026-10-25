@@ -29,7 +29,7 @@ export function Marks({
     <div
       role="group"
       aria-label={`${label}: ${filled} de ${count}`}
-      className="flex flex-wrap items-center gap-1"
+      className="flex flex-wrap items-center gap-1 pointer-coarse:gap-2"
     >
       {Array.from({ length: count }, (_, index) => {
         const position = index + 1;
@@ -43,6 +43,7 @@ export function Marks({
             className={cn(
               'focus-visible:ring-ring/50 rounded-full border-2 transition-colors outline-none focus-visible:ring-[3px]',
               size === 'sm' ? 'size-5' : 'size-6',
+              'pointer-coarse:size-8',
               on ? 'border-primary bg-primary' : 'border-muted-foreground/40 hover:border-primary',
             )}
             onClick={() => onChange(position === filled ? position - 1 : position)}

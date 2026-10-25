@@ -120,11 +120,11 @@ export function EditorPage({ id }: { id: string }) {
         <Link
           href="/sistemas"
           aria-label="Voltar aos sistemas"
-          className="text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground pointer-coarse:-m-2.5 pointer-coarse:p-2.5"
         >
           <ArrowLeftIcon className="size-5" />
         </Link>
-        <h1 className="min-w-0 flex-1 truncate text-xl font-bold tracking-tight">
+        <h1 className="min-w-40 flex-1 truncate text-xl font-bold tracking-tight">
           {template.name || 'Sistema sem nome'}
         </h1>
         <div className="flex flex-wrap items-center gap-1">

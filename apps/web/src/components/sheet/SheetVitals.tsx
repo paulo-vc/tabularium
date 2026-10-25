@@ -182,7 +182,7 @@ function ResourceVital({
               type="button"
               aria-label={`Ajustar ${field.label}`}
               title="Ajustar valores"
-              className="hover:bg-muted focus-visible:ring-ring/50 -mx-1 rounded px-1 font-semibold tabular-nums outline-none focus-visible:ring-[3px]"
+              className="hover:bg-muted focus-visible:ring-ring/50 relative -mx-1 rounded px-1 font-semibold tabular-nums outline-none focus-visible:ring-[3px] pointer-coarse:after:absolute pointer-coarse:after:-inset-x-2 pointer-coarse:after:-inset-y-3"
             >
               {formatNumber(value.current)}
               {max !== undefined && (
