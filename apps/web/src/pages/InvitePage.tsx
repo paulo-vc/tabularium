@@ -61,7 +61,7 @@ export function InvitePage({ code }: { code: string }) {
     <div className="mx-auto max-w-lg py-8">
       <Card>
         <CardHeader>
-          <CardDescription>Você foi convidado para a campanha</CardDescription>
+          <CardDescription>Você recebeu um convite para a campanha</CardDescription>
           <CardTitle>
             <h1 className="text-2xl">{invite.name}</h1>
           </CardTitle>

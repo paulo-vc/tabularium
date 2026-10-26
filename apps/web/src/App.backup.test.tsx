@@ -85,7 +85,8 @@ describe('cópia de segurança', () => {
   });
 
   it('lembra de fazer a cópia quando há o que perder; "Fazer cópia" leva às Configurações', async () => {
-    const services = device('lembrete');
+    let now = Date.parse('2026-10-24T12:00:00Z');
+    const services = device('lembrete', () => now);
     window.location.hash = '#/';
     const user = userEvent.setup();
     render(<App services={services} />);
@@ -95,6 +96,9 @@ describe('cópia de segurança', () => {
     cleanup();
 
     await services.sheets.create({ name: 'Lia', templateId: 'dnd5e-srd' });
+    // Quem acabou de instalar não vê o lembrete; depois de uma semana de uso, vê.
+    expect(await services.backup.shouldRemind()).toBe(false);
+    now += 8 * 24 * 60 * 60 * 1000;
     render(<App services={services} />);
     const note = await screen.findByRole('note');
     expect(note).toHaveTextContent('Faça uma cópia de segurança');
@@ -107,6 +111,7 @@ describe('cópia de segurança', () => {
     let now = Date.parse('2026-10-24T12:00:00Z');
     const services = device('adiar', () => now);
     await services.sheets.create({ name: 'Lia', templateId: 'dnd5e-srd' });
+    now += 8 * 24 * 60 * 60 * 1000;
     window.location.hash = '#/';
     const user = userEvent.setup();
     render(<App services={services} />);

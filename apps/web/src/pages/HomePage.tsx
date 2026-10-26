@@ -1,5 +1,5 @@
 import { useLiveQuery } from 'dexie-react-hooks';
-import { FileUpIcon, ScrollTextIcon, SparklesIcon } from 'lucide-react';
+import { FileUpIcon, ScrollTextIcon, UsersIcon, SparklesIcon } from 'lucide-react';
 import { useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Welcome, welcomeSeen } from './Welcome';
@@ -33,10 +33,7 @@ const dateFormat = new Intl.DateTimeFormat('pt-BR', { dateStyle: 'short', timeSt
 export function HomePage() {
   const { catalog, sheetRepository, campaignRepository } = useServices();
   const sheets = useLiveQuery(() => sheetRepository.list(), [sheetRepository]);
-  const campaignCount = useLiveQuery(
-    () => campaignRepository.list().then((all) => all.length),
-    [campaignRepository],
-  );
+  const campaigns = useLiveQuery(() => campaignRepository.list(), [campaignRepository]);
   const [skipped, setSkipped] = useState(welcomeSeen);
   const templates = useLiveQuery(() => catalog.list(), [catalog]);
   const importFile = useImport();
@@ -44,7 +41,7 @@ export function HomePage() {
   const templateName = (id: string) => templateOf(id)?.name ?? id;
 
   // Primeira vez: aparelho vazio e as boas-vindas ainda não vistas.
-  if (!skipped && sheets?.length === 0 && campaignCount === 0) {
+  if (!skipped && sheets?.length === 0 && campaigns?.length === 0) {
     return <Welcome onSkip={() => setSkipped(true)} />;
   }
 
@@ -65,9 +62,23 @@ export function HomePage() {
       {sheets?.length === 0 && (
         <div className="flex flex-col items-center gap-3 rounded-lg border border-dashed py-16 text-center">
           <ScrollTextIcon className="text-muted-foreground size-10" />
+          {/* Quem só mestra chega aqui ao abrir o app: o caminho para as campanhas fica à mão. */}
           <p className="text-muted-foreground">
-            Você ainda não tem fichas. Crie uma nova ou importe um arquivo.
+            {campaigns && campaigns.length > 0
+              ? 'Você ainda não tem fichas. Para mestrar, abra a campanha:'
+              : 'Você ainda não tem fichas. Crie uma nova ou importe um arquivo.'}
           </p>
+          {campaigns && campaigns.length > 0 && (
+            <div className="flex flex-wrap justify-center gap-2">
+              {campaigns.slice(0, 3).map((campaign) => (
+                <Button key={campaign.id} variant="outline" asChild>
+                  <Link href={`/campanhas/${campaign.id}`}>
+                    <UsersIcon /> {campaign.name}
+                  </Link>
+                </Button>
+              ))}
+            </div>
+          )}
           <ExampleButton />
         </div>
       )}

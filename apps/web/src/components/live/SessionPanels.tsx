@@ -146,7 +146,7 @@ export function GameMasterPlayers({ campaign }: { campaign: Campaign }) {
 }
 
 const PLAYER_STATUS: Record<ClientStatus['state'], string> = {
-  'procurando-mestre': 'Procurando o Mestre… Ele precisa estar com a sessão aberta.',
+  'procurando-mestre': 'Procurando o Mestre… A sessão precisa estar aberta do lado do Mestre.',
   sincronizando: 'Mestre encontrado. Sincronizando sua ficha…',
   conectado: 'Conectado. Suas alterações aparecem para o Mestre em tempo real.',
   recusado: 'O Mestre recusou a entrada.',
@@ -207,9 +207,11 @@ export function PlayerSession({ campaign, hasSheet }: { campaign: Campaign; hasS
           )}
         </CardTitle>
         <CardDescription>
-          {hasSheet
-            ? `Quando ${campaign.gmName} abrir a sessão, entre para compartilhar sua ficha.`
-            : 'Escolha ou crie sua ficha para entrar na sessão.'}
+          {!hasSheet
+            ? 'Escolha ou crie sua ficha para entrar na sessão.'
+            : active
+              ? `Sua ficha vai junto: ${campaign.gmName} vê o que você mudar nela.`
+              : `Quando ${campaign.gmName} abrir a sessão, entre para compartilhar sua ficha.`}
         </CardDescription>
       </CardHeader>
       {status && (
