@@ -140,10 +140,13 @@ function SheetEditor({ id, compiled }: { id: string; compiled: OpenedReady['comp
   // Ficha de jogador numa campanha: os campos secretos são do Mestre. Escondidos também
   // enquanto a consulta carrega, para não piscarem na tela.
   const deviceId = useDeviceId();
-  const isPlayerSheet = useLiveQuery(
-    async () => (deviceId ? services.campaigns.isPlayerSheet(id, deviceId) : undefined),
+  // `null`: não é ficha de jogador; `undefined`: ainda carregando.
+  const playerCampaign = useLiveQuery(
+    async () =>
+      deviceId ? ((await services.campaigns.playerCampaignOf(id, deviceId)) ?? null) : undefined,
     [services, id, deviceId],
   );
+  const isPlayerSheet = playerCampaign === undefined ? undefined : playerCampaign !== null;
   const hidden = useMemo(
     () =>
       isPlayerSheet !== false
@@ -175,7 +178,11 @@ function SheetEditor({ id, compiled }: { id: string; compiled: OpenedReady['comp
     <div className="space-y-4">
       <div className="flex flex-wrap items-center gap-2">
         <Button variant="ghost" size="icon" asChild>
-          <Link href="/" aria-label="Voltar às fichas">
+          {/* Ficha de jogador: volta à campanha, de onde o jogador costuma vir. */}
+          <Link
+            href={playerCampaign ? `/campanhas/${playerCampaign.id}` : '/'}
+            aria-label={playerCampaign ? 'Voltar à campanha' : 'Voltar às fichas'}
+          >
             <ArrowLeftIcon />
           </Link>
         </Button>

@@ -157,8 +157,13 @@ export class CampaignService {
    * secretos (do Mestre) não aparecem para ele.
    */
   async isPlayerSheet(sheetId: string, userId: string): Promise<boolean> {
+    return (await this.playerCampaignOf(sheetId, userId)) !== undefined;
+  }
+
+  /** A campanha em que esta ficha é a do jogador (se houver). */
+  async playerCampaignOf(sheetId: string, userId: string): Promise<Campaign | undefined> {
     const campaigns = await this.campaigns.list();
-    return campaigns.some(
+    return campaigns.find(
       (campaign) =>
         roleOf(campaign, userId) === 'jogador' && linkedSheetId(campaign, userId) === sheetId,
     );

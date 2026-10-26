@@ -124,7 +124,7 @@ function PlayerView({ campaign, userId }: { campaign: Campaign; userId: string }
           <p>
             Escolha (ou crie) a sua ficha aqui. Quando o Mestre iniciar a sessão, toque em{' '}
             <strong>Entrar na sessão</strong>: a ficha vai junto, e o que você mudar nela aparece
-            para ele na hora.
+            para o Mestre na hora.
           </p>
         </Tip>
       </div>
@@ -271,7 +271,7 @@ function SheetChooser({
 const RECEIPT_FAILURE: Record<'mestre-ausente' | 'falha-de-conexao' | 'campanha-ausente', string> =
   {
     'mestre-ausente':
-      'O Mestre não respondeu. Peça para ele abrir a sessão da campanha e tente de novo.',
+      'O Mestre não respondeu. Peça ao Mestre para abrir a sessão da campanha e tente de novo.',
     'falha-de-conexao':
       'A conexão direta com o Mestre não abriu (redes de empresa/escola ou 4G dos dois lados costumam bloquear). Tentem outra rede ou importe o arquivo do sistema.',
     'campanha-ausente': 'Campanha não encontrada.',
@@ -309,7 +309,7 @@ function MissingTemplate({ campaign, onImport }: { campaign: Campaign; onImport:
     <div className="space-y-3 text-sm">
       <p>
         O sistema <strong>{campaign.templateName}</strong> ainda não está neste dispositivo. Receba
-        direto do Mestre enquanto a sessão dele estiver aberta.
+        direto do Mestre enquanto a sessão estiver aberta.
       </p>
       {waiting ? (
         <div className="flex flex-wrap items-center gap-2">

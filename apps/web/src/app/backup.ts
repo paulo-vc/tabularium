@@ -21,6 +21,8 @@ const SNOOZE_KEY = 'lembreteCopia';
 
 /** Depois de quanto tempo sem cópia o app lembra de fazer uma. */
 export const BACKUP_REMINDER_MS = 30 * 24 * 60 * 60 * 1000;
+/** Num aparelho que nunca fez cópia, o lembrete espera o app estar em uso há uma semana. */
+export const FIRST_REMINDER_MS = 7 * 24 * 60 * 60 * 1000;
 
 export interface InspectedBackup {
   backup: Backup;
@@ -60,15 +62,21 @@ export class BackupService {
 
   /**
    * Lembrar de fazer a cópia? Só quando há algo a perder (fichas ou campanhas), a última
-   * cópia tem mais de um mês (ou nunca houve) e o lembrete não foi adiado.
+   * cópia tem mais de um mês e o lembrete não foi adiado. Sem cópia nenhuma, só depois de uma
+   * semana desde a primeira ficha ou campanha: quem acabou de instalar não precisa do aviso.
    */
   async shouldRemind(): Promise<boolean> {
     const now = this.clock.now();
     const snoozed = (await this.db.settings.get(SNOOZE_KEY))?.value;
     if (typeof snoozed === 'number' && snoozed > now) return false;
     const last = await this.lastBackupAt();
-    if (last !== undefined && now - last < BACKUP_REMINDER_MS) return false;
-    return (await this.db.sheets.count()) + (await this.db.campaigns.count()) > 0;
+    if (last !== undefined) return now - last >= BACKUP_REMINDER_MS;
+    const [sheets, campaigns] = await Promise.all([
+      this.db.sheets.toArray(),
+      this.db.campaigns.toArray(),
+    ]);
+    const oldest = Math.min(...[...sheets, ...campaigns].map((record) => record.createdAt));
+    return now - oldest >= FIRST_REMINDER_MS;
   }
 
   /** "Agora não": o lembrete volta depois de um mês. */

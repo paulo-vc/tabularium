@@ -147,8 +147,8 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
                   entram pela campanha deles, e você vê as fichas mudando ao vivo aqui.
                 </p>
                 <p>
-                  3. Na sessão: combate, rolagens, chat, imagens e música, nas abas e no painel ao
-                  lado.
+                  3. Na sessão: combate, rolagens, imagens e música ficam nas abas; o chat, no botão
+                  do canto da tela.
                 </p>
               </Tip>
               <InviteCard campaign={campaign} compact={online > 0} />

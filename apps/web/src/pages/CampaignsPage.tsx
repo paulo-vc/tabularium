@@ -235,7 +235,7 @@ export function JoinDialog({ trigger }: { trigger?: ReactElement }) {
     setError(
       result.reason === 'falha-de-conexao'
         ? 'O Mestre foi encontrado, mas a conexão não abriu (rede restritiva). Peça o link do convite.'
-        : 'O Mestre não foi encontrado. O código curto só funciona com a sessão dele aberta; confira o código ou peça o link.',
+        : 'O Mestre não foi encontrado. O código curto só funciona com a sessão do Mestre aberta; confira o código ou peça o link.',
     );
   };
 
