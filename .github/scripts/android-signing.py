@@ -15,7 +15,7 @@ SIGNING = """
             val keystoreProperties = Properties()
             val keystorePropertiesFile = rootProject.file("keystore.properties")
             if (keystorePropertiesFile.exists()) {
-                keystoreProperties.load(java.io.FileInputStream(keystorePropertiesFile))
+                keystoreProperties.load(FileInputStream(keystorePropertiesFile))
             }
             keyAlias = keystoreProperties["keyAlias"] as String
             keyPassword = keystoreProperties["password"] as String
@@ -39,7 +39,10 @@ text = text.replace(anchor, anchor + SIGNING, 1)
 text = text.replace(
     release, release + '            signingConfig = signingConfigs.getByName("release")\n', 1
 )
-if "import java.util.Properties" not in text:
-    text = "import java.util.Properties\n" + text
+# Importados no topo: dentro do bloco `android { }`, `java.` aponta para uma propriedade do
+# bloco, não para o pacote (o nome completo `java.io.FileInputStream` não compila).
+for imported in ("java.io.FileInputStream", "java.util.Properties"):
+    if f"import {imported}" not in text:
+        text = f"import {imported}\n" + text
 open(path, "w", encoding="utf-8").write(text)
 print("assinatura de release ligada")
