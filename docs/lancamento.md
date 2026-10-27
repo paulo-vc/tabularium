@@ -203,3 +203,28 @@ Mesmo roteiro (tag `v0.4.2`, conferir o rascunho, publicar como versão normal).
 - [ ] Na sessão, tocar num resultado abre a aba Rolagens do chat, com o histórico.
 - [ ] A engrenagem abre as Configurações; o tema escuro vale e continua depois de fechar e abrir o app.
 - [ ] Um sistema importado com dados próprios (ex.: `4dF`) rola pela ficha e pelo chat, e a mesa vê as faces do sistema.
+
+## v1.0.0
+
+A primeira versão para outras pessoas: desktop (Windows e Linux) e Android. Roteiro completo, porque muda mais coisa que as anteriores.
+
+**Antes da tag:**
+
+- [ ] **Chave do Android** nos segredos do repositório ([passos acima](#android-chave-de-assinatura-uma-vez)). Sem ela, o workflow Android gera só o APK de teste e não anexa nada à release.
+- [ ] **Versão web:** o `pages.yml` ainda publica `paulo-vc.github.io/tabularium` a cada mudança no `main`, mas a decisão para a 1.0 é não distribuir a versão de navegador. Decidir entre desligar (remover o workflow e desativar o Pages nas configurações do repositório) ou manter no ar sem divulgar. Os apps instalados não dependem dela: o convite deles é o código e o código curto, sem link.
+- [ ] **PR da versão:** `1.0.0` em `apps/web/package.json`, `apps/desktop/src-tauri/tauri.conf.json` e `Cargo.toml`; o "Próxima versão" do [CHANGELOG](../CHANGELOG.md) vira "v1.0.0", com um resumo no topo.
+- [ ] Mesclado o PR, conferir que o `main` tem `1.0.0` no `apps/web/package.json` e só então criar e enviar a tag:
+
+```bash
+git tag v1.0.0 && git push origin v1.0.0
+```
+
+**Conferir o rascunho** (o `release.yml` gera os instaladores do desktop; o `android.yml` anexa o APK):
+
+- [ ] O APK assinado (`Tabularium_1.0.0_android.apk`) está no rascunho. Quem instalou um APK de teste precisa desinstalá-lo antes (a chave é outra).
+- [ ] Na v0.4.2 instalada no Windows, a atualização para a 1.0 chega, e campanhas e fichas abrem como antes. As campanhas antigas do Mestre ganham a chave ao abrir o app.
+- [ ] Sessão de verdade: o Mestre no desktop e um jogador no Android pelo 4G ou 5G, entrando pelo código curto. Ficha ao vivo, rolagem com dados 3D, combate (aviso da vez), chat e música.
+- [ ] No Android, Configurações → Conexão → Testar minha rede responde, e o link "Guia de uso" abre o navegador.
+- [ ] Notas da release: o trecho da v1.0.0 do CHANGELOG, avisando que **a mesa toda precisa estar na 1.0** (o jogador só aceita o Mestre com prova da chave, e convites do formato antigo não valem mais).
+
+**Publicar** o rascunho como versão normal, para o `releases/latest` apontar para ela. Depois, atualizar o README se algo dos downloads mudou e marcar a 1.0 como entregue no [roteiro](roadmap.md).
