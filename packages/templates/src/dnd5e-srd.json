@@ -1,8 +1,8 @@
 {
   "id": "dnd5e-srd",
-  "version": "1.6.0",
+  "version": "1.7.0",
   "name": "D&D 5ª Edição (SRD 5.1)",
-  "description": "Ficha para personagens de D&D 5ª edição. This work includes material taken from the System Reference Document 5.1 (\"SRD 5.1\") by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode. Termos traduzidos para o português e organizados como ficha pelo projeto Tabularium.",
+  "description": "Ficha para personagens de D&D 5ª edição, com opção para as regras de 2024 (5.5): maestria de armas, talento de origem e a Exaustão nova. This work includes material taken from the System Reference Document 5.1 (\"SRD 5.1\") by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode. Termos traduzidos para o português e organizados como ficha pelo projeto Tabularium. This work includes material from the System Reference Document 5.2 (\"SRD 5.2\") by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd. The SRD 5.2 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode.",
   "author": "Tabularium",
   "license": "CC-BY-4.0",
   "language": "pt-BR",
@@ -16,6 +16,26 @@
       "key": "nome",
       "label": "Nome do personagem",
       "type": "text"
+    },
+    {
+      "id": "edicao",
+      "key": "edicao",
+      "label": "Regras",
+      "type": "select",
+      "options": [
+        {
+          "value": "2014",
+          "label": "5e (2014)",
+          "number": 0
+        },
+        {
+          "value": "2024",
+          "label": "5.5 (2024)",
+          "number": 1
+        }
+      ],
+      "default": "2014",
+      "description": "As regras de 2024 trocam raça por espécie, dão um talento de origem pelo antecedente, maestria de armas e mudam a Exaustão."
     },
     {
       "id": "classe",
@@ -36,7 +56,7 @@
     {
       "id": "raca",
       "key": "raca",
-      "label": "Raça",
+      "label": "Raça / Espécie",
       "type": "text"
     },
     {
@@ -44,6 +64,13 @@
       "key": "antecedente",
       "label": "Antecedente",
       "type": "text"
+    },
+    {
+      "id": "talento_origem",
+      "key": "talento_origem",
+      "label": "Talento de origem",
+      "type": "text",
+      "description": "Regras de 2024: o talento que o antecedente dá no 1º nível."
     },
     {
       "id": "alinhamento",
@@ -218,7 +245,8 @@
       "id": "inspiracao",
       "key": "inspiracao",
       "label": "Inspiração",
-      "type": "boolean"
+      "type": "boolean",
+      "description": "Na 2024 é a Inspiração Heroica: gaste para rolar de novo um dado."
     },
     {
       "id": "prof_salv_for",
@@ -848,7 +876,17 @@
       "min": 0,
       "max": 6,
       "integer": true,
-      "display": "marcadores"
+      "display": "marcadores",
+      "description": "Na 2024: cada nível dá −2 nos testes de d20 e −1,5 m de deslocamento; no 6º nível o personagem morre."
+    },
+    {
+      "id": "exaustao_penalidade",
+      "key": "exaustao_penalidade",
+      "label": "Penalidade da Exaustão (2024)",
+      "type": "computed",
+      "formula": "-2 * @exaustao * @edicao",
+      "signed": true,
+      "description": "Some nos testes de d20 (regras de 2024)."
     },
     {
       "id": "ataques",
@@ -884,6 +922,52 @@
           "type": "text"
         },
         {
+          "id": "maestria",
+          "key": "maestria",
+          "label": "Maestria",
+          "type": "select",
+          "options": [
+            {
+              "value": "nenhuma",
+              "label": "—"
+            },
+            {
+              "value": "afligir",
+              "label": "Afligir"
+            },
+            {
+              "value": "agil",
+              "label": "Ágil"
+            },
+            {
+              "value": "derrubar",
+              "label": "Derrubar"
+            },
+            {
+              "value": "drenar",
+              "label": "Drenar"
+            },
+            {
+              "value": "empurrar",
+              "label": "Empurrar"
+            },
+            {
+              "value": "garantido",
+              "label": "Garantido"
+            },
+            {
+              "value": "lentidao",
+              "label": "Lentidão"
+            },
+            {
+              "value": "trespassar",
+              "label": "Trespassar"
+            }
+          ],
+          "default": "nenhuma",
+          "description": "Afligir: vantagem no próximo ataque contra o alvo. Ágil: o ataque extra de Leve entra na ação Atacar. Derrubar: salvaguarda de Con ou Caído. Drenar: desvantagem no próximo ataque do alvo. Empurrar: 3 m para longe. Garantido: ao errar, dano igual ao modificador. Lentidão: −3 m de deslocamento. Trespassar: ataque extra numa segunda criatura."
+        },
+        {
           "id": "notas",
           "key": "notas",
           "label": "Notas",
@@ -894,6 +978,63 @@
         "bonus": "bonus",
         "damage": "dano"
       }
+    },
+    {
+      "id": "maestrias",
+      "key": "maestrias",
+      "label": "Maestrias de arma (2024)",
+      "type": "list",
+      "maxItems": 10,
+      "itemFields": [
+        {
+          "id": "arma",
+          "key": "arma",
+          "label": "Tipo de arma",
+          "type": "text"
+        },
+        {
+          "id": "propriedade",
+          "key": "propriedade",
+          "label": "Propriedade",
+          "type": "select",
+          "options": [
+            {
+              "value": "afligir",
+              "label": "Afligir"
+            },
+            {
+              "value": "agil",
+              "label": "Ágil"
+            },
+            {
+              "value": "derrubar",
+              "label": "Derrubar"
+            },
+            {
+              "value": "drenar",
+              "label": "Drenar"
+            },
+            {
+              "value": "empurrar",
+              "label": "Empurrar"
+            },
+            {
+              "value": "garantido",
+              "label": "Garantido"
+            },
+            {
+              "value": "lentidao",
+              "label": "Lentidão"
+            },
+            {
+              "value": "trespassar",
+              "label": "Trespassar"
+            }
+          ],
+          "default": "afligir"
+        }
+      ],
+      "description": "Os tipos de arma cuja maestria você desbloqueou (a classe diz quantos). Troque um após um Descanso Longo. Afligir: vantagem no próximo ataque contra o alvo. Ágil: o ataque extra de Leve entra na ação Atacar. Derrubar: salvaguarda de Con ou Caído. Drenar: desvantagem no próximo ataque do alvo. Empurrar: 3 m para longe. Garantido: ao errar, dano igual ao modificador. Lentidão: −3 m de deslocamento. Trespassar: ataque extra numa segunda criatura."
     },
     {
       "id": "atributo_conjuracao",
@@ -1668,6 +1809,10 @@
           {
             "kind": "field",
             "fieldId": "exaustao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "exaustao_penalidade"
           }
         ],
         "tab": "Combate"
@@ -1680,6 +1825,10 @@
           {
             "kind": "field",
             "fieldId": "ataques"
+          },
+          {
+            "kind": "field",
+            "fieldId": "maestrias"
           }
         ]
       },
@@ -1805,6 +1954,10 @@
           },
           {
             "kind": "field",
+            "fieldId": "edicao"
+          },
+          {
+            "kind": "field",
             "fieldId": "classe"
           },
           {
@@ -1818,6 +1971,10 @@
           {
             "kind": "field",
             "fieldId": "antecedente"
+          },
+          {
+            "kind": "field",
+            "fieldId": "talento_origem"
           },
           {
             "kind": "field",
