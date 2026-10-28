@@ -28,8 +28,8 @@ export default defineConfig({
         short_name: 'Tabularium',
         description: 'Fichas de RPG de mesa com sessão ao vivo para o Mestre.',
         lang: 'pt-BR',
-        theme_color: '#8a3418',
-        background_color: '#1c1714',
+        theme_color: '#0b1124',
+        background_color: '#0b1124',
         display: 'standalone',
         start_url: './',
         icons: [
