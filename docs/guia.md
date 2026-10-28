@@ -23,7 +23,7 @@ A ficha calcula sozinha o que depende de outros valores (modificadores, perícia
 ## Para o Mestre
 
 1. Em **Campanhas**, toque em **Nova campanha**, dê um nome e escolha o sistema.
-2. Mande o **convite** aos jogadores: o link, ou o **código curto** de 20 letras, bom para ditar ou digitar no celular (ele só funciona com a sessão aberta).
+2. Mande o **convite** aos jogadores: o **código curto** de 20 letras, bom para ditar ou mandar no grupo (ele funciona com a sessão aberta), ou o **código completo**, que funciona a qualquer hora.
 3. Quando o jogo começar, toque em **Iniciar sessão**. Os jogadores entram pela campanha deles, e você vê as fichas mudando ao vivo.
 
 ![O convite da campanha](imagens/convite.png)
@@ -36,7 +36,7 @@ Na sessão, o Mestre também tem: o **combate** (ordem de turno, com criaturas o
 
 ## Para o jogador
 
-1. Abra o link do convite, ou em **Campanhas → Entrar com convite** cole o link ou digite o código curto.
+1. Em **Campanhas → Entrar com convite**, digite o código curto ou cole o código completo que o Mestre mandou.
 2. Escolha uma ficha sua ou crie uma nova, do sistema da campanha.
 3. Quando o Mestre abrir a sessão, toque em **Entrar na sessão**. A ficha vai junto: o que você mudar nela aparece para o Mestre na hora.
 
