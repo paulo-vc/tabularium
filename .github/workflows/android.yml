@@ -57,7 +57,8 @@ jobs:
         working-directory: apps/desktop
         run: |
           pnpm tauri android init --ci
-          pnpm tauri icon src-tauri/icons/icon.png
+          # Ícone adaptável: fundo e d20 em camadas separadas, para o corte do aparelho não comer o desenho.
+          pnpm tauri icon src-tauri/icons/fonte/manifesto.json
       - name: Assinatura de release
         if: env.HAS_KEY == 'true'
         working-directory: apps/desktop/src-tauri/gen/android

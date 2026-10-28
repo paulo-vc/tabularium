@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <!-- Ícone temático do Android 13+: o mesmo d20 numa cor só (o sistema pinta na cor do tema). -->
+  <g fill="none" stroke="#ffffff" stroke-linejoin="round" stroke-linecap="round" transform="translate(256 256) scale(0.9) translate(-256 -256)">
+    <polygon points="256,116 377,186 377,326 256,396 135,326 135,186" stroke-width="16"/>
+    <polygon points="256,180 322,294 190,294" fill="#ffffff" stroke-width="12"/>
+    <path d="M256 116 V180 M135 186 L256 180 L377 186 M135 186 L190 294 L135 326 M377 186 L322 294 L377 326 M190 294 L256 396 L322 294" stroke-width="9"/>
+  </g>
+</svg>
