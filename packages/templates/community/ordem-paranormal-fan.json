@@ -2172,10 +2172,6 @@
         "children": [
           {
             "kind": "field",
-            "fieldId": "acrobacia"
-          },
-          {
-            "kind": "field",
             "fieldId": "acrobacia_grau"
           },
           {
@@ -2184,7 +2180,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "adestramento"
+            "fieldId": "acrobacia"
           },
           {
             "kind": "field",
@@ -2196,7 +2192,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "artes"
+            "fieldId": "adestramento"
           },
           {
             "kind": "field",
@@ -2208,7 +2204,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "atletismo"
+            "fieldId": "artes"
           },
           {
             "kind": "field",
@@ -2220,7 +2216,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "atualidades"
+            "fieldId": "atletismo"
           },
           {
             "kind": "field",
@@ -2232,7 +2228,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "ciencias"
+            "fieldId": "atualidades"
           },
           {
             "kind": "field",
@@ -2244,7 +2240,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "crime"
+            "fieldId": "ciencias"
           },
           {
             "kind": "field",
@@ -2256,7 +2252,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "diplomacia"
+            "fieldId": "crime"
           },
           {
             "kind": "field",
@@ -2268,7 +2264,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "enganacao"
+            "fieldId": "diplomacia"
           },
           {
             "kind": "field",
@@ -2280,7 +2276,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "fortitude"
+            "fieldId": "enganacao"
           },
           {
             "kind": "field",
@@ -2292,7 +2288,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "furtividade"
+            "fieldId": "fortitude"
           },
           {
             "kind": "field",
@@ -2304,7 +2300,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "iniciativa"
+            "fieldId": "furtividade"
           },
           {
             "kind": "field",
@@ -2316,7 +2312,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "intimidacao"
+            "fieldId": "iniciativa"
           },
           {
             "kind": "field",
@@ -2328,7 +2324,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "intuicao"
+            "fieldId": "intimidacao"
           },
           {
             "kind": "field",
@@ -2340,7 +2336,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "investigacao"
+            "fieldId": "intuicao"
           },
           {
             "kind": "field",
@@ -2352,7 +2348,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "luta"
+            "fieldId": "investigacao"
           },
           {
             "kind": "field",
@@ -2364,7 +2360,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "medicina"
+            "fieldId": "luta"
           },
           {
             "kind": "field",
@@ -2376,7 +2372,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "ocultismo"
+            "fieldId": "medicina"
           },
           {
             "kind": "field",
@@ -2388,7 +2384,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "percepcao"
+            "fieldId": "ocultismo"
           },
           {
             "kind": "field",
@@ -2400,7 +2396,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "pilotagem"
+            "fieldId": "percepcao"
           },
           {
             "kind": "field",
@@ -2412,7 +2408,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "pontaria"
+            "fieldId": "pilotagem"
           },
           {
             "kind": "field",
@@ -2424,7 +2420,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "profissao"
+            "fieldId": "pontaria"
           },
           {
             "kind": "field",
@@ -2436,7 +2432,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "reflexos"
+            "fieldId": "profissao"
           },
           {
             "kind": "field",
@@ -2448,7 +2444,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "religiao"
+            "fieldId": "reflexos"
           },
           {
             "kind": "field",
@@ -2460,7 +2456,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "sobrevivencia"
+            "fieldId": "religiao"
           },
           {
             "kind": "field",
@@ -2472,7 +2468,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "tatica"
+            "fieldId": "sobrevivencia"
           },
           {
             "kind": "field",
@@ -2484,7 +2480,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "tecnologia"
+            "fieldId": "tatica"
           },
           {
             "kind": "field",
@@ -2496,7 +2492,7 @@
           },
           {
             "kind": "field",
-            "fieldId": "vontade"
+            "fieldId": "tecnologia"
           },
           {
             "kind": "field",
@@ -2505,6 +2501,10 @@
           {
             "kind": "field",
             "fieldId": "vontade_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "vontade"
           }
         ],
         "tab": "Perícias",

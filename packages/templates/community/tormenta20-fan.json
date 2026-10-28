@@ -1541,7 +1541,7 @@
       },
       {
         "kind": "section",
-        "title": "Perícias",
+        "title": "Bônus das perícias",
         "columns": 3,
         "children": [
           {
@@ -1555,14 +1555,18 @@
           {
             "kind": "field",
             "fieldId": "cd_magia"
-          },
+          }
+        ],
+        "tab": "Perícias"
+      },
+      {
+        "kind": "section",
+        "title": "Perícias",
+        "columns": 3,
+        "children": [
           {
             "kind": "field",
             "fieldId": "acrobacia_treinada"
-          },
-          {
-            "kind": "field",
-            "fieldId": "acrobacia"
           },
           {
             "kind": "field",
@@ -1570,11 +1574,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "adestramento_treinada"
+            "fieldId": "acrobacia"
           },
           {
             "kind": "field",
-            "fieldId": "adestramento"
+            "fieldId": "adestramento_treinada"
           },
           {
             "kind": "field",
@@ -1582,11 +1586,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "atletismo_treinada"
+            "fieldId": "adestramento"
           },
           {
             "kind": "field",
-            "fieldId": "atletismo"
+            "fieldId": "atletismo_treinada"
           },
           {
             "kind": "field",
@@ -1594,11 +1598,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "atuacao_treinada"
+            "fieldId": "atletismo"
           },
           {
             "kind": "field",
-            "fieldId": "atuacao"
+            "fieldId": "atuacao_treinada"
           },
           {
             "kind": "field",
@@ -1606,11 +1610,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "cavalgar_treinada"
+            "fieldId": "atuacao"
           },
           {
             "kind": "field",
-            "fieldId": "cavalgar"
+            "fieldId": "cavalgar_treinada"
           },
           {
             "kind": "field",
@@ -1618,11 +1622,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "conhecimento_treinada"
+            "fieldId": "cavalgar"
           },
           {
             "kind": "field",
-            "fieldId": "conhecimento"
+            "fieldId": "conhecimento_treinada"
           },
           {
             "kind": "field",
@@ -1630,11 +1634,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "cura_treinada"
+            "fieldId": "conhecimento"
           },
           {
             "kind": "field",
-            "fieldId": "cura"
+            "fieldId": "cura_treinada"
           },
           {
             "kind": "field",
@@ -1642,11 +1646,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "diplomacia_treinada"
+            "fieldId": "cura"
           },
           {
             "kind": "field",
-            "fieldId": "diplomacia"
+            "fieldId": "diplomacia_treinada"
           },
           {
             "kind": "field",
@@ -1654,11 +1658,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "enganacao_treinada"
+            "fieldId": "diplomacia"
           },
           {
             "kind": "field",
-            "fieldId": "enganacao"
+            "fieldId": "enganacao_treinada"
           },
           {
             "kind": "field",
@@ -1666,11 +1670,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "fortitude_treinada"
+            "fieldId": "enganacao"
           },
           {
             "kind": "field",
-            "fieldId": "fortitude"
+            "fieldId": "fortitude_treinada"
           },
           {
             "kind": "field",
@@ -1678,11 +1682,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "furtividade_treinada"
+            "fieldId": "fortitude"
           },
           {
             "kind": "field",
-            "fieldId": "furtividade"
+            "fieldId": "furtividade_treinada"
           },
           {
             "kind": "field",
@@ -1690,11 +1694,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "guerra_treinada"
+            "fieldId": "furtividade"
           },
           {
             "kind": "field",
-            "fieldId": "guerra"
+            "fieldId": "guerra_treinada"
           },
           {
             "kind": "field",
@@ -1702,11 +1706,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "iniciativa_treinada"
+            "fieldId": "guerra"
           },
           {
             "kind": "field",
-            "fieldId": "iniciativa"
+            "fieldId": "iniciativa_treinada"
           },
           {
             "kind": "field",
@@ -1714,11 +1718,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "intimidacao_treinada"
+            "fieldId": "iniciativa"
           },
           {
             "kind": "field",
-            "fieldId": "intimidacao"
+            "fieldId": "intimidacao_treinada"
           },
           {
             "kind": "field",
@@ -1726,11 +1730,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "intuicao_treinada"
+            "fieldId": "intimidacao"
           },
           {
             "kind": "field",
-            "fieldId": "intuicao"
+            "fieldId": "intuicao_treinada"
           },
           {
             "kind": "field",
@@ -1738,11 +1742,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "investigacao_treinada"
+            "fieldId": "intuicao"
           },
           {
             "kind": "field",
-            "fieldId": "investigacao"
+            "fieldId": "investigacao_treinada"
           },
           {
             "kind": "field",
@@ -1750,11 +1754,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "jogatina_treinada"
+            "fieldId": "investigacao"
           },
           {
             "kind": "field",
-            "fieldId": "jogatina"
+            "fieldId": "jogatina_treinada"
           },
           {
             "kind": "field",
@@ -1762,11 +1766,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "ladinagem_treinada"
+            "fieldId": "jogatina"
           },
           {
             "kind": "field",
-            "fieldId": "ladinagem"
+            "fieldId": "ladinagem_treinada"
           },
           {
             "kind": "field",
@@ -1774,11 +1778,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "luta_treinada"
+            "fieldId": "ladinagem"
           },
           {
             "kind": "field",
-            "fieldId": "luta"
+            "fieldId": "luta_treinada"
           },
           {
             "kind": "field",
@@ -1786,11 +1790,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "misticismo_treinada"
+            "fieldId": "luta"
           },
           {
             "kind": "field",
-            "fieldId": "misticismo"
+            "fieldId": "misticismo_treinada"
           },
           {
             "kind": "field",
@@ -1798,11 +1802,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "nobreza_treinada"
+            "fieldId": "misticismo"
           },
           {
             "kind": "field",
-            "fieldId": "nobreza"
+            "fieldId": "nobreza_treinada"
           },
           {
             "kind": "field",
@@ -1810,11 +1814,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "oficio_treinada"
+            "fieldId": "nobreza"
           },
           {
             "kind": "field",
-            "fieldId": "oficio"
+            "fieldId": "oficio_treinada"
           },
           {
             "kind": "field",
@@ -1822,11 +1826,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "percepcao_treinada"
+            "fieldId": "oficio"
           },
           {
             "kind": "field",
-            "fieldId": "percepcao"
+            "fieldId": "percepcao_treinada"
           },
           {
             "kind": "field",
@@ -1834,11 +1838,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "pilotagem_treinada"
+            "fieldId": "percepcao"
           },
           {
             "kind": "field",
-            "fieldId": "pilotagem"
+            "fieldId": "pilotagem_treinada"
           },
           {
             "kind": "field",
@@ -1846,11 +1850,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "pontaria_treinada"
+            "fieldId": "pilotagem"
           },
           {
             "kind": "field",
-            "fieldId": "pontaria"
+            "fieldId": "pontaria_treinada"
           },
           {
             "kind": "field",
@@ -1858,11 +1862,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "reflexos_treinada"
+            "fieldId": "pontaria"
           },
           {
             "kind": "field",
-            "fieldId": "reflexos"
+            "fieldId": "reflexos_treinada"
           },
           {
             "kind": "field",
@@ -1870,11 +1874,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "religiao_treinada"
+            "fieldId": "reflexos"
           },
           {
             "kind": "field",
-            "fieldId": "religiao"
+            "fieldId": "religiao_treinada"
           },
           {
             "kind": "field",
@@ -1882,11 +1886,11 @@
           },
           {
             "kind": "field",
-            "fieldId": "sobrevivencia_treinada"
+            "fieldId": "religiao"
           },
           {
             "kind": "field",
-            "fieldId": "sobrevivencia"
+            "fieldId": "sobrevivencia_treinada"
           },
           {
             "kind": "field",
@@ -1894,18 +1898,21 @@
           },
           {
             "kind": "field",
+            "fieldId": "sobrevivencia"
+          },
+          {
+            "kind": "field",
             "fieldId": "vontade_treinada"
           },
           {
             "kind": "field",
-            "fieldId": "vontade"
+            "fieldId": "vontade_outros"
           },
           {
             "kind": "field",
-            "fieldId": "vontade_outros"
+            "fieldId": "vontade"
           }
         ],
-        "tab": "Perícias",
         "display": "linhas"
       },
       {
