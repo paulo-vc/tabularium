@@ -2,17 +2,18 @@
 
 Cada decisão estrutural do projeto é registrada aqui, com contexto, alternativas e consequências.
 
-| #                                        | Decisão                                             | Status                          |
-| ---------------------------------------- | --------------------------------------------------- | ------------------------------- |
-| [0001](0001-registrar-decisoes.md)       | Registrar decisões de arquitetura                   | Aceita                          |
-| [0002](0002-stack-frontend.md)           | Stack de frontend, validação e testes               | Aceita                          |
-| [0003](0003-local-first.md)              | Local-first com IndexedDB                           | Aceita                          |
-| [0004](0004-sincronizacao.md)            | Sincronização P2P com relay de último recurso       | Aceita (relay adiado pela 0008) |
-| [0005](0005-distribuicao.md)             | Distribuição: app desktop Tauri + versão web        | Aceita                          |
-| [0006](0006-repositorio-de-templates.md) | Repositório de templates estilo plugins do Obsidian | Aceita                          |
-| [0007](0007-fluxo-git.md)                | Fluxo de Git e proteção da `main`                   | Aceita                          |
-| [0008](0008-lancar-sem-relay.md)         | Lançar a v0.1 sem relay (apenas P2P)                | Aceita                          |
-| [0009](0009-identidade-do-mestre.md)     | Identidade do Mestre provada por assinatura         | Aceita                          |
+| #                                              | Decisão                                             | Status                           |
+| ---------------------------------------------- | --------------------------------------------------- | -------------------------------- |
+| [0001](0001-registrar-decisoes.md)             | Registrar decisões de arquitetura                   | Aceita                           |
+| [0002](0002-stack-frontend.md)                 | Stack de frontend, validação e testes               | Aceita                           |
+| [0003](0003-local-first.md)                    | Local-first com IndexedDB                           | Aceita                           |
+| [0004](0004-sincronizacao.md)                  | Sincronização P2P com relay de último recurso       | Aceita (relay adiado pela 0008)  |
+| [0005](0005-distribuicao.md)                   | Distribuição: app desktop Tauri + versão web        | Aceita (site retirado pela 0010) |
+| [0006](0006-repositorio-de-templates.md)       | Repositório de templates estilo plugins do Obsidian | Aceita                           |
+| [0007](0007-fluxo-git.md)                      | Fluxo de Git e proteção da `main`                   | Aceita                           |
+| [0008](0008-lancar-sem-relay.md)               | Lançar a v0.1 sem relay (apenas P2P)                | Aceita                           |
+| [0009](0009-identidade-do-mestre.md)           | Identidade do Mestre provada por assinatura         | Aceita                           |
+| [0010](0010-distribuicao-desktop-e-android.md) | Distribuição da 1.0: desktop e Android, sem site    | Aceita                           |
 
 ## Como criar uma ADR
 

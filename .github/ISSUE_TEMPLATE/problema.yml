@@ -16,7 +16,7 @@ body:
       options:
         - App para Windows
         - App para Linux
-        - Versão web (navegador)
+        - App para Android
     validations:
       required: true
   - type: input
