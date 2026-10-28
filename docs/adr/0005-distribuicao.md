@@ -1,6 +1,6 @@
 # 0005 — Distribuição: app desktop Tauri + versão web
 
-- **Status:** Aceita
+- **Status:** Aceita; o site da versão web foi retirado pela [0010](0010-distribuicao-desktop-e-android.md)
 - **Data:** 2026-10-04
 
 ## Contexto

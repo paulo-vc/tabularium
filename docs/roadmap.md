@@ -35,7 +35,7 @@ Soundboard, YouTube ou Spotify na música, textura dos dados, resultado da duali
 
 ### Decisões tomadas
 
-- Desktop e Android; o site deixa de ser distribuído; sem iOS.
+- Desktop e Android; o site deixa de ser distribuído (desligado em 2026-10-28, [ADR 0010](adr/0010-distribuicao-desktop-e-android.md)); sem iOS.
 - Sem retransmissão (TURN): só conexão direta, com a falha bem explicada.
 - Custo zero também para o projeto: Android pelo APK nas releases, sem Play Store.
 - O criador de sistemas mais fácil e a importação de sistemas entram na 1.0.

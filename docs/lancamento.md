@@ -211,7 +211,7 @@ A primeira versão para outras pessoas: desktop (Windows e Linux) e Android. Rot
 **Antes da tag:**
 
 - [ ] **Chave do Android** nos segredos do repositório ([passos acima](#android-chave-de-assinatura-uma-vez)). Sem ela, o workflow Android gera só o APK de teste e não anexa nada à release.
-- [ ] **Versão web:** o `pages.yml` ainda publica `paulo-vc.github.io/tabularium` a cada mudança no `main`, mas a decisão para a 1.0 é não distribuir a versão de navegador. Decidir entre desligar (remover o workflow e desativar o Pages nas configurações do repositório) ou manter no ar sem divulgar. Os apps instalados não dependem dela: o convite deles é o código e o código curto, sem link.
+- [x] **Versão web:** desligada em 2026-10-28 ([ADR 0010](adr/0010-distribuicao-desktop-e-android.md)). Os apps instalados não dependem dela: o convite deles é o código e o código curto, sem link.
 - [ ] **PR da versão:** `1.0.0` em `apps/web/package.json`, `apps/desktop/src-tauri/tauri.conf.json` e `Cargo.toml`; o "Próxima versão" do [CHANGELOG](../CHANGELOG.md) vira "v1.0.0", com um resumo no topo.
 - [ ] Mesclado o PR, conferir que o `main` tem `1.0.0` no `apps/web/package.json` e só então criar e enviar a tag:
 
