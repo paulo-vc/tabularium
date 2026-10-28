@@ -136,6 +136,16 @@ describe('regras dos sistemas de fãs', () => {
     expect(calc(op, { nex: 99 })('nivel')).toBe(20);
   });
 
+  it('Ordem Paranormal: Sobrevivendo ao Horror (sobrevivente e Determinação)', () => {
+    const op = ordemParanormal as SystemTemplate;
+    const sob = calc(op, { classe: 'sobrevivente', estagio: 3, vig: 2, pre: 1 });
+    expect(['pv_max', 'pe_max', 'san_max', 'pe_rodada', 'pd_max'].map(sob)).toEqual([
+      14, 5, 12, 1, 9,
+    ]);
+    const esp = calc(op, { classe: 'especialista', nex: 10, pre: 2 });
+    expect(esp('pd_max')).toBe(16);
+  });
+
   it('Chamado de Cthulhu: PV, PM, Corpo e Movimento', () => {
     const v = calc(chamadoCthulhu as SystemTemplate, {
       con: 60,

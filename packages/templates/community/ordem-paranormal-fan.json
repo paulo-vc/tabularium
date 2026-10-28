@@ -1,9 +1,9 @@
 {
   "id": "ordem-paranormal-fan",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "minAppVersion": "0.2.0",
   "name": "Ordem Paranormal (fã)",
-  "description": "Ficha de agente para Ordem Paranormal RPG: NEX, atributos de 0 a 5, PV/PE/Sanidade calculados pela classe, perícias com grau de treinamento, rituais e inventário. Ficha não oficial feita por fãs, sem vínculo com os detentores dos direitos. Use com o livro de regras.",
+  "description": "Ficha de agente para Ordem Paranormal RPG: NEX, atributos de 0 a 5, PV/PE/Sanidade calculados pela classe, perícias com grau de treinamento, rituais e inventário. Inclui o suplemento Sobrevivendo ao Horror: classe Sobrevivente (estágios) e a regra opcional de Pontos de Determinação. Ficha não oficial feita por fãs, sem vínculo com os detentores dos direitos. Use com o livro de regras.",
   "author": "Tabularium",
   "license": "Fan-made (não oficial)",
   "language": "pt-BR",
@@ -51,6 +51,11 @@
           "value": "ocultista",
           "label": "Ocultista",
           "number": 3
+        },
+        {
+          "value": "sobrevivente",
+          "label": "Sobrevivente (Sobrevivendo ao Horror)",
+          "number": 4
         }
       ],
       "default": "combatente"
@@ -100,6 +105,25 @@
       "description": "Nível de Exposição Paranormal: 5%, 10%, 15%… até 99%.",
       "min": 0,
       "max": 99
+    },
+    {
+      "id": "estagio",
+      "key": "estagio",
+      "label": "Estágio (sobrevivente)",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "description": "Sobrevivendo ao Horror: o sobrevivente fica em NEX 0% e sobe um estágio por missão.",
+      "min": 1,
+      "max": 5
+    },
+    {
+      "id": "usa_pd",
+      "key": "usa_pd",
+      "label": "Usar Determinação (PD)",
+      "type": "boolean",
+      "default": false,
+      "description": "Regra opcional de Sobrevivendo ao Horror: PE e Sanidade viram uma só reserva, os Pontos de Determinação."
     },
     {
       "id": "nivel",
@@ -193,7 +217,7 @@
       "key": "pv_max",
       "label": "PV máximos",
       "type": "computed",
-      "formula": "if(@classe == 1, 20 + @vig + (@nivel - 1) * (4 + @vig), if(@classe == 2, 16 + @vig + (@nivel - 1) * (3 + @vig), 12 + @vig + (@nivel - 1) * (2 + @vig))) + @pv_bonus"
+      "formula": "if(@classe == 4, 8 + @vig + (@estagio - 1) * 2, if(@classe == 1, 20 + @vig + (@nivel - 1) * (4 + @vig), if(@classe == 2, 16 + @vig + (@nivel - 1) * (3 + @vig), 12 + @vig + (@nivel - 1) * (2 + @vig)))) + @pv_bonus"
     },
     {
       "id": "pv_bonus",
@@ -216,7 +240,7 @@
       "key": "pe_max",
       "label": "PE máximos",
       "type": "computed",
-      "formula": "if(@classe == 1, 2, if(@classe == 2, 3, 4)) * @nivel + @pre * @nivel + @pe_bonus"
+      "formula": "if(@classe == 4, 2 + @pre + @estagio - 1, (if(@classe == 1, 2, if(@classe == 2, 3, 4)) + @pre) * @nivel) + @pe_bonus"
     },
     {
       "id": "pe_bonus",
@@ -239,14 +263,14 @@
       "key": "pe_rodada",
       "label": "Limite de PE por turno",
       "type": "computed",
-      "formula": "@nivel"
+      "formula": "if(@classe == 4, 1, @nivel)"
     },
     {
       "id": "san_max",
       "key": "san_max",
       "label": "Sanidade máxima",
       "type": "computed",
-      "formula": "if(@classe == 1, 12 + (@nivel - 1) * 3, if(@classe == 2, 16 + (@nivel - 1) * 4, 20 + (@nivel - 1) * 5)) + @san_bonus"
+      "formula": "if(@classe == 4, 8 + (@estagio - 1) * 2, if(@classe == 1, 12 + (@nivel - 1) * 3, if(@classe == 2, 16 + (@nivel - 1) * 4, 20 + (@nivel - 1) * 5))) + @san_bonus"
     },
     {
       "id": "san_bonus",
@@ -263,6 +287,30 @@
       "type": "resource",
       "default": 12,
       "max": "@san_max"
+    },
+    {
+      "id": "pd_max",
+      "key": "pd_max",
+      "label": "PD máximos",
+      "type": "computed",
+      "formula": "if(@classe == 4, 4 + @pre + (@estagio - 1) * 2, if(@classe == 1, 6 + @pre + (@nivel - 1) * (3 + @pre), if(@classe == 2, 8 + @pre + (@nivel - 1) * (4 + @pre), 10 + @pre + (@nivel - 1) * (5 + @pre)))) + @pd_bonus"
+    },
+    {
+      "id": "pd_bonus",
+      "key": "pd_bonus",
+      "label": "PD extras",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "pd",
+      "key": "pd",
+      "label": "Pontos de Determinação",
+      "type": "resource",
+      "default": 7,
+      "max": "@pd_max",
+      "description": "Só com a regra de Determinação: substitui PE e Sanidade."
     },
     {
       "id": "defesa",
@@ -1962,6 +2010,10 @@
           },
           {
             "kind": "field",
+            "fieldId": "estagio"
+          },
+          {
+            "kind": "field",
             "fieldId": "patente"
           },
           {
@@ -2047,6 +2099,29 @@
           {
             "kind": "field",
             "fieldId": "pe_rodada"
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "title": "Determinação (Sobrevivendo ao Horror)",
+        "columns": 3,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "usa_pd"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pd"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pd_max"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pd_bonus"
           }
         ]
       },
@@ -2501,6 +2576,6 @@
         "tab": "Anotações"
       }
     ],
-    "gmSummary": ["pv", "pe", "san", "defesa", "nex", "condicoes"]
+    "gmSummary": ["pv", "pe", "san", "pd", "defesa", "nex", "condicoes"]
   }
 }
