@@ -1,0 +1,1616 @@
+{
+  "id": "chamado-cthulhu-7e-fan",
+  "version": "1.0.0",
+  "minAppVersion": "0.2.0",
+  "name": "Chamado de Cthulhu 7e (fã)",
+  "description": "Ficha de investigador para Call of Cthulhu 7ª edição: características com metade e quinto, PV, PM, Sanidade (limitada pelos Mitos), Sorte, Movimento e Corpo calculados, perícias com os valores-base. Os testes são em 1d100: role igual ou abaixo do valor. Ficha não oficial feita por fãs, sem vínculo com os detentores dos direitos. Use com o livro de regras.",
+  "author": "Tabularium",
+  "license": "Fan-made (não oficial)",
+  "language": "pt-BR",
+  "tags": ["horror", "investigação", "d100", "lovecraft"],
+  "source": "community",
+  "checkDice": "1d100",
+  "bonusTab": "Combate",
+  "fields": [
+    {
+      "id": "nome",
+      "key": "nome",
+      "label": "Nome do investigador",
+      "type": "text"
+    },
+    {
+      "id": "jogador",
+      "key": "jogador",
+      "label": "Jogador",
+      "type": "text"
+    },
+    {
+      "id": "ocupacao",
+      "key": "ocupacao",
+      "label": "Ocupação",
+      "type": "text"
+    },
+    {
+      "id": "idade",
+      "key": "idade",
+      "label": "Idade",
+      "type": "number",
+      "default": 25,
+      "integer": true,
+      "min": 15,
+      "max": 99
+    },
+    {
+      "id": "sexo",
+      "key": "sexo",
+      "label": "Pronomes",
+      "type": "text"
+    },
+    {
+      "id": "residencia",
+      "key": "residencia",
+      "label": "Residência",
+      "type": "text"
+    },
+    {
+      "id": "nascimento",
+      "key": "nascimento",
+      "label": "Local de nascimento",
+      "type": "text"
+    },
+    {
+      "id": "for",
+      "key": "for",
+      "label": "Força (FOR)",
+      "type": "number",
+      "default": 50,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "for_metade",
+      "key": "for_metade",
+      "label": "FOR ½",
+      "type": "computed",
+      "formula": "floor(@for / 2)",
+      "description": "Sucesso difícil."
+    },
+    {
+      "id": "for_quinto",
+      "key": "for_quinto",
+      "label": "FOR ⅕",
+      "type": "computed",
+      "formula": "floor(@for / 5)",
+      "description": "Sucesso extremo."
+    },
+    {
+      "id": "con",
+      "key": "con",
+      "label": "Constituição (CON)",
+      "type": "number",
+      "default": 50,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "con_metade",
+      "key": "con_metade",
+      "label": "CON ½",
+      "type": "computed",
+      "formula": "floor(@con / 2)",
+      "description": "Sucesso difícil."
+    },
+    {
+      "id": "con_quinto",
+      "key": "con_quinto",
+      "label": "CON ⅕",
+      "type": "computed",
+      "formula": "floor(@con / 5)",
+      "description": "Sucesso extremo."
+    },
+    {
+      "id": "tam",
+      "key": "tam",
+      "label": "Tamanho (TAM)",
+      "type": "number",
+      "default": 50,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "tam_metade",
+      "key": "tam_metade",
+      "label": "TAM ½",
+      "type": "computed",
+      "formula": "floor(@tam / 2)",
+      "description": "Sucesso difícil."
+    },
+    {
+      "id": "tam_quinto",
+      "key": "tam_quinto",
+      "label": "TAM ⅕",
+      "type": "computed",
+      "formula": "floor(@tam / 5)",
+      "description": "Sucesso extremo."
+    },
+    {
+      "id": "des",
+      "key": "des",
+      "label": "Destreza (DES)",
+      "type": "number",
+      "default": 50,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "des_metade",
+      "key": "des_metade",
+      "label": "DES ½",
+      "type": "computed",
+      "formula": "floor(@des / 2)",
+      "description": "Sucesso difícil."
+    },
+    {
+      "id": "des_quinto",
+      "key": "des_quinto",
+      "label": "DES ⅕",
+      "type": "computed",
+      "formula": "floor(@des / 5)",
+      "description": "Sucesso extremo."
+    },
+    {
+      "id": "apa",
+      "key": "apa",
+      "label": "Aparência (APA)",
+      "type": "number",
+      "default": 50,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "apa_metade",
+      "key": "apa_metade",
+      "label": "APA ½",
+      "type": "computed",
+      "formula": "floor(@apa / 2)",
+      "description": "Sucesso difícil."
+    },
+    {
+      "id": "apa_quinto",
+      "key": "apa_quinto",
+      "label": "APA ⅕",
+      "type": "computed",
+      "formula": "floor(@apa / 5)",
+      "description": "Sucesso extremo."
+    },
+    {
+      "id": "int",
+      "key": "int",
+      "label": "Inteligência (INT)",
+      "type": "number",
+      "default": 50,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "int_metade",
+      "key": "int_metade",
+      "label": "INT ½",
+      "type": "computed",
+      "formula": "floor(@int / 2)",
+      "description": "Sucesso difícil."
+    },
+    {
+      "id": "int_quinto",
+      "key": "int_quinto",
+      "label": "INT ⅕",
+      "type": "computed",
+      "formula": "floor(@int / 5)",
+      "description": "Sucesso extremo."
+    },
+    {
+      "id": "pod",
+      "key": "pod",
+      "label": "Poder (POD)",
+      "type": "number",
+      "default": 50,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "pod_metade",
+      "key": "pod_metade",
+      "label": "POD ½",
+      "type": "computed",
+      "formula": "floor(@pod / 2)",
+      "description": "Sucesso difícil."
+    },
+    {
+      "id": "pod_quinto",
+      "key": "pod_quinto",
+      "label": "POD ⅕",
+      "type": "computed",
+      "formula": "floor(@pod / 5)",
+      "description": "Sucesso extremo."
+    },
+    {
+      "id": "edu",
+      "key": "edu",
+      "label": "Educação (EDU)",
+      "type": "number",
+      "default": 50,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "edu_metade",
+      "key": "edu_metade",
+      "label": "EDU ½",
+      "type": "computed",
+      "formula": "floor(@edu / 2)",
+      "description": "Sucesso difícil."
+    },
+    {
+      "id": "edu_quinto",
+      "key": "edu_quinto",
+      "label": "EDU ⅕",
+      "type": "computed",
+      "formula": "floor(@edu / 5)",
+      "description": "Sucesso extremo."
+    },
+    {
+      "id": "pv_max",
+      "key": "pv_max",
+      "label": "PV máximos",
+      "type": "computed",
+      "formula": "floor((@con + @tam) / 10)"
+    },
+    {
+      "id": "pv",
+      "key": "pv",
+      "label": "Pontos de Vida",
+      "type": "resource",
+      "default": 10,
+      "max": "@pv_max"
+    },
+    {
+      "id": "pm_max",
+      "key": "pm_max",
+      "label": "PM máximos",
+      "type": "computed",
+      "formula": "floor(@pod / 5)"
+    },
+    {
+      "id": "pm",
+      "key": "pm",
+      "label": "Pontos de Magia",
+      "type": "resource",
+      "default": 10,
+      "max": "@pm_max"
+    },
+    {
+      "id": "mitos",
+      "key": "mitos",
+      "label": "Mitos de Cthulhu",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "san_max",
+      "key": "san_max",
+      "label": "Sanidade máxima",
+      "type": "computed",
+      "formula": "99 - @mitos"
+    },
+    {
+      "id": "san",
+      "key": "san",
+      "label": "Sanidade",
+      "type": "resource",
+      "default": 50,
+      "max": "@san_max",
+      "description": "Começa igual ao POD."
+    },
+    {
+      "id": "san_inicial",
+      "key": "san_inicial",
+      "label": "Sanidade inicial",
+      "type": "computed",
+      "formula": "@pod"
+    },
+    {
+      "id": "sorte",
+      "key": "sorte",
+      "label": "Sorte",
+      "type": "number",
+      "default": 50,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "corpo",
+      "key": "corpo",
+      "label": "Corpo",
+      "type": "computed",
+      "formula": "if(@for + @tam >= 165, 2, if(@for + @tam >= 125, 1, if(@for + @tam >= 85, 0, if(@for + @tam >= 65, -1, -2))))",
+      "signed": true,
+      "description": "FOR+TAM: 2–64 → −2 (BD −2); 65–84 → −1 (BD −1); 85–124 → 0; 125–164 → +1 (BD +1d4); 165–204 → +2 (BD +1d6)."
+    },
+    {
+      "id": "bonus_dano",
+      "key": "bonus_dano",
+      "label": "Bônus de dano",
+      "type": "dice",
+      "description": "Veja a tabela em Corpo (ex.: +1d4)."
+    },
+    {
+      "id": "movimento",
+      "key": "movimento",
+      "label": "Movimento",
+      "type": "computed",
+      "formula": "if(max(@des, @for) < @tam, 7, if(min(@des, @for) > @tam, 9, 8)) - if(@idade >= 80, 5, if(@idade >= 70, 4, if(@idade >= 60, 3, if(@idade >= 50, 2, if(@idade >= 40, 1, 0)))))"
+    },
+    {
+      "id": "esquiva_base",
+      "key": "esquiva_base",
+      "label": "Esquiva (base)",
+      "type": "computed",
+      "formula": "floor(@des / 2)"
+    },
+    {
+      "id": "esquiva",
+      "key": "esquiva",
+      "label": "Esquiva",
+      "type": "number",
+      "default": 25,
+      "integer": true,
+      "description": "Comece com metade da DES.",
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "lingua_base",
+      "key": "lingua_base",
+      "label": "Língua nativa (base)",
+      "type": "computed",
+      "formula": "@edu"
+    },
+    {
+      "id": "lingua_nativa",
+      "key": "lingua_nativa",
+      "label": "Língua nativa",
+      "type": "number",
+      "default": 50,
+      "integer": true,
+      "description": "Comece com o valor de EDU.",
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "credito",
+      "key": "credito",
+      "label": "Nível de Crédito",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "estado",
+      "key": "estado",
+      "label": "Estado",
+      "type": "select",
+      "options": [
+        {
+          "value": "ferimento_grave",
+          "label": "Ferimento grave"
+        },
+        {
+          "value": "morrendo",
+          "label": "Morrendo"
+        },
+        {
+          "value": "inconsciente",
+          "label": "Inconsciente"
+        },
+        {
+          "value": "insanidade_temp",
+          "label": "Insanidade temporária"
+        },
+        {
+          "value": "insanidade_indef",
+          "label": "Insanidade indefinida"
+        },
+        {
+          "value": "insanidade_perm",
+          "label": "Insanidade permanente"
+        }
+      ],
+      "multiple": true
+    },
+    {
+      "id": "antropologia",
+      "key": "antropologia",
+      "label": "Antropologia (01%)",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "arqueologia",
+      "key": "arqueologia",
+      "label": "Arqueologia (01%)",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "arremessar",
+      "key": "arremessar",
+      "label": "Arremessar (20%)",
+      "type": "number",
+      "default": 20,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "arte_oficio",
+      "key": "arte_oficio",
+      "label": "Arte/Ofício (05%)",
+      "type": "number",
+      "default": 5,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "avaliacao",
+      "key": "avaliacao",
+      "label": "Avaliação (05%)",
+      "type": "number",
+      "default": 5,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "charme",
+      "key": "charme",
+      "label": "Charme (15%)",
+      "type": "number",
+      "default": 15,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "chaveiro",
+      "key": "chaveiro",
+      "label": "Chaveiro (01%)",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "ciencia",
+      "key": "ciencia",
+      "label": "Ciência (01%)",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "consertos_eletricos",
+      "key": "consertos_eletricos",
+      "label": "Consertos Elétricos (10%)",
+      "type": "number",
+      "default": 10,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "consertos_mecanicos",
+      "key": "consertos_mecanicos",
+      "label": "Consertos Mecânicos (10%)",
+      "type": "number",
+      "default": 10,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "contabilidade",
+      "key": "contabilidade",
+      "label": "Contabilidade (05%)",
+      "type": "number",
+      "default": 5,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "direito",
+      "key": "direito",
+      "label": "Direito (05%)",
+      "type": "number",
+      "default": 5,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "dirigir_automoveis",
+      "key": "dirigir_automoveis",
+      "label": "Dirigir Automóveis (20%)",
+      "type": "number",
+      "default": 20,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "disfarce",
+      "key": "disfarce",
+      "label": "Disfarce (05%)",
+      "type": "number",
+      "default": 5,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "encontrar",
+      "key": "encontrar",
+      "label": "Encontrar (25%)",
+      "type": "number",
+      "default": 25,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "escalar",
+      "key": "escalar",
+      "label": "Escalar (20%)",
+      "type": "number",
+      "default": 20,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "escutar",
+      "key": "escutar",
+      "label": "Escutar (20%)",
+      "type": "number",
+      "default": 20,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "furtividade",
+      "key": "furtividade",
+      "label": "Furtividade (20%)",
+      "type": "number",
+      "default": 20,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "historia",
+      "key": "historia",
+      "label": "História (05%)",
+      "type": "number",
+      "default": 5,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "intimidacao",
+      "key": "intimidacao",
+      "label": "Intimidação (15%)",
+      "type": "number",
+      "default": 15,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "labia",
+      "key": "labia",
+      "label": "Lábia (05%)",
+      "type": "number",
+      "default": 5,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "lutar_briga",
+      "key": "lutar_briga",
+      "label": "Lutar (Briga) (25%)",
+      "type": "number",
+      "default": 25,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "medicina",
+      "key": "medicina",
+      "label": "Medicina (01%)",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "mundo_natural",
+      "key": "mundo_natural",
+      "label": "Mundo Natural (10%)",
+      "type": "number",
+      "default": 10,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "nadar",
+      "key": "nadar",
+      "label": "Nadar (20%)",
+      "type": "number",
+      "default": 20,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "navegacao",
+      "key": "navegacao",
+      "label": "Navegação (10%)",
+      "type": "number",
+      "default": 10,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "ocultismo",
+      "key": "ocultismo",
+      "label": "Ocultismo (05%)",
+      "type": "number",
+      "default": 5,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "operar_maquinario_pesado",
+      "key": "operar_maquinario_pesado",
+      "label": "Operar Maquinário Pesado (01%)",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "persuasao",
+      "key": "persuasao",
+      "label": "Persuasão (10%)",
+      "type": "number",
+      "default": 10,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "pilotar",
+      "key": "pilotar",
+      "label": "Pilotar (01%)",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "prestidigitacao",
+      "key": "prestidigitacao",
+      "label": "Prestidigitação (10%)",
+      "type": "number",
+      "default": 10,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "primeiros_socorros",
+      "key": "primeiros_socorros",
+      "label": "Primeiros Socorros (30%)",
+      "type": "number",
+      "default": 30,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "psicanalise",
+      "key": "psicanalise",
+      "label": "Psicanálise (01%)",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "psicologia",
+      "key": "psicologia",
+      "label": "Psicologia (10%)",
+      "type": "number",
+      "default": 10,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "rastrear",
+      "key": "rastrear",
+      "label": "Rastrear (10%)",
+      "type": "number",
+      "default": 10,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "saltar",
+      "key": "saltar",
+      "label": "Saltar (20%)",
+      "type": "number",
+      "default": 20,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "sobrevivencia",
+      "key": "sobrevivencia",
+      "label": "Sobrevivência (10%)",
+      "type": "number",
+      "default": 10,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "usar_bibliotecas",
+      "key": "usar_bibliotecas",
+      "label": "Usar Bibliotecas (20%)",
+      "type": "number",
+      "default": 20,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "usar_computadores",
+      "key": "usar_computadores",
+      "label": "Usar Computadores (05%)",
+      "type": "number",
+      "default": 5,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "armas_de_fogo_pistolas",
+      "key": "armas_de_fogo_pistolas",
+      "label": "Armas de Fogo (Pistolas) (20%)",
+      "type": "number",
+      "default": 20,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "armas_de_fogo_rifles_espingardas",
+      "key": "armas_de_fogo_rifles_espingardas",
+      "label": "Armas de Fogo (Rifles/Espingardas) (25%)",
+      "type": "number",
+      "default": 25,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "cavalgar",
+      "key": "cavalgar",
+      "label": "Cavalgar (05%)",
+      "type": "number",
+      "default": 5,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "lingua_outra",
+      "key": "lingua_outra",
+      "label": "Língua (Outra) (01%)",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "pericias_extra",
+      "key": "pericias_extra",
+      "label": "Outras perícias",
+      "type": "list",
+      "itemFields": [
+        {
+          "id": "nome",
+          "key": "nome",
+          "label": "Perícia",
+          "type": "text"
+        },
+        {
+          "id": "valor",
+          "key": "valor",
+          "label": "%",
+          "type": "number",
+          "default": 1,
+          "integer": true,
+          "min": 0,
+          "max": 99
+        },
+        {
+          "id": "marcada",
+          "key": "marcada",
+          "label": "marcada",
+          "type": "boolean"
+        }
+      ]
+    },
+    {
+      "id": "armas",
+      "key": "armas",
+      "label": "Armas",
+      "type": "list",
+      "itemFields": [
+        {
+          "id": "nome",
+          "key": "nome",
+          "label": "Arma",
+          "type": "text"
+        },
+        {
+          "id": "pericia",
+          "key": "pericia",
+          "label": "Perícia %",
+          "type": "number",
+          "default": 25,
+          "integer": true,
+          "min": 0,
+          "max": 99
+        },
+        {
+          "id": "dano",
+          "key": "dano",
+          "label": "Dano",
+          "type": "dice"
+        },
+        {
+          "id": "alcance",
+          "key": "alcance",
+          "label": "Alcance",
+          "type": "text"
+        },
+        {
+          "id": "ataques",
+          "key": "ataques",
+          "label": "Ataques/rodada",
+          "type": "text"
+        },
+        {
+          "id": "municao",
+          "key": "municao",
+          "label": "Munição",
+          "type": "text"
+        },
+        {
+          "id": "defeito",
+          "key": "defeito",
+          "label": "Defeito",
+          "type": "number",
+          "default": 100,
+          "integer": true,
+          "min": 0,
+          "max": 100
+        }
+      ]
+    },
+    {
+      "id": "marcas",
+      "key": "marcas",
+      "label": "Perícias marcadas para evolução",
+      "type": "list",
+      "itemFields": [
+        {
+          "id": "nome",
+          "key": "nome",
+          "label": "Perícia",
+          "type": "text"
+        }
+      ],
+      "description": "Marque a perícia ao ter sucesso; na fase de desenvolvimento, role 1d100 acima dela para ganhar 1d10."
+    },
+    {
+      "id": "inventario",
+      "key": "inventario",
+      "label": "Inventário",
+      "type": "list",
+      "itemFields": [
+        {
+          "id": "nome",
+          "key": "nome",
+          "label": "Item",
+          "type": "text"
+        },
+        {
+          "id": "qtd",
+          "key": "qtd",
+          "label": "Qtd.",
+          "type": "number",
+          "default": 1,
+          "integer": true,
+          "min": 0
+        },
+        {
+          "id": "espacos",
+          "key": "espacos",
+          "label": "Espaços",
+          "type": "number",
+          "default": 1,
+          "integer": true,
+          "min": 0
+        }
+      ]
+    },
+    {
+      "id": "dinheiro",
+      "key": "dinheiro",
+      "label": "Dinheiro",
+      "type": "text"
+    },
+    {
+      "id": "patrimonio",
+      "key": "patrimonio",
+      "label": "Patrimônio",
+      "type": "text"
+    },
+    {
+      "id": "descricao",
+      "key": "descricao",
+      "label": "Descrição pessoal",
+      "type": "longtext"
+    },
+    {
+      "id": "ideologia",
+      "key": "ideologia",
+      "label": "Ideologia/crenças",
+      "type": "longtext"
+    },
+    {
+      "id": "pessoas",
+      "key": "pessoas",
+      "label": "Pessoas significativas",
+      "type": "longtext"
+    },
+    {
+      "id": "locais",
+      "key": "locais",
+      "label": "Locais importantes",
+      "type": "longtext"
+    },
+    {
+      "id": "pertences",
+      "key": "pertences",
+      "label": "Pertences queridos",
+      "type": "longtext"
+    },
+    {
+      "id": "tracos",
+      "key": "tracos",
+      "label": "Traços",
+      "type": "longtext"
+    },
+    {
+      "id": "ferimentos",
+      "key": "ferimentos",
+      "label": "Ferimentos e cicatrizes",
+      "type": "longtext"
+    },
+    {
+      "id": "fobias",
+      "key": "fobias",
+      "label": "Fobias e manias",
+      "type": "longtext"
+    },
+    {
+      "id": "tomos",
+      "key": "tomos",
+      "label": "Tomos arcanos, feitiços e artefatos",
+      "type": "longtext"
+    },
+    {
+      "id": "encontros",
+      "key": "encontros",
+      "label": "Encontros com entidades estranhas",
+      "type": "longtext"
+    },
+    {
+      "id": "anotacoes",
+      "key": "anotacoes",
+      "label": "Anotações",
+      "type": "longtext"
+    }
+  ],
+  "layouts": {
+    "full": [
+      {
+        "kind": "section",
+        "title": "Investigador",
+        "columns": 4,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "nome",
+            "span": 2
+          },
+          {
+            "kind": "field",
+            "fieldId": "jogador"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ocupacao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "idade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "sexo"
+          },
+          {
+            "kind": "field",
+            "fieldId": "residencia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "nascimento"
+          },
+          {
+            "kind": "field",
+            "fieldId": "credito"
+          }
+        ],
+        "tab": "Principal"
+      },
+      {
+        "kind": "section",
+        "title": "Características",
+        "columns": 4,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "for"
+          },
+          {
+            "kind": "field",
+            "fieldId": "con"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tam"
+          },
+          {
+            "kind": "field",
+            "fieldId": "des"
+          },
+          {
+            "kind": "field",
+            "fieldId": "apa"
+          },
+          {
+            "kind": "field",
+            "fieldId": "int"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pod"
+          },
+          {
+            "kind": "field",
+            "fieldId": "edu"
+          },
+          {
+            "kind": "field",
+            "fieldId": "sorte"
+          }
+        ],
+        "display": "compacto"
+      },
+      {
+        "kind": "section",
+        "title": "Metade e quinto",
+        "columns": 4,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "for_metade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "for_quinto"
+          },
+          {
+            "kind": "field",
+            "fieldId": "con_metade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "con_quinto"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tam_metade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tam_quinto"
+          },
+          {
+            "kind": "field",
+            "fieldId": "des_metade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "des_quinto"
+          },
+          {
+            "kind": "field",
+            "fieldId": "apa_metade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "apa_quinto"
+          },
+          {
+            "kind": "field",
+            "fieldId": "int_metade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "int_quinto"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pod_metade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pod_quinto"
+          },
+          {
+            "kind": "field",
+            "fieldId": "edu_metade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "edu_quinto"
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "title": "Atributos derivados",
+        "columns": 3,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "pv"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pm"
+          },
+          {
+            "kind": "field",
+            "fieldId": "san"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pv_max"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pm_max"
+          },
+          {
+            "kind": "field",
+            "fieldId": "san_max"
+          },
+          {
+            "kind": "field",
+            "fieldId": "san_inicial"
+          },
+          {
+            "kind": "field",
+            "fieldId": "mitos"
+          },
+          {
+            "kind": "field",
+            "fieldId": "movimento"
+          },
+          {
+            "kind": "field",
+            "fieldId": "estado",
+            "span": 3
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "title": "Combate",
+        "columns": 4,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "corpo"
+          },
+          {
+            "kind": "field",
+            "fieldId": "bonus_dano"
+          },
+          {
+            "kind": "field",
+            "fieldId": "esquiva"
+          },
+          {
+            "kind": "field",
+            "fieldId": "esquiva_base"
+          }
+        ],
+        "tab": "Combate"
+      },
+      {
+        "kind": "section",
+        "title": "Armas",
+        "columns": 1,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "armas"
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "title": "Perícias",
+        "columns": 4,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "antropologia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "arqueologia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "arremessar"
+          },
+          {
+            "kind": "field",
+            "fieldId": "arte_oficio"
+          },
+          {
+            "kind": "field",
+            "fieldId": "avaliacao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "charme"
+          },
+          {
+            "kind": "field",
+            "fieldId": "chaveiro"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ciencia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "consertos_eletricos"
+          },
+          {
+            "kind": "field",
+            "fieldId": "consertos_mecanicos"
+          },
+          {
+            "kind": "field",
+            "fieldId": "contabilidade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "direito"
+          },
+          {
+            "kind": "field",
+            "fieldId": "dirigir_automoveis"
+          },
+          {
+            "kind": "field",
+            "fieldId": "disfarce"
+          },
+          {
+            "kind": "field",
+            "fieldId": "encontrar"
+          },
+          {
+            "kind": "field",
+            "fieldId": "escalar"
+          },
+          {
+            "kind": "field",
+            "fieldId": "escutar"
+          },
+          {
+            "kind": "field",
+            "fieldId": "furtividade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "historia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intimidacao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "labia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "lutar_briga"
+          },
+          {
+            "kind": "field",
+            "fieldId": "medicina"
+          },
+          {
+            "kind": "field",
+            "fieldId": "mundo_natural"
+          },
+          {
+            "kind": "field",
+            "fieldId": "nadar"
+          },
+          {
+            "kind": "field",
+            "fieldId": "navegacao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ocultismo"
+          },
+          {
+            "kind": "field",
+            "fieldId": "operar_maquinario_pesado"
+          },
+          {
+            "kind": "field",
+            "fieldId": "persuasao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pilotar"
+          },
+          {
+            "kind": "field",
+            "fieldId": "prestidigitacao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "primeiros_socorros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "psicanalise"
+          },
+          {
+            "kind": "field",
+            "fieldId": "psicologia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "rastrear"
+          },
+          {
+            "kind": "field",
+            "fieldId": "saltar"
+          },
+          {
+            "kind": "field",
+            "fieldId": "sobrevivencia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "usar_bibliotecas"
+          },
+          {
+            "kind": "field",
+            "fieldId": "usar_computadores"
+          },
+          {
+            "kind": "field",
+            "fieldId": "armas_de_fogo_pistolas"
+          },
+          {
+            "kind": "field",
+            "fieldId": "armas_de_fogo_rifles_espingardas"
+          },
+          {
+            "kind": "field",
+            "fieldId": "cavalgar"
+          },
+          {
+            "kind": "field",
+            "fieldId": "lingua_outra"
+          },
+          {
+            "kind": "field",
+            "fieldId": "lingua_nativa"
+          },
+          {
+            "kind": "field",
+            "fieldId": "lingua_base"
+          }
+        ],
+        "tab": "Perícias"
+      },
+      {
+        "kind": "section",
+        "title": "Outras perícias",
+        "columns": 2,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "pericias_extra"
+          },
+          {
+            "kind": "field",
+            "fieldId": "marcas"
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "title": "Equipamento",
+        "columns": 2,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "inventario",
+            "span": 2
+          },
+          {
+            "kind": "field",
+            "fieldId": "dinheiro"
+          },
+          {
+            "kind": "field",
+            "fieldId": "patrimonio"
+          }
+        ],
+        "tab": "Equipamento"
+      },
+      {
+        "kind": "section",
+        "title": "História",
+        "columns": 2,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "descricao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ideologia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pessoas"
+          },
+          {
+            "kind": "field",
+            "fieldId": "locais"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pertences"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tracos"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ferimentos"
+          },
+          {
+            "kind": "field",
+            "fieldId": "fobias"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tomos"
+          },
+          {
+            "kind": "field",
+            "fieldId": "encontros"
+          }
+        ],
+        "tab": "História"
+      },
+      {
+        "kind": "section",
+        "title": "Anotações",
+        "columns": 1,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "anotacoes"
+          }
+        ],
+        "tab": "Anotações"
+      }
+    ],
+    "gmSummary": ["pv", "pm", "san", "sorte", "estado"]
+  }
+}

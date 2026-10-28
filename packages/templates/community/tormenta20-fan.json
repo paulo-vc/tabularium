@@ -1,0 +1,1984 @@
+{
+  "id": "tormenta20-fan",
+  "version": "1.0.0",
+  "minAppVersion": "0.2.0",
+  "name": "Tormenta20 (fã)",
+  "description": "Ficha para Tormenta20: atributos somados direto, perícias com metade do nível e treinamento (+2/+4/+6), PV e PM pela classe, Defesa, ataques, magias e poderes. Ficha não oficial feita por fãs, sem vínculo com os detentores dos direitos. Use com o livro de regras.",
+  "author": "Tabularium",
+  "license": "Fan-made (não oficial)",
+  "language": "pt-BR",
+  "tags": ["fantasia", "d20", "arton"],
+  "source": "community",
+  "checkDice": "1d20",
+  "initiative": "iniciativa",
+  "bonusTab": "Combate",
+  "fields": [
+    {
+      "id": "nome",
+      "key": "nome",
+      "label": "Nome do personagem",
+      "type": "text"
+    },
+    {
+      "id": "jogador",
+      "key": "jogador",
+      "label": "Jogador",
+      "type": "text"
+    },
+    {
+      "id": "raca",
+      "key": "raca",
+      "label": "Raça",
+      "type": "text"
+    },
+    {
+      "id": "origem",
+      "key": "origem",
+      "label": "Origem",
+      "type": "text"
+    },
+    {
+      "id": "classe",
+      "key": "classe",
+      "label": "Classe",
+      "type": "text"
+    },
+    {
+      "id": "nivel",
+      "key": "nivel",
+      "label": "Nível",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "min": 1,
+      "max": 20
+    },
+    {
+      "id": "divindade",
+      "key": "divindade",
+      "label": "Divindade",
+      "type": "text"
+    },
+    {
+      "id": "tamanho",
+      "key": "tamanho",
+      "label": "Tamanho",
+      "type": "select",
+      "options": [
+        {
+          "value": "minusculo",
+          "label": "Minúsculo"
+        },
+        {
+          "value": "pequeno",
+          "label": "Pequeno"
+        },
+        {
+          "value": "medio",
+          "label": "Médio"
+        },
+        {
+          "value": "grande",
+          "label": "Grande"
+        },
+        {
+          "value": "enorme",
+          "label": "Enorme"
+        },
+        {
+          "value": "colossal",
+          "label": "Colossal"
+        }
+      ],
+      "default": "medio"
+    },
+    {
+      "id": "deslocamento",
+      "key": "deslocamento",
+      "label": "Deslocamento (m)",
+      "type": "number",
+      "default": 9,
+      "integer": true,
+      "min": 0
+    },
+    {
+      "id": "xp",
+      "key": "xp",
+      "label": "Experiência",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "min": 0
+    },
+    {
+      "id": "for",
+      "key": "for",
+      "label": "Força",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "description": "Valor do atributo, somado direto nos testes.",
+      "min": -5,
+      "max": 10
+    },
+    {
+      "id": "des",
+      "key": "des",
+      "label": "Destreza",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "description": "Valor do atributo, somado direto nos testes.",
+      "min": -5,
+      "max": 10
+    },
+    {
+      "id": "con",
+      "key": "con",
+      "label": "Constituição",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "description": "Valor do atributo, somado direto nos testes.",
+      "min": -5,
+      "max": 10
+    },
+    {
+      "id": "int",
+      "key": "int",
+      "label": "Inteligência",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "description": "Valor do atributo, somado direto nos testes.",
+      "min": -5,
+      "max": 10
+    },
+    {
+      "id": "sab",
+      "key": "sab",
+      "label": "Sabedoria",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "description": "Valor do atributo, somado direto nos testes.",
+      "min": -5,
+      "max": 10
+    },
+    {
+      "id": "car",
+      "key": "car",
+      "label": "Carisma",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "description": "Valor do atributo, somado direto nos testes.",
+      "min": -5,
+      "max": 10
+    },
+    {
+      "id": "meio_nivel",
+      "key": "meio_nivel",
+      "label": "Metade do nível",
+      "type": "computed",
+      "formula": "floor(@nivel / 2)"
+    },
+    {
+      "id": "treino",
+      "key": "treino",
+      "label": "Bônus de treinamento",
+      "type": "computed",
+      "formula": "if(@nivel >= 15, 6, if(@nivel >= 7, 4, 2))"
+    },
+    {
+      "id": "pv_inicial",
+      "key": "pv_inicial",
+      "label": "PV iniciais da classe",
+      "type": "number",
+      "default": 12,
+      "integer": true,
+      "description": "Ex.: Guerreiro 20, Arcanista 8.",
+      "min": 0
+    },
+    {
+      "id": "pv_nivel",
+      "key": "pv_nivel",
+      "label": "PV por nível da classe",
+      "type": "number",
+      "default": 3,
+      "integer": true,
+      "description": "Ex.: Guerreiro 5, Arcanista 2.",
+      "min": 0
+    },
+    {
+      "id": "pv_bonus",
+      "key": "pv_bonus",
+      "label": "PV extras",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "pv_max",
+      "key": "pv_max",
+      "label": "PV máximos",
+      "type": "computed",
+      "formula": "@pv_inicial + @con + (@nivel - 1) * (@pv_nivel + @con) + @pv_bonus"
+    },
+    {
+      "id": "pv",
+      "key": "pv",
+      "label": "Pontos de Vida",
+      "type": "resource",
+      "default": 12,
+      "max": "@pv_max"
+    },
+    {
+      "id": "pm_nivel",
+      "key": "pm_nivel",
+      "label": "PM por nível da classe",
+      "type": "number",
+      "default": 4,
+      "integer": true,
+      "description": "Ex.: Guerreiro 3, Arcanista 6.",
+      "min": 0
+    },
+    {
+      "id": "pm_bonus",
+      "key": "pm_bonus",
+      "label": "PM extras",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "description": "Inclua o atributo-chave de conjurador, se houver."
+    },
+    {
+      "id": "pm_max",
+      "key": "pm_max",
+      "label": "PM máximos",
+      "type": "computed",
+      "formula": "@pm_nivel * @nivel + @pm_bonus"
+    },
+    {
+      "id": "pm",
+      "key": "pm",
+      "label": "Pontos de Mana",
+      "type": "resource",
+      "default": 4,
+      "max": "@pm_max"
+    },
+    {
+      "id": "armadura",
+      "key": "armadura",
+      "label": "Bônus da armadura",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "min": 0
+    },
+    {
+      "id": "escudo",
+      "key": "escudo",
+      "label": "Bônus do escudo",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "min": 0
+    },
+    {
+      "id": "defesa_outros",
+      "key": "defesa_outros",
+      "label": "Outros bônus de Defesa",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "penalidade",
+      "key": "penalidade",
+      "label": "Penalidade de armadura",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "min": -10,
+      "max": 0
+    },
+    {
+      "id": "usa_des",
+      "key": "usa_des",
+      "label": "Soma Destreza na Defesa",
+      "type": "boolean",
+      "default": true,
+      "description": "Desmarque com armadura pesada."
+    },
+    {
+      "id": "defesa",
+      "key": "defesa",
+      "label": "Defesa",
+      "type": "computed",
+      "formula": "10 + @des * @usa_des + @armadura + @escudo + @defesa_outros"
+    },
+    {
+      "id": "condicoes",
+      "key": "condicoes",
+      "label": "Condições",
+      "type": "select",
+      "options": [
+        {
+          "value": "abalado",
+          "label": "Abalado"
+        },
+        {
+          "value": "agarrado",
+          "label": "Agarrado"
+        },
+        {
+          "value": "alquebrado",
+          "label": "Alquebrado"
+        },
+        {
+          "value": "apavorado",
+          "label": "Apavorado"
+        },
+        {
+          "value": "atordoado",
+          "label": "Atordoado"
+        },
+        {
+          "value": "caido",
+          "label": "Caído"
+        },
+        {
+          "value": "cego",
+          "label": "Cego"
+        },
+        {
+          "value": "confuso",
+          "label": "Confuso"
+        },
+        {
+          "value": "debilitado",
+          "label": "Debilitado"
+        },
+        {
+          "value": "desprevenido",
+          "label": "Desprevenido"
+        },
+        {
+          "value": "enjoado",
+          "label": "Enjoado"
+        },
+        {
+          "value": "enredado",
+          "label": "Enredado"
+        },
+        {
+          "value": "esmorecido",
+          "label": "Esmorecido"
+        },
+        {
+          "value": "exausto",
+          "label": "Exausto"
+        },
+        {
+          "value": "fascinado",
+          "label": "Fascinado"
+        },
+        {
+          "value": "fatigado",
+          "label": "Fatigado"
+        },
+        {
+          "value": "fraco",
+          "label": "Fraco"
+        },
+        {
+          "value": "frustrado",
+          "label": "Frustrado"
+        },
+        {
+          "value": "imovel",
+          "label": "Imóvel"
+        },
+        {
+          "value": "inconsciente",
+          "label": "Inconsciente"
+        },
+        {
+          "value": "indefeso",
+          "label": "Indefeso"
+        },
+        {
+          "value": "lento",
+          "label": "Lento"
+        },
+        {
+          "value": "ofuscado",
+          "label": "Ofuscado"
+        },
+        {
+          "value": "paralisado",
+          "label": "Paralisado"
+        },
+        {
+          "value": "pasmo",
+          "label": "Pasmo"
+        },
+        {
+          "value": "petrificado",
+          "label": "Petrificado"
+        },
+        {
+          "value": "sangrando",
+          "label": "Sangrando"
+        },
+        {
+          "value": "surdo",
+          "label": "Surdo"
+        },
+        {
+          "value": "surpreendido",
+          "label": "Surpreendido"
+        },
+        {
+          "value": "vulneravel",
+          "label": "Vulnerável"
+        }
+      ],
+      "multiple": true
+    },
+    {
+      "id": "acrobacia_treinada",
+      "key": "acrobacia_treinada",
+      "label": "Acrobacia — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "acrobacia_outros",
+      "key": "acrobacia_outros",
+      "label": "Acrobacia — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "acrobacia",
+      "key": "acrobacia",
+      "label": "Acrobacia (DES)",
+      "type": "computed",
+      "formula": "@meio_nivel + @des + @treino * @acrobacia_treinada + @acrobacia_outros",
+      "signed": true
+    },
+    {
+      "id": "adestramento_treinada",
+      "key": "adestramento_treinada",
+      "label": "Adestramento — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "adestramento_outros",
+      "key": "adestramento_outros",
+      "label": "Adestramento — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "adestramento",
+      "key": "adestramento",
+      "label": "Adestramento (CAR)",
+      "type": "computed",
+      "formula": "@meio_nivel + @car + @treino * @adestramento_treinada + @adestramento_outros",
+      "signed": true
+    },
+    {
+      "id": "atletismo_treinada",
+      "key": "atletismo_treinada",
+      "label": "Atletismo — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "atletismo_outros",
+      "key": "atletismo_outros",
+      "label": "Atletismo — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "atletismo",
+      "key": "atletismo",
+      "label": "Atletismo (FOR)",
+      "type": "computed",
+      "formula": "@meio_nivel + @for + @treino * @atletismo_treinada + @atletismo_outros",
+      "signed": true
+    },
+    {
+      "id": "atuacao_treinada",
+      "key": "atuacao_treinada",
+      "label": "Atuação — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "atuacao_outros",
+      "key": "atuacao_outros",
+      "label": "Atuação — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "atuacao",
+      "key": "atuacao",
+      "label": "Atuação (CAR)",
+      "type": "computed",
+      "formula": "@meio_nivel + @car + @treino * @atuacao_treinada + @atuacao_outros",
+      "signed": true
+    },
+    {
+      "id": "cavalgar_treinada",
+      "key": "cavalgar_treinada",
+      "label": "Cavalgar — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "cavalgar_outros",
+      "key": "cavalgar_outros",
+      "label": "Cavalgar — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "cavalgar",
+      "key": "cavalgar",
+      "label": "Cavalgar (DES)",
+      "type": "computed",
+      "formula": "@meio_nivel + @des + @treino * @cavalgar_treinada + @cavalgar_outros",
+      "signed": true
+    },
+    {
+      "id": "conhecimento_treinada",
+      "key": "conhecimento_treinada",
+      "label": "Conhecimento — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "conhecimento_outros",
+      "key": "conhecimento_outros",
+      "label": "Conhecimento — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "conhecimento",
+      "key": "conhecimento",
+      "label": "Conhecimento (INT)",
+      "type": "computed",
+      "formula": "@meio_nivel + @int + @treino * @conhecimento_treinada + @conhecimento_outros",
+      "signed": true
+    },
+    {
+      "id": "cura_treinada",
+      "key": "cura_treinada",
+      "label": "Cura — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "cura_outros",
+      "key": "cura_outros",
+      "label": "Cura — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "cura",
+      "key": "cura",
+      "label": "Cura (SAB)",
+      "type": "computed",
+      "formula": "@meio_nivel + @sab + @treino * @cura_treinada + @cura_outros",
+      "signed": true
+    },
+    {
+      "id": "diplomacia_treinada",
+      "key": "diplomacia_treinada",
+      "label": "Diplomacia — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "diplomacia_outros",
+      "key": "diplomacia_outros",
+      "label": "Diplomacia — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "diplomacia",
+      "key": "diplomacia",
+      "label": "Diplomacia (CAR)",
+      "type": "computed",
+      "formula": "@meio_nivel + @car + @treino * @diplomacia_treinada + @diplomacia_outros",
+      "signed": true
+    },
+    {
+      "id": "enganacao_treinada",
+      "key": "enganacao_treinada",
+      "label": "Enganação — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "enganacao_outros",
+      "key": "enganacao_outros",
+      "label": "Enganação — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "enganacao",
+      "key": "enganacao",
+      "label": "Enganação (CAR)",
+      "type": "computed",
+      "formula": "@meio_nivel + @car + @treino * @enganacao_treinada + @enganacao_outros",
+      "signed": true
+    },
+    {
+      "id": "fortitude_treinada",
+      "key": "fortitude_treinada",
+      "label": "Fortitude — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "fortitude_outros",
+      "key": "fortitude_outros",
+      "label": "Fortitude — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "fortitude",
+      "key": "fortitude",
+      "label": "Fortitude (CON)",
+      "type": "computed",
+      "formula": "@meio_nivel + @con + @treino * @fortitude_treinada + @fortitude_outros",
+      "signed": true
+    },
+    {
+      "id": "furtividade_treinada",
+      "key": "furtividade_treinada",
+      "label": "Furtividade — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "furtividade_outros",
+      "key": "furtividade_outros",
+      "label": "Furtividade — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "furtividade",
+      "key": "furtividade",
+      "label": "Furtividade (DES)",
+      "type": "computed",
+      "formula": "@meio_nivel + @des + @treino * @furtividade_treinada + @furtividade_outros",
+      "signed": true
+    },
+    {
+      "id": "guerra_treinada",
+      "key": "guerra_treinada",
+      "label": "Guerra — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "guerra_outros",
+      "key": "guerra_outros",
+      "label": "Guerra — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "guerra",
+      "key": "guerra",
+      "label": "Guerra (INT)",
+      "type": "computed",
+      "formula": "@meio_nivel + @int + @treino * @guerra_treinada + @guerra_outros",
+      "signed": true
+    },
+    {
+      "id": "iniciativa_treinada",
+      "key": "iniciativa_treinada",
+      "label": "Iniciativa — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "iniciativa_outros",
+      "key": "iniciativa_outros",
+      "label": "Iniciativa — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "iniciativa",
+      "key": "iniciativa",
+      "label": "Iniciativa (DES)",
+      "type": "computed",
+      "formula": "@meio_nivel + @des + @treino * @iniciativa_treinada + @iniciativa_outros",
+      "signed": true
+    },
+    {
+      "id": "intimidacao_treinada",
+      "key": "intimidacao_treinada",
+      "label": "Intimidação — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "intimidacao_outros",
+      "key": "intimidacao_outros",
+      "label": "Intimidação — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "intimidacao",
+      "key": "intimidacao",
+      "label": "Intimidação (CAR)",
+      "type": "computed",
+      "formula": "@meio_nivel + @car + @treino * @intimidacao_treinada + @intimidacao_outros",
+      "signed": true
+    },
+    {
+      "id": "intuicao_treinada",
+      "key": "intuicao_treinada",
+      "label": "Intuição — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "intuicao_outros",
+      "key": "intuicao_outros",
+      "label": "Intuição — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "intuicao",
+      "key": "intuicao",
+      "label": "Intuição (SAB)",
+      "type": "computed",
+      "formula": "@meio_nivel + @sab + @treino * @intuicao_treinada + @intuicao_outros",
+      "signed": true
+    },
+    {
+      "id": "investigacao_treinada",
+      "key": "investigacao_treinada",
+      "label": "Investigação — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "investigacao_outros",
+      "key": "investigacao_outros",
+      "label": "Investigação — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "investigacao",
+      "key": "investigacao",
+      "label": "Investigação (INT)",
+      "type": "computed",
+      "formula": "@meio_nivel + @int + @treino * @investigacao_treinada + @investigacao_outros",
+      "signed": true
+    },
+    {
+      "id": "jogatina_treinada",
+      "key": "jogatina_treinada",
+      "label": "Jogatina — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "jogatina_outros",
+      "key": "jogatina_outros",
+      "label": "Jogatina — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "jogatina",
+      "key": "jogatina",
+      "label": "Jogatina (CAR)",
+      "type": "computed",
+      "formula": "@meio_nivel + @car + @treino * @jogatina_treinada + @jogatina_outros",
+      "signed": true
+    },
+    {
+      "id": "ladinagem_treinada",
+      "key": "ladinagem_treinada",
+      "label": "Ladinagem — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "ladinagem_outros",
+      "key": "ladinagem_outros",
+      "label": "Ladinagem — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "ladinagem",
+      "key": "ladinagem",
+      "label": "Ladinagem (DES)",
+      "type": "computed",
+      "formula": "@meio_nivel + @des + @treino * @ladinagem_treinada + @ladinagem_outros",
+      "signed": true
+    },
+    {
+      "id": "luta_treinada",
+      "key": "luta_treinada",
+      "label": "Luta — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "luta_outros",
+      "key": "luta_outros",
+      "label": "Luta — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "luta",
+      "key": "luta",
+      "label": "Luta (FOR)",
+      "type": "computed",
+      "formula": "@meio_nivel + @for + @treino * @luta_treinada + @luta_outros",
+      "signed": true
+    },
+    {
+      "id": "misticismo_treinada",
+      "key": "misticismo_treinada",
+      "label": "Misticismo — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "misticismo_outros",
+      "key": "misticismo_outros",
+      "label": "Misticismo — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "misticismo",
+      "key": "misticismo",
+      "label": "Misticismo (INT)",
+      "type": "computed",
+      "formula": "@meio_nivel + @int + @treino * @misticismo_treinada + @misticismo_outros",
+      "signed": true
+    },
+    {
+      "id": "nobreza_treinada",
+      "key": "nobreza_treinada",
+      "label": "Nobreza — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "nobreza_outros",
+      "key": "nobreza_outros",
+      "label": "Nobreza — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "nobreza",
+      "key": "nobreza",
+      "label": "Nobreza (INT)",
+      "type": "computed",
+      "formula": "@meio_nivel + @int + @treino * @nobreza_treinada + @nobreza_outros",
+      "signed": true
+    },
+    {
+      "id": "oficio_treinada",
+      "key": "oficio_treinada",
+      "label": "Ofício — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "oficio_outros",
+      "key": "oficio_outros",
+      "label": "Ofício — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "oficio",
+      "key": "oficio",
+      "label": "Ofício (INT)",
+      "type": "computed",
+      "formula": "@meio_nivel + @int + @treino * @oficio_treinada + @oficio_outros",
+      "signed": true
+    },
+    {
+      "id": "percepcao_treinada",
+      "key": "percepcao_treinada",
+      "label": "Percepção — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "percepcao_outros",
+      "key": "percepcao_outros",
+      "label": "Percepção — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "percepcao",
+      "key": "percepcao",
+      "label": "Percepção (SAB)",
+      "type": "computed",
+      "formula": "@meio_nivel + @sab + @treino * @percepcao_treinada + @percepcao_outros",
+      "signed": true
+    },
+    {
+      "id": "pilotagem_treinada",
+      "key": "pilotagem_treinada",
+      "label": "Pilotagem — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "pilotagem_outros",
+      "key": "pilotagem_outros",
+      "label": "Pilotagem — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "pilotagem",
+      "key": "pilotagem",
+      "label": "Pilotagem (DES)",
+      "type": "computed",
+      "formula": "@meio_nivel + @des + @treino * @pilotagem_treinada + @pilotagem_outros",
+      "signed": true
+    },
+    {
+      "id": "pontaria_treinada",
+      "key": "pontaria_treinada",
+      "label": "Pontaria — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "pontaria_outros",
+      "key": "pontaria_outros",
+      "label": "Pontaria — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "pontaria",
+      "key": "pontaria",
+      "label": "Pontaria (DES)",
+      "type": "computed",
+      "formula": "@meio_nivel + @des + @treino * @pontaria_treinada + @pontaria_outros",
+      "signed": true
+    },
+    {
+      "id": "reflexos_treinada",
+      "key": "reflexos_treinada",
+      "label": "Reflexos — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "reflexos_outros",
+      "key": "reflexos_outros",
+      "label": "Reflexos — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "reflexos",
+      "key": "reflexos",
+      "label": "Reflexos (DES)",
+      "type": "computed",
+      "formula": "@meio_nivel + @des + @treino * @reflexos_treinada + @reflexos_outros",
+      "signed": true
+    },
+    {
+      "id": "religiao_treinada",
+      "key": "religiao_treinada",
+      "label": "Religião — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "religiao_outros",
+      "key": "religiao_outros",
+      "label": "Religião — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "religiao",
+      "key": "religiao",
+      "label": "Religião (SAB)",
+      "type": "computed",
+      "formula": "@meio_nivel + @sab + @treino * @religiao_treinada + @religiao_outros",
+      "signed": true
+    },
+    {
+      "id": "sobrevivencia_treinada",
+      "key": "sobrevivencia_treinada",
+      "label": "Sobrevivência — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "sobrevivencia_outros",
+      "key": "sobrevivencia_outros",
+      "label": "Sobrevivência — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "sobrevivencia",
+      "key": "sobrevivencia",
+      "label": "Sobrevivência (SAB)",
+      "type": "computed",
+      "formula": "@meio_nivel + @sab + @treino * @sobrevivencia_treinada + @sobrevivencia_outros",
+      "signed": true
+    },
+    {
+      "id": "vontade_treinada",
+      "key": "vontade_treinada",
+      "label": "Vontade — treinada",
+      "type": "boolean"
+    },
+    {
+      "id": "vontade_outros",
+      "key": "vontade_outros",
+      "label": "Vontade — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "vontade",
+      "key": "vontade",
+      "label": "Vontade (SAB)",
+      "type": "computed",
+      "formula": "@meio_nivel + @sab + @treino * @vontade_treinada + @vontade_outros",
+      "signed": true
+    },
+    {
+      "id": "ataques",
+      "key": "ataques",
+      "label": "Ataques",
+      "type": "list",
+      "itemFields": [
+        {
+          "id": "nome",
+          "key": "nome",
+          "label": "Arma",
+          "type": "text"
+        },
+        {
+          "id": "bonus",
+          "key": "bonus",
+          "label": "Teste de ataque",
+          "type": "number",
+          "default": 0,
+          "integer": true
+        },
+        {
+          "id": "dano",
+          "key": "dano",
+          "label": "Dano",
+          "type": "dice"
+        },
+        {
+          "id": "critico",
+          "key": "critico",
+          "label": "Crítico",
+          "type": "text"
+        },
+        {
+          "id": "tipo",
+          "key": "tipo",
+          "label": "Tipo",
+          "type": "text"
+        },
+        {
+          "id": "alcance",
+          "key": "alcance",
+          "label": "Alcance",
+          "type": "text"
+        }
+      ],
+      "attack": {
+        "bonus": "bonus",
+        "damage": "dano"
+      }
+    },
+    {
+      "id": "magias",
+      "key": "magias",
+      "label": "Magias",
+      "type": "list",
+      "itemFields": [
+        {
+          "id": "nome",
+          "key": "nome",
+          "label": "Magia",
+          "type": "text"
+        },
+        {
+          "id": "tipo",
+          "key": "tipo",
+          "label": "Tipo",
+          "type": "select",
+          "options": [
+            {
+              "value": "arcana",
+              "label": "Arcana"
+            },
+            {
+              "value": "divina",
+              "label": "Divina"
+            },
+            {
+              "value": "universal",
+              "label": "Universal"
+            }
+          ],
+          "default": "arcana"
+        },
+        {
+          "id": "circulo",
+          "key": "circulo",
+          "label": "Círculo",
+          "type": "number",
+          "default": 1,
+          "integer": true,
+          "min": 1,
+          "max": 5
+        },
+        {
+          "id": "escola",
+          "key": "escola",
+          "label": "Escola",
+          "type": "text"
+        },
+        {
+          "id": "execucao",
+          "key": "execucao",
+          "label": "Execução",
+          "type": "text"
+        },
+        {
+          "id": "alcance",
+          "key": "alcance",
+          "label": "Alcance",
+          "type": "text"
+        },
+        {
+          "id": "duracao",
+          "key": "duracao",
+          "label": "Duração",
+          "type": "text"
+        },
+        {
+          "id": "resistencia",
+          "key": "resistencia",
+          "label": "Resistência",
+          "type": "text"
+        },
+        {
+          "id": "custo",
+          "key": "custo",
+          "label": "PM",
+          "type": "number",
+          "default": 1,
+          "integer": true,
+          "min": 0
+        },
+        {
+          "id": "descricao",
+          "key": "descricao",
+          "label": "Efeito",
+          "type": "longtext"
+        }
+      ]
+    },
+    {
+      "id": "cd_magia_attr",
+      "key": "cd_magia_attr",
+      "label": "Atributo-chave de magia",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "description": "Int, Sab ou Car, conforme a classe.",
+      "min": -5,
+      "max": 10
+    },
+    {
+      "id": "cd_magia",
+      "key": "cd_magia",
+      "label": "CD das magias",
+      "type": "computed",
+      "formula": "10 + @meio_nivel + @cd_magia_attr"
+    },
+    {
+      "id": "poderes",
+      "key": "poderes",
+      "label": "Habilidades e poderes",
+      "type": "list",
+      "itemFields": [
+        {
+          "id": "nome",
+          "key": "nome",
+          "label": "Poder",
+          "type": "text"
+        },
+        {
+          "id": "fonte",
+          "key": "fonte",
+          "label": "Fonte",
+          "type": "select",
+          "options": [
+            {
+              "value": "raca",
+              "label": "Raça"
+            },
+            {
+              "value": "origem",
+              "label": "Origem"
+            },
+            {
+              "value": "classe",
+              "label": "Classe"
+            },
+            {
+              "value": "geral",
+              "label": "Geral"
+            },
+            {
+              "value": "concedido",
+              "label": "Concedido"
+            },
+            {
+              "value": "tormenta",
+              "label": "Tormenta"
+            }
+          ],
+          "default": "classe"
+        },
+        {
+          "id": "descricao",
+          "key": "descricao",
+          "label": "Descrição",
+          "type": "longtext"
+        }
+      ]
+    },
+    {
+      "id": "inventario",
+      "key": "inventario",
+      "label": "Inventário",
+      "type": "list",
+      "itemFields": [
+        {
+          "id": "nome",
+          "key": "nome",
+          "label": "Item",
+          "type": "text"
+        },
+        {
+          "id": "qtd",
+          "key": "qtd",
+          "label": "Qtd.",
+          "type": "number",
+          "default": 1,
+          "integer": true,
+          "min": 0
+        },
+        {
+          "id": "espacos",
+          "key": "espacos",
+          "label": "Espaços",
+          "type": "number",
+          "default": 1,
+          "integer": true,
+          "min": 0
+        }
+      ]
+    },
+    {
+      "id": "tibares",
+      "key": "tibares",
+      "label": "Tibares (T$)",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "min": 0
+    },
+    {
+      "id": "carga_max",
+      "key": "carga_max",
+      "label": "Limite de carga (espaços)",
+      "type": "computed",
+      "formula": "10 + 2 * max(@for, 0)"
+    },
+    {
+      "id": "aparencia",
+      "key": "aparencia",
+      "label": "Aparência",
+      "type": "longtext"
+    },
+    {
+      "id": "historia",
+      "key": "historia",
+      "label": "História",
+      "type": "longtext"
+    },
+    {
+      "id": "anotacoes",
+      "key": "anotacoes",
+      "label": "Anotações",
+      "type": "longtext"
+    }
+  ],
+  "layouts": {
+    "full": [
+      {
+        "kind": "section",
+        "title": "Personagem",
+        "columns": 4,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "nome",
+            "span": 2
+          },
+          {
+            "kind": "field",
+            "fieldId": "jogador"
+          },
+          {
+            "kind": "field",
+            "fieldId": "raca"
+          },
+          {
+            "kind": "field",
+            "fieldId": "origem"
+          },
+          {
+            "kind": "field",
+            "fieldId": "classe"
+          },
+          {
+            "kind": "field",
+            "fieldId": "nivel"
+          },
+          {
+            "kind": "field",
+            "fieldId": "divindade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tamanho"
+          },
+          {
+            "kind": "field",
+            "fieldId": "deslocamento"
+          },
+          {
+            "kind": "field",
+            "fieldId": "xp"
+          }
+        ],
+        "tab": "Principal"
+      },
+      {
+        "kind": "section",
+        "title": "Atributos",
+        "columns": 3,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "for"
+          },
+          {
+            "kind": "field",
+            "fieldId": "des"
+          },
+          {
+            "kind": "field",
+            "fieldId": "con"
+          },
+          {
+            "kind": "field",
+            "fieldId": "int"
+          },
+          {
+            "kind": "field",
+            "fieldId": "sab"
+          },
+          {
+            "kind": "field",
+            "fieldId": "car"
+          }
+        ],
+        "display": "compacto"
+      },
+      {
+        "kind": "section",
+        "title": "Vida e Mana",
+        "columns": 4,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "pv",
+            "span": 2
+          },
+          {
+            "kind": "field",
+            "fieldId": "pv_max"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pv_inicial"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pv_nivel"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pv_bonus"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pm",
+            "span": 2
+          },
+          {
+            "kind": "field",
+            "fieldId": "pm_max"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pm_nivel"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pm_bonus"
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "title": "Defesa",
+        "columns": 4,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "defesa"
+          },
+          {
+            "kind": "field",
+            "fieldId": "armadura"
+          },
+          {
+            "kind": "field",
+            "fieldId": "escudo"
+          },
+          {
+            "kind": "field",
+            "fieldId": "defesa_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "usa_des"
+          },
+          {
+            "kind": "field",
+            "fieldId": "penalidade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "condicoes",
+            "span": 4
+          }
+        ],
+        "tab": "Combate"
+      },
+      {
+        "kind": "section",
+        "title": "Ataques",
+        "columns": 1,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "ataques"
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "title": "Perícias",
+        "columns": 3,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "meio_nivel"
+          },
+          {
+            "kind": "field",
+            "fieldId": "treino"
+          },
+          {
+            "kind": "field",
+            "fieldId": "cd_magia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "acrobacia_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "acrobacia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "acrobacia_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "adestramento_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "adestramento"
+          },
+          {
+            "kind": "field",
+            "fieldId": "adestramento_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "atletismo_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "atletismo"
+          },
+          {
+            "kind": "field",
+            "fieldId": "atletismo_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "atuacao_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "atuacao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "atuacao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "cavalgar_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "cavalgar"
+          },
+          {
+            "kind": "field",
+            "fieldId": "cavalgar_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "conhecimento_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "conhecimento"
+          },
+          {
+            "kind": "field",
+            "fieldId": "conhecimento_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "cura_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "cura"
+          },
+          {
+            "kind": "field",
+            "fieldId": "cura_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "diplomacia_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "diplomacia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "diplomacia_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "enganacao_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "enganacao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "enganacao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "fortitude_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "fortitude"
+          },
+          {
+            "kind": "field",
+            "fieldId": "fortitude_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "furtividade_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "furtividade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "furtividade_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "guerra_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "guerra"
+          },
+          {
+            "kind": "field",
+            "fieldId": "guerra_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "iniciativa_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "iniciativa"
+          },
+          {
+            "kind": "field",
+            "fieldId": "iniciativa_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intimidacao_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intimidacao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intimidacao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intuicao_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intuicao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intuicao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "investigacao_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "investigacao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "investigacao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "jogatina_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "jogatina"
+          },
+          {
+            "kind": "field",
+            "fieldId": "jogatina_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ladinagem_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ladinagem"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ladinagem_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "luta_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "luta"
+          },
+          {
+            "kind": "field",
+            "fieldId": "luta_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "misticismo_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "misticismo"
+          },
+          {
+            "kind": "field",
+            "fieldId": "misticismo_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "nobreza_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "nobreza"
+          },
+          {
+            "kind": "field",
+            "fieldId": "nobreza_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "oficio_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "oficio"
+          },
+          {
+            "kind": "field",
+            "fieldId": "oficio_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "percepcao_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "percepcao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "percepcao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pilotagem_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pilotagem"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pilotagem_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pontaria_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pontaria"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pontaria_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "reflexos_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "reflexos"
+          },
+          {
+            "kind": "field",
+            "fieldId": "reflexos_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "religiao_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "religiao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "religiao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "sobrevivencia_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "sobrevivencia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "sobrevivencia_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "vontade_treinada"
+          },
+          {
+            "kind": "field",
+            "fieldId": "vontade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "vontade_outros"
+          }
+        ],
+        "tab": "Perícias",
+        "display": "linhas"
+      },
+      {
+        "kind": "section",
+        "title": "Magias",
+        "columns": 2,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "cd_magia_attr"
+          },
+          {
+            "kind": "field",
+            "fieldId": "magias",
+            "span": 2
+          }
+        ],
+        "tab": "Magias"
+      },
+      {
+        "kind": "section",
+        "title": "Poderes",
+        "columns": 1,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "poderes"
+          }
+        ],
+        "tab": "Poderes"
+      },
+      {
+        "kind": "section",
+        "title": "Inventário",
+        "columns": 2,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "inventario",
+            "span": 2
+          },
+          {
+            "kind": "field",
+            "fieldId": "tibares"
+          },
+          {
+            "kind": "field",
+            "fieldId": "carga_max"
+          }
+        ],
+        "tab": "Inventário"
+      },
+      {
+        "kind": "section",
+        "title": "Anotações",
+        "columns": 1,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "aparencia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "historia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "anotacoes"
+          }
+        ],
+        "tab": "Anotações"
+      }
+    ],
+    "gmSummary": ["pv", "pm", "defesa", "condicoes"]
+  }
+}

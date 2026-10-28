@@ -1,0 +1,2506 @@
+{
+  "id": "ordem-paranormal-fan",
+  "version": "1.0.0",
+  "minAppVersion": "0.2.0",
+  "name": "Ordem Paranormal (fã)",
+  "description": "Ficha de agente para Ordem Paranormal RPG: NEX, atributos de 0 a 5, PV/PE/Sanidade calculados pela classe, perícias com grau de treinamento, rituais e inventário. Ficha não oficial feita por fãs, sem vínculo com os detentores dos direitos. Use com o livro de regras.",
+  "author": "Tabularium",
+  "license": "Fan-made (não oficial)",
+  "language": "pt-BR",
+  "tags": ["horror", "investigação", "paranormal"],
+  "source": "community",
+  "checkDice": "1d20",
+  "initiative": "iniciativa",
+  "bonusTab": "Combate",
+  "fields": [
+    {
+      "id": "nome",
+      "key": "nome",
+      "label": "Nome do agente",
+      "type": "text"
+    },
+    {
+      "id": "jogador",
+      "key": "jogador",
+      "label": "Jogador",
+      "type": "text"
+    },
+    {
+      "id": "origem",
+      "key": "origem",
+      "label": "Origem",
+      "type": "text"
+    },
+    {
+      "id": "classe",
+      "key": "classe",
+      "label": "Classe",
+      "type": "select",
+      "options": [
+        {
+          "value": "combatente",
+          "label": "Combatente",
+          "number": 1
+        },
+        {
+          "value": "especialista",
+          "label": "Especialista",
+          "number": 2
+        },
+        {
+          "value": "ocultista",
+          "label": "Ocultista",
+          "number": 3
+        }
+      ],
+      "default": "combatente"
+    },
+    {
+      "id": "trilha",
+      "key": "trilha",
+      "label": "Trilha",
+      "type": "text"
+    },
+    {
+      "id": "afinidade",
+      "key": "afinidade",
+      "label": "Afinidade",
+      "type": "select",
+      "options": [
+        {
+          "value": "nenhuma",
+          "label": "Nenhuma"
+        },
+        {
+          "value": "sangue",
+          "label": "Sangue"
+        },
+        {
+          "value": "morte",
+          "label": "Morte"
+        },
+        {
+          "value": "conhecimento",
+          "label": "Conhecimento"
+        },
+        {
+          "value": "energia",
+          "label": "Energia"
+        }
+      ],
+      "default": "nenhuma"
+    },
+    {
+      "id": "nex",
+      "key": "nex",
+      "label": "NEX (%)",
+      "type": "number",
+      "default": 5,
+      "integer": true,
+      "description": "Nível de Exposição Paranormal: 5%, 10%, 15%… até 99%.",
+      "min": 0,
+      "max": 99
+    },
+    {
+      "id": "nivel",
+      "key": "nivel",
+      "label": "Nível de NEX",
+      "type": "computed",
+      "formula": "if(@nex >= 99, 20, clamp(floor(@nex / 5), 1, 20))",
+      "description": "Cada 5% de NEX é um nível (99% conta como 20)."
+    },
+    {
+      "id": "patente",
+      "key": "patente",
+      "label": "Patente",
+      "type": "text"
+    },
+    {
+      "id": "prestigio",
+      "key": "prestigio",
+      "label": "Pontos de prestígio",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "min": 0
+    },
+    {
+      "id": "deslocamento",
+      "key": "deslocamento",
+      "label": "Deslocamento (m)",
+      "type": "number",
+      "default": 9,
+      "integer": true,
+      "min": 0
+    },
+    {
+      "id": "agi",
+      "key": "agi",
+      "label": "Agilidade",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "description": "Também é quantos d20 você rola (fica com o maior). Com 0, rola 2d20 e fica com o menor.",
+      "min": 0,
+      "max": 5
+    },
+    {
+      "id": "for",
+      "key": "for",
+      "label": "Força",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "description": "Também é quantos d20 você rola (fica com o maior). Com 0, rola 2d20 e fica com o menor.",
+      "min": 0,
+      "max": 5
+    },
+    {
+      "id": "int",
+      "key": "int",
+      "label": "Intelecto",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "description": "Também é quantos d20 você rola (fica com o maior). Com 0, rola 2d20 e fica com o menor.",
+      "min": 0,
+      "max": 5
+    },
+    {
+      "id": "pre",
+      "key": "pre",
+      "label": "Presença",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "description": "Também é quantos d20 você rola (fica com o maior). Com 0, rola 2d20 e fica com o menor.",
+      "min": 0,
+      "max": 5
+    },
+    {
+      "id": "vig",
+      "key": "vig",
+      "label": "Vigor",
+      "type": "number",
+      "default": 1,
+      "integer": true,
+      "description": "Também é quantos d20 você rola (fica com o maior). Com 0, rola 2d20 e fica com o menor.",
+      "min": 0,
+      "max": 5
+    },
+    {
+      "id": "pv_max",
+      "key": "pv_max",
+      "label": "PV máximos",
+      "type": "computed",
+      "formula": "if(@classe == 1, 20 + @vig + (@nivel - 1) * (4 + @vig), if(@classe == 2, 16 + @vig + (@nivel - 1) * (3 + @vig), 12 + @vig + (@nivel - 1) * (2 + @vig))) + @pv_bonus"
+    },
+    {
+      "id": "pv_bonus",
+      "key": "pv_bonus",
+      "label": "PV extras",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "pv",
+      "key": "pv",
+      "label": "Pontos de Vida",
+      "type": "resource",
+      "default": 21,
+      "max": "@pv_max"
+    },
+    {
+      "id": "pe_max",
+      "key": "pe_max",
+      "label": "PE máximos",
+      "type": "computed",
+      "formula": "if(@classe == 1, 2, if(@classe == 2, 3, 4)) * @nivel + @pre * @nivel + @pe_bonus"
+    },
+    {
+      "id": "pe_bonus",
+      "key": "pe_bonus",
+      "label": "PE extras",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "pe",
+      "key": "pe",
+      "label": "Pontos de Esforço",
+      "type": "resource",
+      "default": 3,
+      "max": "@pe_max"
+    },
+    {
+      "id": "pe_rodada",
+      "key": "pe_rodada",
+      "label": "Limite de PE por turno",
+      "type": "computed",
+      "formula": "@nivel"
+    },
+    {
+      "id": "san_max",
+      "key": "san_max",
+      "label": "Sanidade máxima",
+      "type": "computed",
+      "formula": "if(@classe == 1, 12 + (@nivel - 1) * 3, if(@classe == 2, 16 + (@nivel - 1) * 4, 20 + (@nivel - 1) * 5)) + @san_bonus"
+    },
+    {
+      "id": "san_bonus",
+      "key": "san_bonus",
+      "label": "SAN extra",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "san",
+      "key": "san",
+      "label": "Sanidade",
+      "type": "resource",
+      "default": 12,
+      "max": "@san_max"
+    },
+    {
+      "id": "defesa",
+      "key": "defesa",
+      "label": "Defesa",
+      "type": "computed",
+      "formula": "10 + @agi + @defesa_equip + @defesa_outros"
+    },
+    {
+      "id": "defesa_equip",
+      "key": "defesa_equip",
+      "label": "Proteção",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "min": 0
+    },
+    {
+      "id": "defesa_outros",
+      "key": "defesa_outros",
+      "label": "Outros bônus de Defesa",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "bloqueio",
+      "key": "bloqueio",
+      "label": "Bloqueio (RD)",
+      "type": "number",
+      "default": 0,
+      "integer": true,
+      "description": "Redução de dano ao bloquear (Fortitude).",
+      "min": 0
+    },
+    {
+      "id": "condicoes",
+      "key": "condicoes",
+      "label": "Condições",
+      "type": "select",
+      "options": [
+        {
+          "value": "abalado",
+          "label": "Abalado"
+        },
+        {
+          "value": "apavorado",
+          "label": "Apavorado"
+        },
+        {
+          "value": "atordoado",
+          "label": "Atordoado"
+        },
+        {
+          "value": "caido",
+          "label": "Caído"
+        },
+        {
+          "value": "cego",
+          "label": "Cego"
+        },
+        {
+          "value": "confuso",
+          "label": "Confuso"
+        },
+        {
+          "value": "debilitado",
+          "label": "Debilitado"
+        },
+        {
+          "value": "desprevenido",
+          "label": "Desprevenido"
+        },
+        {
+          "value": "enlouquecendo",
+          "label": "Enlouquecendo"
+        },
+        {
+          "value": "enredado",
+          "label": "Enredado"
+        },
+        {
+          "value": "exausto",
+          "label": "Exausto"
+        },
+        {
+          "value": "fatigado",
+          "label": "Fatigado"
+        },
+        {
+          "value": "fraco",
+          "label": "Fraco"
+        },
+        {
+          "value": "lento",
+          "label": "Lento"
+        },
+        {
+          "value": "machucado",
+          "label": "Machucado"
+        },
+        {
+          "value": "morrendo",
+          "label": "Morrendo"
+        },
+        {
+          "value": "ofuscado",
+          "label": "Ofuscado"
+        },
+        {
+          "value": "paralisado",
+          "label": "Paralisado"
+        },
+        {
+          "value": "perturbado",
+          "label": "Perturbado"
+        },
+        {
+          "value": "vulneravel",
+          "label": "Vulnerável"
+        }
+      ],
+      "multiple": true
+    },
+    {
+      "id": "acrobacia_grau",
+      "key": "acrobacia_grau",
+      "label": "Acrobacia — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "acrobacia_outros",
+      "key": "acrobacia_outros",
+      "label": "Acrobacia — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "acrobacia",
+      "key": "acrobacia",
+      "label": "Acrobacia (AGI)",
+      "type": "computed",
+      "formula": "@acrobacia_grau + @acrobacia_outros",
+      "signed": true,
+      "description": "Role Agilidade d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "adestramento_grau",
+      "key": "adestramento_grau",
+      "label": "Adestramento — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "adestramento_outros",
+      "key": "adestramento_outros",
+      "label": "Adestramento — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "adestramento",
+      "key": "adestramento",
+      "label": "Adestramento (PRE)",
+      "type": "computed",
+      "formula": "@adestramento_grau + @adestramento_outros",
+      "signed": true,
+      "description": "Role Presença d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "artes_grau",
+      "key": "artes_grau",
+      "label": "Artes — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "artes_outros",
+      "key": "artes_outros",
+      "label": "Artes — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "artes",
+      "key": "artes",
+      "label": "Artes (PRE)",
+      "type": "computed",
+      "formula": "@artes_grau + @artes_outros",
+      "signed": true,
+      "description": "Role Presença d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "atletismo_grau",
+      "key": "atletismo_grau",
+      "label": "Atletismo — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "atletismo_outros",
+      "key": "atletismo_outros",
+      "label": "Atletismo — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "atletismo",
+      "key": "atletismo",
+      "label": "Atletismo (FOR)",
+      "type": "computed",
+      "formula": "@atletismo_grau + @atletismo_outros",
+      "signed": true,
+      "description": "Role Força d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "atualidades_grau",
+      "key": "atualidades_grau",
+      "label": "Atualidades — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "atualidades_outros",
+      "key": "atualidades_outros",
+      "label": "Atualidades — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "atualidades",
+      "key": "atualidades",
+      "label": "Atualidades (INT)",
+      "type": "computed",
+      "formula": "@atualidades_grau + @atualidades_outros",
+      "signed": true,
+      "description": "Role Intelecto d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "ciencias_grau",
+      "key": "ciencias_grau",
+      "label": "Ciências — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "ciencias_outros",
+      "key": "ciencias_outros",
+      "label": "Ciências — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "ciencias",
+      "key": "ciencias",
+      "label": "Ciências (INT)",
+      "type": "computed",
+      "formula": "@ciencias_grau + @ciencias_outros",
+      "signed": true,
+      "description": "Role Intelecto d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "crime_grau",
+      "key": "crime_grau",
+      "label": "Crime — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "crime_outros",
+      "key": "crime_outros",
+      "label": "Crime — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "crime",
+      "key": "crime",
+      "label": "Crime (AGI)",
+      "type": "computed",
+      "formula": "@crime_grau + @crime_outros",
+      "signed": true,
+      "description": "Role Agilidade d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "diplomacia_grau",
+      "key": "diplomacia_grau",
+      "label": "Diplomacia — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "diplomacia_outros",
+      "key": "diplomacia_outros",
+      "label": "Diplomacia — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "diplomacia",
+      "key": "diplomacia",
+      "label": "Diplomacia (PRE)",
+      "type": "computed",
+      "formula": "@diplomacia_grau + @diplomacia_outros",
+      "signed": true,
+      "description": "Role Presença d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "enganacao_grau",
+      "key": "enganacao_grau",
+      "label": "Enganação — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "enganacao_outros",
+      "key": "enganacao_outros",
+      "label": "Enganação — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "enganacao",
+      "key": "enganacao",
+      "label": "Enganação (PRE)",
+      "type": "computed",
+      "formula": "@enganacao_grau + @enganacao_outros",
+      "signed": true,
+      "description": "Role Presença d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "fortitude_grau",
+      "key": "fortitude_grau",
+      "label": "Fortitude — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "fortitude_outros",
+      "key": "fortitude_outros",
+      "label": "Fortitude — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "fortitude",
+      "key": "fortitude",
+      "label": "Fortitude (VIG)",
+      "type": "computed",
+      "formula": "@fortitude_grau + @fortitude_outros",
+      "signed": true,
+      "description": "Role Vigor d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "furtividade_grau",
+      "key": "furtividade_grau",
+      "label": "Furtividade — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "furtividade_outros",
+      "key": "furtividade_outros",
+      "label": "Furtividade — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "furtividade",
+      "key": "furtividade",
+      "label": "Furtividade (AGI)",
+      "type": "computed",
+      "formula": "@furtividade_grau + @furtividade_outros",
+      "signed": true,
+      "description": "Role Agilidade d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "iniciativa_grau",
+      "key": "iniciativa_grau",
+      "label": "Iniciativa — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "iniciativa_outros",
+      "key": "iniciativa_outros",
+      "label": "Iniciativa — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "iniciativa",
+      "key": "iniciativa",
+      "label": "Iniciativa (AGI)",
+      "type": "computed",
+      "formula": "@iniciativa_grau + @iniciativa_outros",
+      "signed": true,
+      "description": "Role Agilidade d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "intimidacao_grau",
+      "key": "intimidacao_grau",
+      "label": "Intimidação — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "intimidacao_outros",
+      "key": "intimidacao_outros",
+      "label": "Intimidação — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "intimidacao",
+      "key": "intimidacao",
+      "label": "Intimidação (PRE)",
+      "type": "computed",
+      "formula": "@intimidacao_grau + @intimidacao_outros",
+      "signed": true,
+      "description": "Role Presença d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "intuicao_grau",
+      "key": "intuicao_grau",
+      "label": "Intuição — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "intuicao_outros",
+      "key": "intuicao_outros",
+      "label": "Intuição — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "intuicao",
+      "key": "intuicao",
+      "label": "Intuição (PRE)",
+      "type": "computed",
+      "formula": "@intuicao_grau + @intuicao_outros",
+      "signed": true,
+      "description": "Role Presença d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "investigacao_grau",
+      "key": "investigacao_grau",
+      "label": "Investigação — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "investigacao_outros",
+      "key": "investigacao_outros",
+      "label": "Investigação — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "investigacao",
+      "key": "investigacao",
+      "label": "Investigação (INT)",
+      "type": "computed",
+      "formula": "@investigacao_grau + @investigacao_outros",
+      "signed": true,
+      "description": "Role Intelecto d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "luta_grau",
+      "key": "luta_grau",
+      "label": "Luta — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "luta_outros",
+      "key": "luta_outros",
+      "label": "Luta — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "luta",
+      "key": "luta",
+      "label": "Luta (FOR)",
+      "type": "computed",
+      "formula": "@luta_grau + @luta_outros",
+      "signed": true,
+      "description": "Role Força d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "medicina_grau",
+      "key": "medicina_grau",
+      "label": "Medicina — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "medicina_outros",
+      "key": "medicina_outros",
+      "label": "Medicina — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "medicina",
+      "key": "medicina",
+      "label": "Medicina (INT)",
+      "type": "computed",
+      "formula": "@medicina_grau + @medicina_outros",
+      "signed": true,
+      "description": "Role Intelecto d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "ocultismo_grau",
+      "key": "ocultismo_grau",
+      "label": "Ocultismo — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "ocultismo_outros",
+      "key": "ocultismo_outros",
+      "label": "Ocultismo — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "ocultismo",
+      "key": "ocultismo",
+      "label": "Ocultismo (INT)",
+      "type": "computed",
+      "formula": "@ocultismo_grau + @ocultismo_outros",
+      "signed": true,
+      "description": "Role Intelecto d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "percepcao_grau",
+      "key": "percepcao_grau",
+      "label": "Percepção — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "percepcao_outros",
+      "key": "percepcao_outros",
+      "label": "Percepção — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "percepcao",
+      "key": "percepcao",
+      "label": "Percepção (PRE)",
+      "type": "computed",
+      "formula": "@percepcao_grau + @percepcao_outros",
+      "signed": true,
+      "description": "Role Presença d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "pilotagem_grau",
+      "key": "pilotagem_grau",
+      "label": "Pilotagem — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "pilotagem_outros",
+      "key": "pilotagem_outros",
+      "label": "Pilotagem — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "pilotagem",
+      "key": "pilotagem",
+      "label": "Pilotagem (AGI)",
+      "type": "computed",
+      "formula": "@pilotagem_grau + @pilotagem_outros",
+      "signed": true,
+      "description": "Role Agilidade d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "pontaria_grau",
+      "key": "pontaria_grau",
+      "label": "Pontaria — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "pontaria_outros",
+      "key": "pontaria_outros",
+      "label": "Pontaria — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "pontaria",
+      "key": "pontaria",
+      "label": "Pontaria (AGI)",
+      "type": "computed",
+      "formula": "@pontaria_grau + @pontaria_outros",
+      "signed": true,
+      "description": "Role Agilidade d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "profissao_grau",
+      "key": "profissao_grau",
+      "label": "Profissão — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "profissao_outros",
+      "key": "profissao_outros",
+      "label": "Profissão — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "profissao",
+      "key": "profissao",
+      "label": "Profissão (INT)",
+      "type": "computed",
+      "formula": "@profissao_grau + @profissao_outros",
+      "signed": true,
+      "description": "Role Intelecto d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "reflexos_grau",
+      "key": "reflexos_grau",
+      "label": "Reflexos — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "reflexos_outros",
+      "key": "reflexos_outros",
+      "label": "Reflexos — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "reflexos",
+      "key": "reflexos",
+      "label": "Reflexos (AGI)",
+      "type": "computed",
+      "formula": "@reflexos_grau + @reflexos_outros",
+      "signed": true,
+      "description": "Role Agilidade d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "religiao_grau",
+      "key": "religiao_grau",
+      "label": "Religião — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "religiao_outros",
+      "key": "religiao_outros",
+      "label": "Religião — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "religiao",
+      "key": "religiao",
+      "label": "Religião (PRE)",
+      "type": "computed",
+      "formula": "@religiao_grau + @religiao_outros",
+      "signed": true,
+      "description": "Role Presença d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "sobrevivencia_grau",
+      "key": "sobrevivencia_grau",
+      "label": "Sobrevivência — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "sobrevivencia_outros",
+      "key": "sobrevivencia_outros",
+      "label": "Sobrevivência — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "sobrevivencia",
+      "key": "sobrevivencia",
+      "label": "Sobrevivência (INT)",
+      "type": "computed",
+      "formula": "@sobrevivencia_grau + @sobrevivencia_outros",
+      "signed": true,
+      "description": "Role Intelecto d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "tatica_grau",
+      "key": "tatica_grau",
+      "label": "Tática — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "tatica_outros",
+      "key": "tatica_outros",
+      "label": "Tática — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "tatica",
+      "key": "tatica",
+      "label": "Tática (INT)",
+      "type": "computed",
+      "formula": "@tatica_grau + @tatica_outros",
+      "signed": true,
+      "description": "Role Intelecto d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "tecnologia_grau",
+      "key": "tecnologia_grau",
+      "label": "Tecnologia — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "tecnologia_outros",
+      "key": "tecnologia_outros",
+      "label": "Tecnologia — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "tecnologia",
+      "key": "tecnologia",
+      "label": "Tecnologia (INT)",
+      "type": "computed",
+      "formula": "@tecnologia_grau + @tecnologia_outros",
+      "signed": true,
+      "description": "Role Intelecto d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "vontade_grau",
+      "key": "vontade_grau",
+      "label": "Vontade — grau",
+      "type": "select",
+      "options": [
+        {
+          "value": "destreinado",
+          "label": "Destreinado",
+          "number": 0
+        },
+        {
+          "value": "treinado",
+          "label": "Treinado (+5)",
+          "number": 5
+        },
+        {
+          "value": "veterano",
+          "label": "Veterano (+10)",
+          "number": 10
+        },
+        {
+          "value": "expert",
+          "label": "Expert (+15)",
+          "number": 15
+        }
+      ],
+      "default": "destreinado"
+    },
+    {
+      "id": "vontade_outros",
+      "key": "vontade_outros",
+      "label": "Vontade — outros",
+      "type": "number",
+      "default": 0,
+      "integer": true
+    },
+    {
+      "id": "vontade",
+      "key": "vontade",
+      "label": "Vontade (PRE)",
+      "type": "computed",
+      "formula": "@vontade_grau + @vontade_outros",
+      "signed": true,
+      "description": "Role Presença d20 e fique com o maior; some este bônus."
+    },
+    {
+      "id": "ataques",
+      "key": "ataques",
+      "label": "Ataques",
+      "type": "list",
+      "itemFields": [
+        {
+          "id": "nome",
+          "key": "nome",
+          "label": "Arma",
+          "type": "text"
+        },
+        {
+          "id": "bonus",
+          "key": "bonus",
+          "label": "Bônus",
+          "type": "number",
+          "default": 0,
+          "integer": true
+        },
+        {
+          "id": "dano",
+          "key": "dano",
+          "label": "Dano",
+          "type": "dice"
+        },
+        {
+          "id": "critico",
+          "key": "critico",
+          "label": "Crítico",
+          "type": "text"
+        },
+        {
+          "id": "alcance",
+          "key": "alcance",
+          "label": "Alcance",
+          "type": "text"
+        },
+        {
+          "id": "tipo",
+          "key": "tipo",
+          "label": "Tipo",
+          "type": "text"
+        }
+      ],
+      "attack": {
+        "bonus": "bonus",
+        "damage": "dano"
+      }
+    },
+    {
+      "id": "rituais",
+      "key": "rituais",
+      "label": "Rituais",
+      "type": "list",
+      "itemFields": [
+        {
+          "id": "nome",
+          "key": "nome",
+          "label": "Ritual",
+          "type": "text"
+        },
+        {
+          "id": "elemento",
+          "key": "elemento",
+          "label": "Elemento",
+          "type": "select",
+          "options": [
+            {
+              "value": "sangue",
+              "label": "Sangue"
+            },
+            {
+              "value": "morte",
+              "label": "Morte"
+            },
+            {
+              "value": "conhecimento",
+              "label": "Conhecimento"
+            },
+            {
+              "value": "energia",
+              "label": "Energia"
+            },
+            {
+              "value": "medo",
+              "label": "Medo"
+            }
+          ],
+          "default": "sangue"
+        },
+        {
+          "id": "circulo",
+          "key": "circulo",
+          "label": "Círculo",
+          "type": "number",
+          "default": 1,
+          "integer": true,
+          "min": 1,
+          "max": 4
+        },
+        {
+          "id": "execucao",
+          "key": "execucao",
+          "label": "Execução",
+          "type": "text"
+        },
+        {
+          "id": "alcance",
+          "key": "alcance",
+          "label": "Alcance",
+          "type": "text"
+        },
+        {
+          "id": "duracao",
+          "key": "duracao",
+          "label": "Duração",
+          "type": "text"
+        },
+        {
+          "id": "resistencia",
+          "key": "resistencia",
+          "label": "Resistência",
+          "type": "text"
+        },
+        {
+          "id": "descricao",
+          "key": "descricao",
+          "label": "Efeito",
+          "type": "longtext"
+        }
+      ]
+    },
+    {
+      "id": "poderes",
+      "key": "poderes",
+      "label": "Poderes e habilidades",
+      "type": "list",
+      "itemFields": [
+        {
+          "id": "nome",
+          "key": "nome",
+          "label": "Poder",
+          "type": "text"
+        },
+        {
+          "id": "origem",
+          "key": "origem",
+          "label": "Fonte",
+          "type": "text"
+        },
+        {
+          "id": "descricao",
+          "key": "descricao",
+          "label": "Descrição",
+          "type": "longtext"
+        }
+      ]
+    },
+    {
+      "id": "inventario",
+      "key": "inventario",
+      "label": "Inventário",
+      "type": "list",
+      "itemFields": [
+        {
+          "id": "nome",
+          "key": "nome",
+          "label": "Item",
+          "type": "text"
+        },
+        {
+          "id": "qtd",
+          "key": "qtd",
+          "label": "Qtd.",
+          "type": "number",
+          "default": 1,
+          "integer": true,
+          "min": 0
+        },
+        {
+          "id": "espacos",
+          "key": "espacos",
+          "label": "Espaços",
+          "type": "number",
+          "default": 1,
+          "integer": true,
+          "min": 0
+        }
+      ]
+    },
+    {
+      "id": "carga_max",
+      "key": "carga_max",
+      "label": "Limite de carga (espaços)",
+      "type": "number",
+      "default": 10,
+      "integer": true,
+      "description": "5 por ponto de Força (mínimo 2).",
+      "min": 0
+    },
+    {
+      "id": "limite_credito",
+      "key": "limite_credito",
+      "label": "Limite de crédito",
+      "type": "select",
+      "options": [
+        {
+          "value": "baixo",
+          "label": "Baixo"
+        },
+        {
+          "value": "medio",
+          "label": "Médio"
+        },
+        {
+          "value": "alto",
+          "label": "Alto"
+        },
+        {
+          "value": "ilimitado",
+          "label": "Ilimitado"
+        }
+      ],
+      "default": "baixo"
+    },
+    {
+      "id": "aparencia",
+      "key": "aparencia",
+      "label": "Aparência",
+      "type": "longtext"
+    },
+    {
+      "id": "historia",
+      "key": "historia",
+      "label": "História e objetivo",
+      "type": "longtext"
+    },
+    {
+      "id": "anotacoes",
+      "key": "anotacoes",
+      "label": "Anotações",
+      "type": "longtext"
+    }
+  ],
+  "layouts": {
+    "full": [
+      {
+        "kind": "section",
+        "title": "Agente",
+        "columns": 4,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "nome",
+            "span": 2
+          },
+          {
+            "kind": "field",
+            "fieldId": "jogador"
+          },
+          {
+            "kind": "field",
+            "fieldId": "origem"
+          },
+          {
+            "kind": "field",
+            "fieldId": "classe"
+          },
+          {
+            "kind": "field",
+            "fieldId": "trilha"
+          },
+          {
+            "kind": "field",
+            "fieldId": "afinidade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "nex"
+          },
+          {
+            "kind": "field",
+            "fieldId": "nivel"
+          },
+          {
+            "kind": "field",
+            "fieldId": "patente"
+          },
+          {
+            "kind": "field",
+            "fieldId": "prestigio"
+          },
+          {
+            "kind": "field",
+            "fieldId": "deslocamento"
+          }
+        ],
+        "tab": "Principal"
+      },
+      {
+        "kind": "section",
+        "title": "Atributos",
+        "columns": 3,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "agi"
+          },
+          {
+            "kind": "field",
+            "fieldId": "for"
+          },
+          {
+            "kind": "field",
+            "fieldId": "int"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pre"
+          },
+          {
+            "kind": "field",
+            "fieldId": "vig"
+          }
+        ],
+        "display": "compacto"
+      },
+      {
+        "kind": "section",
+        "title": "Vida, Esforço e Sanidade",
+        "columns": 3,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "pv"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pe"
+          },
+          {
+            "kind": "field",
+            "fieldId": "san"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pv_max"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pe_max"
+          },
+          {
+            "kind": "field",
+            "fieldId": "san_max"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pv_bonus"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pe_bonus"
+          },
+          {
+            "kind": "field",
+            "fieldId": "san_bonus"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pe_rodada"
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "title": "Defesa",
+        "columns": 4,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "defesa"
+          },
+          {
+            "kind": "field",
+            "fieldId": "defesa_equip"
+          },
+          {
+            "kind": "field",
+            "fieldId": "defesa_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "bloqueio"
+          },
+          {
+            "kind": "field",
+            "fieldId": "condicoes",
+            "span": 4
+          }
+        ],
+        "tab": "Combate"
+      },
+      {
+        "kind": "section",
+        "title": "Ataques",
+        "columns": 1,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "ataques"
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "title": "Perícias",
+        "columns": 3,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "acrobacia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "acrobacia_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "acrobacia_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "adestramento"
+          },
+          {
+            "kind": "field",
+            "fieldId": "adestramento_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "adestramento_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "artes"
+          },
+          {
+            "kind": "field",
+            "fieldId": "artes_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "artes_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "atletismo"
+          },
+          {
+            "kind": "field",
+            "fieldId": "atletismo_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "atletismo_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "atualidades"
+          },
+          {
+            "kind": "field",
+            "fieldId": "atualidades_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "atualidades_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ciencias"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ciencias_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ciencias_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "crime"
+          },
+          {
+            "kind": "field",
+            "fieldId": "crime_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "crime_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "diplomacia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "diplomacia_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "diplomacia_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "enganacao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "enganacao_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "enganacao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "fortitude"
+          },
+          {
+            "kind": "field",
+            "fieldId": "fortitude_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "fortitude_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "furtividade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "furtividade_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "furtividade_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "iniciativa"
+          },
+          {
+            "kind": "field",
+            "fieldId": "iniciativa_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "iniciativa_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intimidacao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intimidacao_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intimidacao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intuicao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intuicao_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "intuicao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "investigacao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "investigacao_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "investigacao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "luta"
+          },
+          {
+            "kind": "field",
+            "fieldId": "luta_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "luta_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "medicina"
+          },
+          {
+            "kind": "field",
+            "fieldId": "medicina_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "medicina_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ocultismo"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ocultismo_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ocultismo_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "percepcao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "percepcao_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "percepcao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pilotagem"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pilotagem_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pilotagem_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pontaria"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pontaria_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pontaria_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "profissao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "profissao_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "profissao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "reflexos"
+          },
+          {
+            "kind": "field",
+            "fieldId": "reflexos_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "reflexos_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "religiao"
+          },
+          {
+            "kind": "field",
+            "fieldId": "religiao_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "religiao_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "sobrevivencia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "sobrevivencia_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "sobrevivencia_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tatica"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tatica_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tatica_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tecnologia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tecnologia_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tecnologia_outros"
+          },
+          {
+            "kind": "field",
+            "fieldId": "vontade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "vontade_grau"
+          },
+          {
+            "kind": "field",
+            "fieldId": "vontade_outros"
+          }
+        ],
+        "tab": "Perícias",
+        "display": "linhas"
+      },
+      {
+        "kind": "section",
+        "title": "Rituais",
+        "columns": 1,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "rituais"
+          }
+        ],
+        "tab": "Rituais"
+      },
+      {
+        "kind": "section",
+        "title": "Poderes",
+        "columns": 1,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "poderes"
+          }
+        ],
+        "tab": "Poderes"
+      },
+      {
+        "kind": "section",
+        "title": "Inventário",
+        "columns": 2,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "inventario",
+            "span": 2
+          },
+          {
+            "kind": "field",
+            "fieldId": "carga_max"
+          },
+          {
+            "kind": "field",
+            "fieldId": "limite_credito"
+          }
+        ],
+        "tab": "Inventário"
+      },
+      {
+        "kind": "section",
+        "title": "Personagem",
+        "columns": 1,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "aparencia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "historia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "anotacoes"
+          }
+        ],
+        "tab": "Anotações"
+      }
+    ],
+    "gmSummary": ["pv", "pe", "san", "defesa", "nex", "condicoes"]
+  }
+}
