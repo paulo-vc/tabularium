@@ -2,7 +2,7 @@
 
 # Tabularium RPG
 
-Fichas de RPG de mesa com **sessão ao vivo**: o Mestre acompanha a ficha de cada jogador em tempo real, a mesa rola dados em 3D, conversa no chat e ouve a música do Mestre. Gratuito, sem conta e sem servidor: os dados ficam no seu aparelho, e a mesa se conecta direto entre os participantes.
+Fichas de RPG de mesa com **sessão ao vivo**: o Mestre acompanha a ficha de cada jogador em tempo real, a mesa rola dados em 3D, conversa no chat e ouve a música do Mestre. No computador (Windows e Linux) e no Android. Gratuito, sem conta e sem servidor: os dados ficam no seu aparelho, e a mesa se conecta direto entre os participantes.
 
 ![O Mestre com a sessão aberta](docs/imagens/mestre-sessao.png)
 
@@ -12,7 +12,7 @@ Na [página de versões](https://github.com/paulo-vc/tabularium/releases):
 
 - **Windows:** o instalador (`.exe` ou `.msi`), ou o executável que roda sem instalar. No computador, o app se atualiza sozinho.
 - **Linux:** `.AppImage`, `.deb` ou `.rpm`.
-- **Android:** o `.apk`. Na primeira vez, o Android pede para permitir instalar de "fontes desconhecidas".
+- **Android:** o `.apk`, aberto pelo navegador do celular. Na primeira vez, o Android pede para permitir instalar de "fontes desconhecidas". O app avisa quando há versão nova.
 
 > No Windows, o aviso "O Windows protegeu seu computador" aparece porque o executável não tem assinatura digital paga. Clique em **Mais informações → Executar assim mesmo**.
 
@@ -20,8 +20,9 @@ O [guia de uso](docs/guia.md) mostra como mestrar, jogar e criar sistemas, com i
 
 ## O que ele faz
 
+- **Começo guiado:** na primeira vez, o app pergunta se você vai mestrar, jogar ou só montar uma ficha, e mostra uma ficha de exemplo já preenchida.
 - **Fichas** de D&D 5ª Edição (SRD 5.1) e **Lendas d20** (regras ORC), com os cálculos automáticos: modificadores, CA, perícias, carga, bônus de itens, maldições e bênçãos. Ataques, testes e dano rolam pela própria ficha; dá para imprimir ou salvar em PDF.
-- **Sessão ao vivo:** o Mestre cria a campanha e manda o convite (link ou código curto). Cada jogador entra com a própria ficha, e o Mestre vê tudo mudar na hora, pode alterar as fichas e guardar campos secretos.
+- **Sessão ao vivo:** o Mestre cria a campanha e manda o convite (um código curto, para ditar ou mandar no grupo). Cada jogador entra com a própria ficha, e o Mestre vê tudo mudar na hora, pode alterar as fichas e guardar campos secretos.
 - **Combate:** ordem de turno com iniciativas, rodadas e criaturas ocultas; cada jogador recebe um aviso na vez dele.
 - **Dados em 3D:** toda rolagem cai na tela e para na face sorteada; a mesa vê os dados de todos, cada um na sua cor. Histórico de rolagens no chat.
 - **Chat:** falas de personagem, ações, rolagens com `/r` e sussurros; entre jogadores, cifrados de ponta a ponta.
@@ -33,7 +34,7 @@ O [guia de uso](docs/guia.md) mostra como mestrar, jogar e criar sistemas, com i
 
 ## Como a mesa se conecta
 
-Os participantes se conectam **diretamente** (WebRTC), sem servidor do Tabularium no meio: é isso que mantém o app gratuito para todos. Serviços públicos só ajudam os aparelhos a se encontrarem. A conexão direta funciona na maioria das redes; em algumas (empresa, faculdade e, às vezes, o 4G), ela é bloqueada, e trocar de rede resolve. Detalhes em [Privacidade](docs/privacidade.md).
+Os participantes se conectam **diretamente** (WebRTC), sem servidor do Tabularium no meio: é isso que mantém o app gratuito para todos. Serviços públicos só ajudam os aparelhos a se encontrarem. A conexão direta funciona na maioria das redes; em algumas (empresa, faculdade e, às vezes, o 4G), ela é bloqueada, e trocar de rede resolve. Em **Configurações → Conexão → Testar minha rede**, o app diz em segundos se a sua rede deixa a conexão abrir. Detalhes em [Privacidade](docs/privacidade.md).
 
 ## Sistemas incluídos e licenças
 
