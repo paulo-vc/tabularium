@@ -2,9 +2,9 @@
 
 O que está em andamento e as ideias para depois. As fases já entregues ficam em [`architecture.md`](architecture.md#roadmap); as mudanças de cada versão, no [CHANGELOG](../CHANGELOG.md).
 
-## Plano para a 1.0
+## Plano para a 1.0 (entregue)
 
-Desde a v0.4.2 (2026-10), sem lançar versões: o projeto ainda não é distribuído, então o foco é chegar a uma 1.0 pronta para outras pessoas. Até lá, o `main` segue sempre funcionando (PRs, `pnpm check`, testes de ponta a ponta), o CHANGELOG acumula em "Próxima versão" e, para testar o app instalado, vale o instalador gerado pelo workflow "Desktop" em cada PR.
+**A v1.0.0 foi lançada em 2026-10-28**, para Windows, Linux e Android ([release](https://github.com/paulo-vc/tabularium/releases/tag/v1.0.0)). O plano abaixo fica como registro do que levou até ela. Entre a v0.4.2 e a 1.0, nenhuma versão foi lançada: o CHANGELOG acumulou em "Próxima versão", que virou a v1.0.0.
 
 **Plataformas da 1.0** (decidido em 2026-10-24): **desktop e Android**. A versão de navegador deixa de ser distribuída; o app web continua sendo a base do desktop e do celular e é onde rodam os testes, mas não é publicado como site.
 
