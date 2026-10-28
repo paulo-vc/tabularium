@@ -61,6 +61,19 @@ describe('D&D 5e (SRD)', () => {
     expect(template.license).toBe('CC-BY-4.0');
     expect(template.description).toContain('System Reference Document 5.1');
     expect(template.description).toContain('Wizards of the Coast');
+    expect(template.description).toContain('System Reference Document 5.2');
+  });
+
+  it('regras de 2024: Exaustão dá −2 por nível só na 5.5; ataques têm maestria', () => {
+    const base = createSheet(compiled, { id: 's', name: 'T', ownerId: 'u', now: 0 }).values;
+    expect(base.edicao).toBe('2014');
+    const penalty = (edicao: string) =>
+      computeDerived(compiled, { ...base, edicao, exaustao: 3 } as never).computed
+        .exaustao_penalidade;
+    expect(penalty('2014')).toEqual({ ok: true, value: 0 });
+    expect(penalty('2024')).toEqual({ ok: true, value: -6 });
+    const ataques = template.fields.find((f) => f.id === 'ataques');
+    expect(ataques?.type === 'list' && ataques.itemFields.map((f) => f.id)).toContain('maestria');
   });
 
   it('calcula um guerreiro de nível 5 como no livro', () => {
