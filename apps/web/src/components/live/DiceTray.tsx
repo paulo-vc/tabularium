@@ -1,4 +1,10 @@
-import { DEFAULT_DICE_COLOR, describeRoll, diceToShow, type RollEntry } from '@tabula/domain';
+import {
+  DEFAULT_DICE_COLOR,
+  describeRoll,
+  diceToShow,
+  rollOutcome,
+  type RollEntry,
+} from '@tabula/domain';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { EyeOffIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -138,8 +144,16 @@ export function DiceTray() {
   );
 }
 
+/** Texto preto ou branco, o que se lê melhor sobre a cor (#rrggbb). */
+function readableOn(hex: string): string {
+  const [r, g, b] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16) / 255);
+  const luminance = 0.2126 * (r ?? 0) + 0.7152 * (g ?? 0) + 0.0722 * (b ?? 0);
+  return luminance > 0.5 ? '#111111' : '#ffffff';
+}
+
 function ResultCard({ entry, onOpen }: { entry: RollEntry; onOpen?: (() => void) | undefined }) {
   const hidden = diceToShow(entry.result).hidden;
+  const outcome = rollOutcome(entry.result);
   // Na ordem do texto: "Ana · Furtividade: 17" e a conta; na tela, o total fica à direita.
   const body = (
     <>
@@ -148,7 +162,24 @@ function ResultCard({ entry, onOpen }: { entry: RollEntry; onOpen?: (() => void)
         {entry.label && <span className="text-muted-foreground"> · {entry.label}</span>}
         <span className="sr-only">: </span>
       </span>
-      <span className="row-span-2 flex items-center gap-1.5 self-center text-2xl font-bold tabular-nums">
+      {/* Dados que se comparam (dualidade): o resultado em destaque, na cor do dado que venceu. */}
+      {outcome && (
+        <span
+          className="col-start-1 justify-self-start rounded-full border px-2 text-xs font-semibold"
+          style={
+            outcome.color
+              ? {
+                  backgroundColor: outcome.color,
+                  borderColor: outcome.color,
+                  color: readableOn(outcome.color),
+                }
+              : undefined
+          }
+        >
+          {outcome.label}
+        </span>
+      )}
+      <span className="row-span-3 flex items-center gap-1.5 self-center text-2xl font-bold tabular-nums">
         {entry.secret && (
           <EyeOffIcon aria-label="Secreta" className="text-muted-foreground size-4" />
         )}
@@ -156,7 +187,7 @@ function ResultCard({ entry, onOpen }: { entry: RollEntry; onOpen?: (() => void)
       </span>
       <span className="text-muted-foreground min-w-0 truncate text-left font-mono text-xs">
         <span className="sr-only"> </span>
-        {describeRoll(entry.result)}
+        {describeRoll(entry.result, false)}
         {hidden > 0 && ` · +${hidden} fora da bandeja`}
       </span>
     </>

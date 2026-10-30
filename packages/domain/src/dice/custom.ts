@@ -1,6 +1,9 @@
 import { z } from 'zod';
 import { LabelSchema } from '../schema/primitives';
 
+const DieIdSchema = z.string().regex(/^[A-Za-z][A-Za-z0-9]{0,15}$/);
+const OutcomeLabelSchema = z.string().trim().min(1).max(40);
+
 /** Quantas faces um dado do sistema pode ter: as formas que existem em 3D. */
 export const CUSTOM_DIE_FACES = [4, 6, 8, 10, 12, 20] as const;
 
@@ -12,7 +15,7 @@ export const CUSTOM_DIE_FACES = [4, 6, 8, 10, 12, 20] as const;
  */
 export const CustomDieSchema = z.object({
   /** Usado na notação (`4dF`). Letras e números, começando por letra; maiúsculas não importam. */
-  id: z.string().regex(/^[A-Za-z][A-Za-z0-9]{0,15}$/),
+  id: DieIdSchema,
   name: LabelSchema,
   faces: z
     .array(
@@ -28,6 +31,13 @@ export const CustomDieSchema = z.object({
   color: z
     .string()
     .regex(/^#[0-9a-f]{6}$/i)
+    .optional(),
+  /**
+   * Comparação com outro dado rolado junto, como na dualidade: quando este sai maior que o
+   * `against`, a rolagem fica "com Esperança" (`win`); empatados, vale o `tie` ("crítico").
+   */
+  duel: z
+    .object({ against: DieIdSchema, win: OutcomeLabelSchema, tie: OutcomeLabelSchema.optional() })
     .optional(),
 });
 export type CustomDie = z.infer<typeof CustomDieSchema>;
