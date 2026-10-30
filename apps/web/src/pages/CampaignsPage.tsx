@@ -234,8 +234,8 @@ export function JoinDialog({ trigger }: { trigger?: ReactElement }) {
     if (result.reason === 'cancelado') return;
     setError(
       result.reason === 'falha-de-conexao'
-        ? 'O Mestre foi encontrado, mas a conexão não abriu (rede restritiva). Peça o link do convite.'
-        : 'O Mestre não foi encontrado. O código curto só funciona com a sessão do Mestre aberta; confira o código ou peça o link.',
+        ? 'O Mestre foi encontrado, mas a conexão não abriu (rede restritiva). Peça o código completo do convite, que funciona sem a sessão aberta.'
+        : 'O Mestre não foi encontrado. O código curto só funciona com a sessão do Mestre aberta; confira o código ou peça o código completo do convite.',
     );
   };
 
@@ -260,8 +260,8 @@ export function JoinDialog({ trigger }: { trigger?: ReactElement }) {
           <DialogHeader>
             <DialogTitle>Entrar com convite</DialogTitle>
             <DialogDescription>
-              Cole o link que o Mestre enviou, ou digite o código curto (ex.:
-              K7QM-2XPA-9DFR-WB3N-5T6H).
+              Digite o código curto que o Mestre enviou (ex.: K7QM-2XPA-9DFR-WB3N-5T6H) ou cole o
+              código completo.
             </DialogDescription>
           </DialogHeader>
           <div className="space-y-2">

@@ -289,6 +289,19 @@ export function compileTemplate(template: SystemTemplate): Result<CompiledTempla
     }
     ids.add(id);
   });
+  template.dice?.forEach((die, index) => {
+    if (!die.duel) return;
+    const rival = die.duel.against.toLowerCase();
+    if (rival === die.id.toLowerCase() || !ids.has(rival)) {
+      issues.push(
+        issue(
+          'dado-sem-rival',
+          ['dice', index, 'duel', 'against'],
+          `O dado "d${die.id}" compara com "d${die.duel.against}", que não é outro dado do sistema`,
+        ),
+      );
+    }
+  });
 
   if (template.checkDice !== undefined) {
     const dice = parseDice(template.checkDice, template.dice);
