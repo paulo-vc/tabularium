@@ -52,7 +52,7 @@ const invalid = (message: string): Result<CampaignInvite, Issue> =>
 /** Lê um convite colado pelo usuário: o link completo ou só o código. */
 export function decodeInvite(input: string): Result<CampaignInvite, Issue> {
   const text = input.trim();
-  if (text.length === 0) return invalid('Cole o link ou o código do convite.');
+  if (text.length === 0) return invalid('Cole ou digite o código do convite.');
   if (text.length > MAX_INVITE_LENGTH) return invalid('Convite inválido.');
 
   const marker = text.indexOf(INVITE_ROUTE);

@@ -24,6 +24,9 @@ const COLORS = [
   { name: 'Preto', value: '#1c1917' },
 ];
 
+/** Valor do seletor "Comparar com" para nenhum dado (o Select não aceita valor vazio). */
+const NO_RIVAL = '__nenhum__';
+
 const numbered = (count: number) =>
   Array.from({ length: count }, (_, i) => ({ label: String(i + 1), value: i + 1 }));
 
@@ -49,8 +52,20 @@ const PRESETS: { name: string; dice: CustomDie[] }[] = [
   {
     name: 'Esperança e Medo (2d12)',
     dice: [
-      { id: 'Esperanca', name: 'Esperança', color: '#d4a017', faces: numbered(12) },
-      { id: 'Medo', name: 'Medo', color: '#5b21b6', faces: numbered(12) },
+      {
+        id: 'Esperanca',
+        name: 'Esperança',
+        color: '#d4a017',
+        faces: numbered(12),
+        duel: { against: 'Medo', win: 'com Esperança', tie: 'crítico' },
+      },
+      {
+        id: 'Medo',
+        name: 'Medo',
+        color: '#5b21b6',
+        faces: numbered(12),
+        duel: { against: 'Esperanca', win: 'com Medo', tie: 'crítico' },
+      },
     ],
   },
   { name: 'Em branco (6 faces)', dice: [{ id: 'X', name: 'Novo dado', faces: numbered(6) }] },
@@ -82,8 +97,50 @@ export function DiceEditor({ template, apply }: { template: SystemTemplate; appl
     );
   const add = (preset: CustomDie[]) => {
     const added = [...dice];
-    for (const die of preset) added.push({ ...die, id: freeId(die.id, added) });
-    setDice(added, 'novo dado');
+    const renamed = new Map<string, string>();
+    for (const die of preset) {
+      const id = freeId(die.id, added);
+      renamed.set(die.id, id);
+      added.push({ ...die, id });
+    }
+    // Os dados de um modelo se comparam entre si: a comparação acompanha a notação nova.
+    setDice(
+      added.map((die) =>
+        die.duel && renamed.has(die.duel.against) && preset.some((p) => p.id === die.duel?.against)
+          ? { ...die, duel: { ...die.duel, against: renamed.get(die.duel.against) as string } }
+          : die,
+      ),
+      'novo dado',
+    );
+  };
+  /**
+   * Liga (ou desliga) a comparação de um dado com outro. O outro ganha a comparação de volta,
+   * se ainda não tiver uma: assim "com Esperança" e "com Medo" saem de uma escolha só.
+   */
+  const setRival = (index: number, rivalId: string | null) => {
+    const die = dice[index];
+    if (!die) return;
+    const next = dice.map((d, i): CustomDie => {
+      if (i === index) {
+        if (rivalId === null) {
+          const { duel: _duel, ...rest } = d;
+          return rest;
+        }
+        return { ...d, duel: { win: d.duel?.win ?? `com ${d.name}`, ...d.duel, against: rivalId } };
+      }
+      if (rivalId !== null && d.id === rivalId && !d.duel) {
+        return {
+          ...d,
+          duel: { against: die.id, win: `com ${d.name}`, tie: die.duel?.tie ?? 'crítico' },
+        };
+      }
+      return d;
+    });
+    if (rivalId !== null && !next[index]?.duel?.tie) {
+      const self = next[index];
+      if (self?.duel) next[index] = { ...self, duel: { ...self.duel, tie: 'crítico' } };
+    }
+    setDice(next, 'comparação de dados');
   };
 
   return (
@@ -102,6 +159,8 @@ export function DiceEditor({ template, apply }: { template: SystemTemplate; appl
         <DieCard
           key={index}
           die={die}
+          others={dice.filter((_, i) => i !== index)}
+          onRival={(rivalId) => setRival(index, rivalId)}
           onChange={(change) => update(index, change)}
           onRemove={() =>
             setDice(
@@ -131,10 +190,15 @@ export function DiceEditor({ template, apply }: { template: SystemTemplate; appl
 
 function DieCard({
   die,
+  others,
+  onRival,
   onChange,
   onRemove,
 }: {
   die: CustomDie;
+  /** Os outros dados do sistema, com quem este pode se comparar. */
+  others: readonly CustomDie[];
+  onRival: (rivalId: string | null) => void;
   onChange: (change: (die: CustomDie) => CustomDie) => void;
   onRemove: () => void;
 }) {
@@ -241,6 +305,72 @@ function DieCard({
           ))}
         </div>
       </div>
+
+      {others.length > 0 && (
+        <div className="space-y-2">
+          <div className="grid gap-3 sm:grid-cols-[minmax(0,12rem)_1fr_1fr] sm:items-end">
+            <div className="space-y-1.5">
+              <Label htmlFor={`${base}-rival`}>Comparar com</Label>
+              <Select
+                value={die.duel?.against ?? NO_RIVAL}
+                onValueChange={(value) => onRival(value === NO_RIVAL ? null : value)}
+              >
+                <SelectTrigger id={`${base}-rival`} className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={NO_RIVAL}>Nenhum</SelectItem>
+                  {others.map((other) => (
+                    <SelectItem key={other.id} value={other.id}>
+                      {other.name} (d{other.id})
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+            {die.duel && (
+              <>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`${base}-vence`}>Se este vencer</Label>
+                  <Input
+                    id={`${base}-vence`}
+                    value={die.duel.win}
+                    maxLength={40}
+                    onChange={(event) =>
+                      onChange((d) =>
+                        d.duel ? { ...d, duel: { ...d.duel, win: event.target.value } } : d,
+                      )
+                    }
+                  />
+                </div>
+                <div className="space-y-1.5">
+                  <Label htmlFor={`${base}-empate`}>Se empatar</Label>
+                  <Input
+                    id={`${base}-empate`}
+                    value={die.duel.tie ?? ''}
+                    maxLength={40}
+                    placeholder="Nada"
+                    onChange={(event) =>
+                      onChange((d) => {
+                        if (!d.duel) return d;
+                        const { tie: _tie, ...duel } = d.duel;
+                        return {
+                          ...d,
+                          duel: event.target.value ? { ...duel, tie: event.target.value } : duel,
+                        };
+                      })
+                    }
+                  />
+                </div>
+              </>
+            )}
+          </div>
+          <p className="text-muted-foreground text-xs">
+            Rolados juntos, um de cada, o maior dá o resultado da rolagem, como na dualidade ("com
+            Esperança" ou "com Medo").
+          </p>
+        </div>
+      )}
 
       <fieldset className="space-y-1.5">
         <legend className="text-sm font-medium">Faces: o que aparece e quanto soma</legend>

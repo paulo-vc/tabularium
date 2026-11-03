@@ -2,6 +2,11 @@
 
 As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos ficam nos PRs e em [`docs/`](docs/).
 
+## Próxima versão
+
+- **Resultado da dualidade:** dados do sistema podem se comparar, como Esperança e Medo. Rolados juntos, um de cada, o maior dá o resultado da rolagem: "com Esperança" ou "com Medo", e o empate sai como "crítico". O resultado aparece em destaque na bandeja dos dados, na cor do dado que venceu, e também no histórico de rolagens e nos avisos. No criador de sistemas, cada dado ganha "Comparar com": escolher o rival liga a comparação de volta no outro dado, e o modelo "Esperança e Medo" já vem comparado. O sistema Dualidade (1.3.0) passa a rolar os testes com os dados de Esperança e Medo.
+- O convite fala só em código (o curto e o completo), sem o "link", que os apps não geram mais.
+
 ## v1.0.0
 
 A primeira versão para qualquer grupo usar: app para **Android**, cara e ícone novos, um começo guiado para quem nunca viu o app, cópia de segurança completa e um criador de sistemas bem mais fácil.

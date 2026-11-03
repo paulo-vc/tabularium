@@ -1,4 +1,5 @@
 import {
+  compareVersions,
   compileTemplate,
   computeDerived,
   createSheet,
@@ -31,7 +32,11 @@ describe.each(COMMUNITY.map((template) => [template.id, template] as const))(
     it('pede a v0.2 se usa recursos da ficha nova (a v0.1 esconderia campos)', () => {
       const json = JSON.stringify(template);
       const usesNewSheet = /"(tab|secondary|display)":/.test(json);
-      if (usesNewSheet) expect(template.minAppVersion).toBe('0.2.0');
+      if (usesNewSheet) {
+        expect(compareVersions(template.minAppVersion ?? '0.0.0', '0.2.0')).toBeGreaterThanOrEqual(
+          0,
+        );
+      }
     });
   },
 );
@@ -61,8 +66,12 @@ describe('Dualidade (compatível com Daggerheart)', () => {
     expect(template.description).toContain('Darrington Press Community Gaming License');
   });
 
-  it('testes rolam os dados de dualidade (2d12)', () => {
-    expect(template.checkDice).toBe('2d12');
+  it('testes rolam os dados de Esperança e Medo, e o maior dá o resultado', () => {
+    expect(template.checkDice).toBe('1dEsperanca+1dMedo');
+    expect(template.dice?.map((die) => [die.id, die.faces.length, die.duel?.win])).toEqual([
+      ['Esperanca', 12, 'com Esperança'],
+      ['Medo', 12, 'com Medo'],
+    ]);
   });
 
   it('patamar acompanha o nível', () => {
