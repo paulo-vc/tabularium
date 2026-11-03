@@ -20,7 +20,7 @@ export class HttpRegistrySource implements RegistrySource {
     let lastError: unknown;
     for (const base of this.mirrors) {
       try {
-        return await download(base + path, maxBytes);
+        return await download(base + path, maxBytes, path === 'index.json');
       } catch (error) {
         lastError = error;
       }
@@ -29,9 +29,16 @@ export class HttpRegistrySource implements RegistrySource {
   }
 }
 
-/** Download com tempo e tamanho máximos: um servidor lento ou um arquivo enorme não travam o app. */
-async function download(url: string, maxBytes: number): Promise<Uint8Array> {
-  const response = await fetch(url, { signal: AbortSignal.timeout(TIMEOUT_MS) });
+/**
+ * Download com tempo e tamanho máximos: um servidor lento ou um arquivo enorme não travam o app.
+ * O índice muda a cada publicação, mas a jsDelivr manda guardá-lo por 7 dias; `revalidate`
+ * confere com a CDN toda vez (os arquivos dos sistemas não mudam e podem ficar no cache).
+ */
+async function download(url: string, maxBytes: number, revalidate = false): Promise<Uint8Array> {
+  const response = await fetch(url, {
+    signal: AbortSignal.timeout(TIMEOUT_MS),
+    ...(revalidate ? { cache: 'no-cache' as const } : {}),
+  });
   if (!response.ok || !response.body) throw new Error(`HTTP ${response.status} em ${url}`);
   const reader = response.body.getReader();
   const chunks: Uint8Array[] = [];
