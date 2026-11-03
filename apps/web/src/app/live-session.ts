@@ -755,11 +755,13 @@ export class LiveSessionManager {
       id: await this.device.getDeviceId(),
       name: (await this.device.getDisplayName()) ?? 'Você',
     };
-    // A cor dos dados é enfeite: sem acesso às preferências, a rolagem sai sem ela.
-    const diceColor = await this.device.getSoundSettings().then(
-      (settings) => settings.diceColor,
+    // A cor e o acabamento dos dados são enfeite: sem acesso às preferências, a rolagem sai sem eles.
+    const looks = await this.device.getSoundSettings().then(
+      (settings) => settings,
       () => undefined,
     );
+    const diceColor = looks?.diceColor;
+    const diceFinish = looks?.diceFinish !== 'liso' ? looks?.diceFinish : undefined;
     const entry: RollEntry = {
       id: this.newId(),
       at: this.clock.now(),
@@ -771,6 +773,7 @@ export class LiveSessionManager {
       secret: input.secret === true && this.snapshot.kind === 'mestre',
       ...(input.purpose && { purpose: input.purpose }),
       ...(diceColor && { diceColor }),
+      ...(diceFinish && { diceFinish }),
     };
     if (active) {
       active.shareRoll(entry);

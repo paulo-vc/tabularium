@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import { parseChatInput } from '../chat/schema';
 import { CustomDieSchema, type CustomDie } from './custom';
 import { describeRoll, parseDice, rollDice } from './dice';
+import { asDiceFinish } from '../preferences/sounds';
 import { RollEntrySchema, type RollEntry } from './log';
 import { diceToShow } from './visual';
 
@@ -103,5 +104,20 @@ describe('dados do sistema', () => {
       expression: '2d6',
       label: 'dano de fogo',
     });
+  });
+});
+
+describe('acabamento dos dados', () => {
+  it('um acabamento conhecido passa; um desconhecido (de versão mais nova) vira liso', () => {
+    expect(asDiceFinish('marmore')).toBe('marmore');
+    expect(asDiceFinish('cristal')).toBe('liso');
+    expect(asDiceFinish(undefined)).toBe('liso');
+  });
+
+  it('a rolagem com um acabamento que esta versão não conhece continua valendo', () => {
+    const result = rollDice([{ kind: 'dados', sign: 1, count: 1, sides: 20 }], () => 7);
+    expect(RollEntrySchema.safeParse({ ...entry(result), diceFinish: 'cristal' }).success).toBe(
+      true,
+    );
   });
 });

@@ -177,12 +177,16 @@ describe('rolagens pela ficha', () => {
 
   it('a rolagem leva a cor dos dados de quem rolou, para a mesa ver nela', async () => {
     const { campaign } = await setUpLiveTable();
-    await player.sounds.update({ diceColor: '#b91c1c' });
+    await player.sounds.update({ diceColor: '#b91c1c', diceFinish: 'madeira' });
     await player.session.roll({ label: 'Furtividade', expression: '1d20+3' });
     await waitLong(async () => {
       await network.settle();
       const [received] = await gm.session.rolls(campaign.id);
-      expect(received).toMatchObject({ authorName: 'Ana', diceColor: '#b91c1c' });
+      expect(received).toMatchObject({
+        authorName: 'Ana',
+        diceColor: '#b91c1c',
+        diceFinish: 'madeira',
+      });
     });
   });
 

@@ -135,11 +135,37 @@ function facesOf(geometry: BufferGeometry, sides: number): DieFace[] {
 
 const cache = new Map<DieShape, DieModel>();
 
+/**
+ * Coordenadas de textura planas, face a face: cada triângulo é projetado no plano dele, e as
+ * faces começam em pontos diferentes da textura, para o veio não se repetir igual em todas.
+ */
+function planarUvs(geometry: BufferGeometry): void {
+  const position = geometry.getAttribute('position');
+  const uvs: number[] = [];
+  const a = new Vector3();
+  const b = new Vector3();
+  const c = new Vector3();
+  for (let i = 0; i < position.count; i += 3) {
+    a.fromBufferAttribute(position, i);
+    b.fromBufferAttribute(position, i + 1);
+    c.fromBufferAttribute(position, i + 2);
+    const normal = new Vector3().subVectors(c, b).cross(new Vector3().subVectors(a, b)).normalize();
+    const helper = Math.abs(normal.y) < 0.9 ? new Vector3(0, 1, 0) : new Vector3(1, 0, 0);
+    const u = new Vector3().crossVectors(helper, normal).normalize();
+    const v = new Vector3().crossVectors(normal, u);
+    // Ponto de partida na textura pela direção da face: o mesmo em todos os triângulos dela.
+    const offset = (normal.x * 0.37 + normal.y * 0.71 + normal.z * 0.53) * 2;
+    for (const p of [a, b, c]) uvs.push(p.dot(u) * 0.45 + offset, p.dot(v) * 0.45 + offset * 0.6);
+  }
+  geometry.setAttribute('uv', new Float32BufferAttribute(uvs, 2));
+}
+
 export function dieModel(shape: DieShape): DieModel {
   let model = cache.get(shape);
   if (!model) {
     const geometry = baseGeometry(shape);
     geometry.computeVertexNormals();
+    planarUvs(geometry);
     model = { geometry, faces: facesOf(geometry, SIDES[shape]) };
     cache.set(shape, model);
   }

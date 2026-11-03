@@ -1,7 +1,12 @@
-import { DEFAULT_DICE_COLOR, DEFAULT_MUSIC_VOLUME } from '@tabula/domain';
+import {
+  DEFAULT_DICE_COLOR,
+  DEFAULT_MUSIC_VOLUME,
+  DICE_FINISHES,
+  type DiceFinish,
+} from '@tabula/domain';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { MonitorIcon, MoonIcon, PlayIcon, SunIcon, Trash2Icon } from 'lucide-react';
-import { useEffect, useId, useState, type ReactNode } from 'react';
+import { useEffect, useId, useMemo, useState, type ReactNode } from 'react';
 import { toast } from 'sonner';
 import {
   askNotificationPermission,
@@ -10,6 +15,7 @@ import {
 } from '@/lib/attention';
 import { openExternal } from '@/lib/open-external';
 import { setTheme, storedTheme, type ThemeChoice } from '@/lib/theme';
+import { paintFinish } from '@/lib/dice3d/finish';
 import { privacyUrl } from '@/app/updates';
 import { cn } from '@/lib/utils';
 import { useServices } from '@/app/services-context';
@@ -308,6 +314,11 @@ function DiceSection() {
             </div>
             <Hint>Na sessão, a mesa vê seus dados nesta cor.</Hint>
           </div>
+          <FinishPicker
+            color={settings.diceColor ?? DEFAULT_DICE_COLOR}
+            value={settings.diceFinish ?? 'liso'}
+            onChange={(diceFinish) => void sounds.update({ diceFinish })}
+          />
           <Toggle
             id={`${base}-girar`}
             checked={settings.diceMotion !== false}
@@ -319,6 +330,78 @@ function DiceSection() {
         </>
       )}
     </Section>
+  );
+}
+
+const FINISH_NAMES: Record<DiceFinish, string> = {
+  liso: 'Liso',
+  marmore: 'Mármore',
+  madeira: 'Madeira',
+  pedra: 'Pedra',
+  metal: 'Metal',
+};
+
+/** Acabamento dos dados: cada opção com uma amostra da textura, na cor escolhida. */
+function FinishPicker({
+  color,
+  value,
+  onChange,
+}: {
+  color: string;
+  value: DiceFinish;
+  onChange: (finish: DiceFinish) => void;
+}) {
+  const labelId = useId();
+  // As texturas são desenhadas uma vez (pequenas), só para a amostra.
+  const samples = useMemo(
+    () =>
+      Object.fromEntries(
+        DICE_FINISHES.map((finish) => [finish, paintFinish(finish, 64)?.toDataURL() ?? null]),
+      ) as Record<DiceFinish, string | null>,
+    [],
+  );
+  return (
+    <div className="space-y-1.5">
+      <p id={labelId} className="text-sm font-medium">
+        Acabamento
+      </p>
+      <div role="radiogroup" aria-labelledby={labelId} className="flex flex-wrap gap-3">
+        {DICE_FINISHES.map((finish) => {
+          const chosen = value === finish;
+          const sample = samples[finish];
+          return (
+            <button
+              key={finish}
+              type="button"
+              role="radio"
+              aria-checked={chosen}
+              className="group flex flex-col items-center gap-1 text-xs"
+              onClick={() => onChange(finish)}
+            >
+              <span
+                aria-hidden
+                className={cn(
+                  'size-10 rounded-lg border shadow-sm transition-transform group-hover:scale-105',
+                  chosen && 'ring-primary ring-offset-background ring-2 ring-offset-2',
+                )}
+                style={{
+                  backgroundColor: color,
+                  ...(sample && {
+                    backgroundImage: `url(${sample})`,
+                    backgroundSize: 'cover',
+                    backgroundBlendMode: 'multiply',
+                  }),
+                }}
+              />
+              <span className={chosen ? 'font-medium' : 'text-muted-foreground'}>
+                {FINISH_NAMES[finish]}
+              </span>
+            </button>
+          );
+        })}
+      </div>
+      <Hint>A textura vai junto das suas rolagens: a mesa vê seus dados com ela.</Hint>
+    </div>
   );
 }
 

@@ -1,4 +1,4 @@
-import { faceLabel, type VisualDie } from '@tabula/domain';
+import { faceLabel, type DiceFinish, type VisualDie } from '@tabula/domain';
 import {
   AmbientLight,
   CanvasTexture,
@@ -10,7 +10,9 @@ import {
   MeshStandardMaterial,
   OrthographicCamera,
   PlaneGeometry,
+  PMREMGenerator,
   Quaternion,
+  RepeatWrapping,
   Scene,
   SRGBColorSpace,
   Vector3,
@@ -18,15 +20,17 @@ import {
   type Material,
   type Texture,
 } from 'three';
+import { RoomEnvironment } from 'three/examples/jsm/environments/RoomEnvironment.js';
+import { FINISHES, paintFinish } from './finish';
 import { dieModel, restingRotation } from './geometry';
 
 /** Quanto dura a rolagem até os dados pararem (ms). */
 export const ROLL_MS = 1300;
 
-/** Texto escuro ou claro, conforme a cor do dado. */
-function inkFor(color: string): string {
+/** Texto escuro ou claro, conforme a cor do dado (escurecida pela textura, em `shade`). */
+function inkFor(color: string, shade = 1): string {
   const { r, g, b } = new Color(color);
-  return 0.299 * r + 0.587 * g + 0.114 * b > 0.55 ? '#1c1917' : '#fafaf9';
+  return (0.299 * r + 0.587 * g + 0.114 * b) * shade > 0.55 ? '#1c1917' : '#fafaf9';
 }
 
 function labelTexture(text: string, ink: string): Texture | null {
@@ -59,9 +63,10 @@ const bounce = (t: number) => {
 export interface DiceStage {
   /**
    * Rola os dados até as faces dadas. Termina quando eles param. `still`: sem animação, já
-   * parados (para quem pede menos movimento no sistema).
+   * parados (para quem pede menos movimento no sistema). `finish`: o acabamento (liso,
+   * mármore…), na cor dada.
    */
-  roll(dice: VisualDie[], color: string, still?: boolean): Promise<void>;
+  roll(dice: VisualDie[], color: string, still?: boolean, finish?: DiceFinish): Promise<void>;
   dispose(): void;
 }
 
@@ -93,6 +98,31 @@ export function createDiceStage(canvas: HTMLCanvasElement): DiceStage | null {
   let frame = 0;
   let current: Group | null = null;
   const owned: { dispose(): void }[] = [];
+  // Texturas dos acabamentos e o reflexo do metal: feitos uma vez, na primeira vez que aparecem.
+  const textures = new Map<DiceFinish, Texture | null>();
+  const textureOf = (finish: DiceFinish) => {
+    if (!textures.has(finish)) {
+      const painted = paintFinish(finish);
+      let texture: Texture | null = null;
+      if (painted) {
+        texture = new CanvasTexture(painted);
+        texture.colorSpace = SRGBColorSpace;
+        texture.wrapS = texture.wrapT = RepeatWrapping;
+        texture.anisotropy = 4;
+      }
+      textures.set(finish, texture);
+    }
+    return textures.get(finish) ?? null;
+  };
+  let reflection: Texture | null = null;
+  const reflectionOf = () => {
+    if (!reflection) {
+      const pmrem = new PMREMGenerator(renderer);
+      reflection = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+      pmrem.dispose();
+    }
+    return reflection;
+  };
 
   const clear = () => {
     cancelAnimationFrame(frame);
@@ -109,7 +139,7 @@ export function createDiceStage(canvas: HTMLCanvasElement): DiceStage | null {
   };
 
   return {
-    roll(dice, color, still = false) {
+    roll(dice, color, still = false, finish = 'liso') {
       clear();
       resize();
       const group = new Group();
@@ -127,15 +157,21 @@ export function createDiceStage(canvas: HTMLCanvasElement): DiceStage | null {
       camera.bottom = -half;
       camera.updateProjectionMatrix();
 
-      const ink = inkFor(color);
+      const look = FINISHES[finish];
+      const map = textureOf(finish);
+      const envMap = look.metalness > 0.5 ? reflectionOf() : null;
+      const ink = inkFor(color, look.shade);
       const body = new MeshStandardMaterial({
         color,
-        roughness: 0.35,
-        metalness: 0.05,
+        map,
+        envMap,
+        roughness: look.roughness,
+        metalness: look.metalness,
         flatShading: true,
       });
       const faded = new MeshStandardMaterial({
         color,
+        map,
         roughness: 0.6,
         transparent: true,
         opacity: 0.35,
@@ -146,8 +182,15 @@ export function createDiceStage(canvas: HTMLCanvasElement): DiceStage | null {
         let pair = extra.get(tint);
         if (!pair) {
           pair = {
-            body: new MeshStandardMaterial({ color: tint, roughness: 0.35, flatShading: true }),
-            faded: new MeshStandardMaterial({ color: tint, transparent: true, opacity: 0.35 }),
+            body: new MeshStandardMaterial({
+              color: tint,
+              map,
+              envMap,
+              roughness: look.roughness,
+              metalness: look.metalness,
+              flatShading: true,
+            }),
+            faded: new MeshStandardMaterial({ color: tint, map, transparent: true, opacity: 0.35 }),
           };
           extra.set(tint, pair);
           owned.push(pair.body, pair.faded);
@@ -165,7 +208,7 @@ export function createDiceStage(canvas: HTMLCanvasElement): DiceStage | null {
         );
         for (const face of model.faces) {
           const text = die.labels?.[face.value - 1] ?? faceLabel(die.shape, face.value, die.tens);
-          const texture = labelTexture(text, die.color ? inkFor(die.color) : ink);
+          const texture = labelTexture(text, die.color ? inkFor(die.color, look.shade) : ink);
           if (!texture) continue;
           const material: Material = new MeshBasicMaterial({
             map: texture,
@@ -228,6 +271,8 @@ export function createDiceStage(canvas: HTMLCanvasElement): DiceStage | null {
     },
     dispose() {
       clear();
+      for (const texture of textures.values()) texture?.dispose();
+      reflection?.dispose();
       renderer.dispose();
     },
   };
