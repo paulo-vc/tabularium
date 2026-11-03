@@ -4,6 +4,20 @@ import { z } from 'zod';
 export const SOUND_CUES = ['sua-vez', 'rolagem', 'mensagem', 'sussurro'] as const;
 export type SoundCue = (typeof SOUND_CUES)[number];
 
+/**
+ * Acabamento dos dados 3D: liso, ou com textura de mármore, madeira, pedra ou metal, sempre
+ * na cor escolhida.
+ */
+export const DICE_FINISHES = ['liso', 'marmore', 'madeira', 'pedra', 'metal'] as const;
+export type DiceFinish = (typeof DICE_FINISHES)[number];
+
+/** O acabamento que veio numa rolagem; um desconhecido (de uma versão mais nova) vira liso. */
+export function asDiceFinish(value: string | undefined): DiceFinish {
+  return (DICE_FINISHES as readonly string[]).includes(value ?? '')
+    ? (value as DiceFinish)
+    : 'liso';
+}
+
 /** Preferências de som deste aparelho. */
 export const SoundSettingsSchema = z.object({
   enabled: z.boolean(),
@@ -22,6 +36,8 @@ export const SoundSettingsSchema = z.object({
     .string()
     .regex(/^#[0-9a-f]{6}$/i)
     .optional(),
+  /** Acabamento dos dados 3D neste aparelho (liso quando nunca escolhido). */
+  diceFinish: z.enum(DICE_FINISHES).optional(),
 });
 export type SoundSettings = z.infer<typeof SoundSettingsSchema>;
 

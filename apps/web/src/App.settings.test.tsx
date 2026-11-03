@@ -76,16 +76,19 @@ describe('configurações', () => {
     await waitFor(async () => expect(await services.device.getDisplayName()).toBe('Ana'));
   });
 
-  it('dados 3D: cor e animação; desligar esconde as opções', async () => {
+  it('dados 3D: cor, acabamento e animação; desligar esconde as opções', async () => {
     const user = renderSettings();
     await user.click(await screen.findByRole('radio', { name: 'Safira' }));
+    await user.click(screen.getByRole('radio', { name: 'Mármore' }));
     await user.click(screen.getByRole('checkbox', { name: /Animar os dados/ }));
     await waitFor(async () =>
       expect(await services.sounds.settings()).toMatchObject({
         diceColor: '#1d4ed8',
+        diceFinish: 'marmore',
         diceMotion: false,
       }),
     );
+    expect(screen.getByRole('radio', { name: 'Mármore' })).toHaveAttribute('aria-checked', 'true');
     await user.click(screen.getByRole('checkbox', { name: /Dados 3D nas rolagens/ }));
     await waitFor(() => expect(screen.queryByRole('radio', { name: 'Safira' })).toBeNull());
   });
