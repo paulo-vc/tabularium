@@ -31,13 +31,14 @@ O que está em andamento e as ideias para depois. As fases já entregues ficam e
 
 ### Depois da 1.0
 
-Soundboard, YouTube ou Spotify na música, textura dos dados, resultado da dualidade e outras ideias abaixo.
+Na próxima versão: textura dos dados e resultado da dualidade. Depois, YouTube ou Spotify na música e outras ideias abaixo.
 
 ### Decisões tomadas
 
 - Desktop e Android; o site deixa de ser distribuído (desligado em 2026-10-28, [ADR 0010](adr/0010-distribuicao-desktop-e-android.md)); sem iOS.
 - Sem retransmissão (TURN): só conexão direta, com a falha bem explicada.
 - Custo zero também para o projeto: Android pelo APK nas releases, sem Play Store.
+- Sem soundboard no Tabularium (decidido em 2026-11-03): o autor já tem um projeto à parte para isso.
 - O criador de sistemas mais fácil e a importação de sistemas entram na 1.0.
 
 ## Depois (sem data)
@@ -46,11 +47,10 @@ Ideias levantadas em 2026-10, ainda sem desenho. A ordem não é de prioridade.
 
 ### Dados 3D: o que falta
 
-Os dados 3D e os dados com faces do sistema já existem. Já dá para criá-los pelo editor. Faltam: textura e mostrar o resultado dos dados de dualidade ("com Esperança" ou "com Medo").
+Os dados 3D e os dados com faces do sistema já existem. Já dá para criá-los pelo editor. A textura e o resultado dos dados de dualidade ("com Esperança" ou "com Medo") entram na próxima versão.
 
 ### Ferramentas do Mestre
 
-- **Soundboard:** efeitos curtos disparados pelo Mestre, no mesmo esquema da música (que já existe).
 - **Links do YouTube ou Spotify** na música: dependem dos termos e dos players oficiais de cada serviço, e o Spotify exige conta.
 
 ## Já existe
