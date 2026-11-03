@@ -1,4 +1,10 @@
-import { DEFAULT_DICE_COLOR, describeRoll, diceToShow, type RollEntry } from '@tabula/domain';
+import {
+  asDiceFinish,
+  DEFAULT_DICE_COLOR,
+  describeRoll,
+  diceToShow,
+  type RollEntry,
+} from '@tabula/domain';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { EyeOffIcon } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
@@ -88,7 +94,13 @@ export function DiceTray() {
       if (stage.current && dice.length > 0) {
         // Cada um rola com a própria cor; sem cor (versão antiga ou nunca escolhida), a deste aparelho.
         const color = rolling.diceColor ?? settings.current.color;
-        await stage.current.roll(dice, color, !settings.current.motion);
+        // O acabamento também é o de quem rolou; sem ele (versão antiga ou liso), liso.
+        await stage.current.roll(
+          dice,
+          color,
+          !settings.current.motion,
+          asDiceFinish(rolling.diceFinish),
+        );
       }
       if (!cancelled) hide = setTimeout(() => setDiceVisible(false), HOLD_MS);
     })();

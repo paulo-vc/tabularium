@@ -70,6 +70,14 @@ export const RollEntrySchema = z.object({
     .string()
     .regex(/^#[0-9a-f]{6}$/i)
     .optional(),
+  /**
+   * Acabamento dos dados 3D de quem rolou (`DICE_FINISHES`). Texto livre de propósito: um
+   * acabamento novo, de uma versão mais nova, não recusa a rolagem; aqui ele vira liso.
+   */
+  diceFinish: z
+    .string()
+    .regex(/^[a-z]{1,20}$/)
+    .optional(),
 });
 export type RollEntry = z.infer<typeof RollEntrySchema>;
 

@@ -2,6 +2,10 @@
 
 As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos ficam nos PRs e em [`docs/`](docs/).
 
+## Próxima versão
+
+- **Textura nos dados 3D:** em Configurações → Dados 3D, o "Acabamento" muda a cara dos seus dados: liso, mármore, madeira, pedra ou metal (que reflete a luz), sempre na cor escolhida. Cada opção mostra uma amostra na sua cor. Como a cor, o acabamento vai junto das suas rolagens, e a mesa vê seus dados com ele. Os dados do sistema com cor fixa, como Esperança e Medo, também ganham o acabamento de quem rola.
+
 ## v1.0.0
 
 A primeira versão para qualquer grupo usar: app para **Android**, cara e ícone novos, um começo guiado para quem nunca viu o app, cópia de segurança completa e um criador de sistemas bem mais fácil.
