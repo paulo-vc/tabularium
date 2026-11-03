@@ -60,6 +60,35 @@ describe('editor: dados do sistema e ícone', () => {
     await waitFor(async () => expect((await saved())?.dice).toHaveLength(1));
   });
 
+  it('Esperança e Medo já vêm comparados: o maior dá o resultado da rolagem', async () => {
+    const { user, saved } = await openInfo();
+    await user.click(screen.getByRole('button', { name: /Esperança e Medo/ }));
+    await waitFor(async () =>
+      expect((await saved())?.dice?.map((d) => d.duel)).toEqual([
+        { against: 'Medo', win: 'com Esperança', tie: 'crítico' },
+        { against: 'Esperanca', win: 'com Medo', tie: 'crítico' },
+      ]),
+    );
+  });
+
+  it('comparar um dado com outro liga a comparação de volta no outro', async () => {
+    const { user, saved } = await openInfo();
+    const blank = screen.getByRole('button', { name: /Em branco/ });
+    await user.click(blank);
+    await user.click(blank);
+    const first = await screen.findAllByRole('group', { name: 'Dado Novo dado' });
+    await user.click(
+      within(first[0] as HTMLElement).getByRole('combobox', { name: 'Comparar com' }),
+    );
+    await user.click(await screen.findByRole('option', { name: 'Novo dado (dX2)' }));
+    await waitFor(async () =>
+      expect((await saved())?.dice?.map((d) => [d.id, d.duel?.against, d.duel?.win])).toEqual([
+        ['X', 'X2', 'com Novo dado'],
+        ['X2', 'X', 'com Novo dado'],
+      ]),
+    );
+  });
+
   it('o ícone é escolhido, aparece e sai', async () => {
     const { user, saved } = await openInfo();
     await user.upload(

@@ -1,7 +1,7 @@
 {
   "id": "dualidade",
-  "version": "1.2.0",
-  "minAppVersion": "0.2.0",
+  "version": "1.3.0",
+  "minAppVersion": "1.0.0",
   "name": "Dualidade",
   "description": "Ficha compatível com o sistema Daggerheart™: traços, Evasão, limiares de dano, Esperança, Estresse, armas e cartas de domínio. Ficha não oficial da comunidade. This product includes materials from the Daggerheart System Reference Document 1.0, © Critical Role, LLC, under the terms of the Darrington Press Community Gaming License. More information at www.daggerheart.com. Darrington Press™ and the Darrington Press authorized work logo are trademarks of Critical Role, LLC and used with permission.",
   "author": "Tabularium",
@@ -9,7 +9,129 @@
   "language": "pt-BR",
   "tags": ["fantasia", "narrativo", "compatível com Daggerheart"],
   "source": "community",
-  "checkDice": "2d12",
+  "dice": [
+    {
+      "id": "Esperanca",
+      "name": "Esperança",
+      "color": "#d4a017",
+      "faces": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "11",
+          "value": 11
+        },
+        {
+          "label": "12",
+          "value": 12
+        }
+      ],
+      "duel": {
+        "against": "Medo",
+        "win": "com Esperança",
+        "tie": "crítico"
+      }
+    },
+    {
+      "id": "Medo",
+      "name": "Medo",
+      "color": "#5b21b6",
+      "faces": [
+        {
+          "label": "1",
+          "value": 1
+        },
+        {
+          "label": "2",
+          "value": 2
+        },
+        {
+          "label": "3",
+          "value": 3
+        },
+        {
+          "label": "4",
+          "value": 4
+        },
+        {
+          "label": "5",
+          "value": 5
+        },
+        {
+          "label": "6",
+          "value": 6
+        },
+        {
+          "label": "7",
+          "value": 7
+        },
+        {
+          "label": "8",
+          "value": 8
+        },
+        {
+          "label": "9",
+          "value": 9
+        },
+        {
+          "label": "10",
+          "value": 10
+        },
+        {
+          "label": "11",
+          "value": 11
+        },
+        {
+          "label": "12",
+          "value": 12
+        }
+      ],
+      "duel": {
+        "against": "Esperanca",
+        "win": "com Medo",
+        "tie": "crítico"
+      }
+    }
+  ],
+  "checkDice": "1dEsperanca+1dMedo",
   "fields": [
     {
       "id": "nome",

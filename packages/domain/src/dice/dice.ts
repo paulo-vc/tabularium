@@ -233,8 +233,48 @@ export function checkExpression(checkDice: string, modifier: number): string {
   return `${checkDice}${modifier > 0 ? '+' : '-'}${Math.abs(modifier)}`;
 }
 
-/** Resumo legível: "1d20 + 5 → [14] + 5 = 19". Dados descartados aparecem entre parênteses. */
-export function describeRoll(result: RollResult): string {
+/** O resultado de dados que se comparam: o texto e, se houver, a cor do dado que venceu. */
+export interface RollOutcome {
+  label: string;
+  color?: string | undefined;
+}
+
+/**
+ * O resultado de dados que se comparam (ver `CustomDie.duel`): "com Esperança" quando o dado
+ * de Esperança sai maior que o de Medo, por exemplo. Só vale com um dado de cada lado na
+ * rolagem; sem comparação, nada.
+ */
+export function rollOutcome(result: RollResult): RollOutcome | undefined {
+  const single = new Map<string, { value: number; term: DiceTerm }>();
+  for (const term of result.terms) {
+    if (term.kind !== 'dados' || !term.custom || term.count !== 1) continue;
+    const die = term.results[0];
+    const id = term.custom.id.toLowerCase();
+    if (die && !single.has(id)) single.set(id, { value: faceValue(term, die.value), term });
+  }
+  for (const { value, term } of single.values()) {
+    const duel = term.custom?.duel;
+    const rival = duel && single.get(duel.against.toLowerCase());
+    if (!duel || !rival || rival.term === term) continue;
+    if (value > rival.value) return { label: duel.win, color: term.custom?.color };
+    if (value < rival.value) {
+      const back = rival.term.custom?.duel;
+      return back && back.against.toLowerCase() === term.custom?.id.toLowerCase()
+        ? { label: back.win, color: rival.term.custom?.color }
+        : undefined;
+    }
+    const tie = duel.tie ?? rival.term.custom?.duel?.tie;
+    return tie ? { label: tie } : undefined;
+  }
+  return undefined;
+}
+
+/**
+ * Resumo legível: "1d20 + 5 → [14] + 5 = 19". Dados descartados aparecem entre parênteses.
+ * O resultado de dados que se comparam vem no fim ("· com Esperança"), a não ser que a tela o
+ * mostre à parte (`withOutcome` falso).
+ */
+export function describeRoll(result: RollResult, withOutcome = true): string {
   const parts = result.terms.map((term, index) => {
     const body =
       term.kind === 'constante'
@@ -243,5 +283,6 @@ export function describeRoll(result: RollResult): string {
     if (index === 0) return term.sign < 0 ? `-${body}` : body;
     return `${term.sign < 0 ? '-' : '+'} ${body}`;
   });
-  return `${result.expression} → ${parts.join(' ')} = ${result.total}`;
+  const outcome = withOutcome ? rollOutcome(result) : undefined;
+  return `${result.expression} → ${parts.join(' ')} = ${result.total}${outcome ? ` · ${outcome.label}` : ''}`;
 }

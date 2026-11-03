@@ -73,7 +73,7 @@ export function Welcome({ onSkip }: { onSkip: () => void }) {
         <JoinDialog
           trigger={
             <Choice icon={<DoorOpenIcon />} title="Vou jogar" onOpen={markSeen}>
-              Entre com o link ou o código que o Mestre mandou e crie a sua ficha.
+              Entre com o código que o Mestre mandou e crie a sua ficha.
             </Choice>
           }
         />
