@@ -6,6 +6,9 @@ As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos
 
 - **Resultado da dualidade:** dados do sistema podem se comparar, como Esperança e Medo. Rolados juntos, um de cada, o maior dá o resultado da rolagem: "com Esperança" ou "com Medo", e o empate sai como "crítico". O resultado aparece em destaque na bandeja dos dados, na cor do dado que venceu, e também no histórico de rolagens e nos avisos. No criador de sistemas, cada dado ganha "Comparar com": escolher o rival liga a comparação de volta no outro dado, e o modelo "Esperança e Medo" já vem comparado. O sistema Dualidade (1.3.0) passa a rolar os testes com os dados de Esperança e Medo.
 - **Textura nos dados 3D:** em Configurações → Dados 3D, o "Acabamento" muda a cara dos seus dados: liso, mármore, madeira, pedra ou metal (que reflete a luz), sempre na cor escolhida. Cada opção mostra uma amostra na sua cor. Como a cor, o acabamento vai junto das suas rolagens, e a mesa vê seus dados com ele. Os dados do sistema com cor fixa, como Esperança e Medo, também ganham o acabamento de quem rola.
+- **Pathfinder 2e no catálogo da comunidade:** o Lendas d20 deixa de vir com o app e vira a ficha "Pathfinder 2e (fã)", com o nome do sistema, no catálogo da comunidade. Quem já tem fichas de Lendas d20 não perde nada: o sistema fica instalado no aparelho e a versão nova chega como atualização. O app passa a trazer só o D&D 5e; os outros sistemas se instalam pelo catálogo.
+- **Regras de 2024 (5.5) na ficha de D&D:** maestria de armas, talento de origem e a Exaustão nova.
+- **Catálogo da comunidade sempre atualizado:** sistemas publicados aparecem na hora, sem esperar o cache de até 7 dias.
 - O convite fala só em código (o curto e o completo), sem o "link", que os apps não geram mais.
 
 ## v1.0.0

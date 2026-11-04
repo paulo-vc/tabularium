@@ -9,7 +9,7 @@ import {
   type SystemTemplate,
 } from '@tabula/domain';
 import { describe, expect, it } from 'vitest';
-import { BUILTIN_TEMPLATES, getBuiltinTemplate } from './index';
+import { BUILTIN_TEMPLATES, getBuiltinTemplate, RETIRED_TEMPLATES } from './index';
 
 function compile(template: SystemTemplate): CompiledTemplate {
   const result = compileTemplate(template);
@@ -233,97 +233,16 @@ describe('D&D 5e: nova ficha (1.2.0)', () => {
   });
 });
 
-describe('Lendas d20 (ORC)', () => {
-  const template = getBuiltinTemplate('lendas-d20-orc');
-  if (!template) throw new Error('template ausente');
-  const compiled = compile(template);
-  const base = createSheet(compiled, { id: 's', name: 'Teste', ownerId: 'u', now: 0 }).values;
-  const calc = (values: Record<string, unknown>, bonuses: Bonus[] = []) => {
-    const { computed, resourceMax } = computeDerived(
-      compiled,
-      { ...base, ...values } as never,
-      bonuses,
-    );
-    const read = (result: { ok: boolean; value?: number } | undefined) =>
-      result?.ok ? result.value : 'erro';
-    return {
-      value: (id: string) => read(computed[id] as never),
-      max: (id: string) => read(resourceMax[id] as never),
-    };
-  };
-
-  it('traz o aviso da licença ORC e não usa marcas da Paizo', () => {
-    expect(template.license).toBe('ORC');
-    expect(template.description).toContain('ORC License');
-    expect(template.description).toContain('TX 9-307-067');
-    expect(template.description).toContain('Player Core © 2023 Paizo Inc.');
-    const visible = JSON.stringify({ ...template, description: '' });
-    expect(visible).not.toMatch(/pathfinder|golarion/i);
-  });
-
-  it('proficiência: grau + nível se treinado; só o atributo se destreinado', () => {
-    const { value } = calc({ nivel: 5, for: 4, prof_atletismo: 'treinado' });
-    expect(value('atletismo')).toBe(4 + 2 + 5);
-    expect(value('acrobatismo')).toBe(0);
-    expect(calc({ nivel: 20, for: 7, prof_atletismo: 'lendario' }).value('atletismo')).toBe(
-      7 + 8 + 20,
-    );
-  });
-
-  it('salvaguardas, Percepção e CD de classe começam treinadas', () => {
-    const { value } = calc({ nivel: 1, con: 2, sab: 1, des: 3, atributo_chave: 'des' });
-    expect(value('fortitude')).toBe(2 + 3);
-    expect(value('reflexos')).toBe(3 + 3);
-    expect(value('percepcao')).toBe(1 + 3);
-    expect(value('cd_classe')).toBe(10 + 3 + 3);
-  });
-
-  it('CA: limite de Destreza, armadura e escudo erguido', () => {
-    expect(calc({ nivel: 1, des: 3 }).value('ca')).toBe(10 + 3 + 3);
-    expect(calc({ nivel: 1, des: 3, limite_des: 1, bonus_armadura: 4 }).value('ca')).toBe(
-      10 + 1 + 3 + 4,
-    );
-    expect(calc({ nivel: 1, des: 0, escudo_erguido: true, escudo_ca: 2 }).value('ca')).toBe(
-      10 + 0 + 3 + 2,
-    );
-  });
-
-  it('PV: ancestralidade + (classe + Constituição) × nível', () => {
-    const { max } = calc({ nivel: 3, con: 2, pv_ancestralidade: 8, pv_classe: 10 });
-    expect(max('pv')).toBe(8 + (10 + 2) * 3);
-    expect(calc({ ferido: 1 }).max('moribundo')).toBe(3);
-  });
-
-  it('magia, bônus e volume', () => {
-    const item = (id: string, values: Record<string, unknown>) => ({ id, values });
-    const { value } = calc(
-      {
-        nivel: 3,
-        sab: 4,
-        atributo_magia: 'sab',
-        prof_magia: 'treinado',
-        equipamento: [
-          item('a', { nome: 'Armadura', qtd: 1, volume: 2, investido: false }),
-          item('b', { nome: 'Rações', qtd: 5, volume: 0.1, investido: false }),
-          item('c', { nome: 'Anel', qtd: 1, volume: 0, investido: true }),
-        ],
-      },
-      [
-        bonus('medo', 'Amedrontado 1', [
-          { fieldId: 'medicina', value: -1 },
-          { fieldId: 'cd_magia', value: -1 },
-        ]),
-      ],
-    );
-    expect(value('mod_magia')).toBe(4);
-    expect(value('ataque_magia')).toBe(4 + 2 + 3);
-    expect(value('cd_magia')).toBe(10 + 4 + 5 - 1);
-    expect(value('medicina')).toBe(4 - 1);
-    expect(value('volume_total')).toBe(2);
-    expect(value('investidos')).toBe(1);
-  });
-});
-
 function bonus(id: string, name: string, targets: Bonus['targets']): Bonus {
   return { id, name, kind: 'outro', active: true, targets };
 }
+
+describe('sistemas aposentados', () => {
+  it('compilam e não voltam a ser nativos', () => {
+    for (const template of RETIRED_TEMPLATES) {
+      expect(compile(template).template.id).toBe(template.id);
+      expect(template.source).toBe('community');
+      expect(getBuiltinTemplate(template.id)).toBeUndefined();
+    }
+  });
+});

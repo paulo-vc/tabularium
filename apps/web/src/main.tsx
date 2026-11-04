@@ -22,6 +22,12 @@ keepSessionAcrossReloads(services.session);
 void services.campaigns
   .ensureGmKeys()
   .catch((error: unknown) => console.error('Falha ao criar a chave do Mestre', error));
+// Fichas e campanhas de um sistema que saiu do app (o Lendas d20) o ganham como instalado.
+void Promise.all([services.sheetRepository.list(), services.campaignRepository.list()])
+  .then(([sheets, campaigns]) =>
+    services.catalog.adoptRetired([...sheets, ...campaigns].map((item) => item.templateRef.id)),
+  )
+  .catch((error: unknown) => console.error('Falha ao instalar sistemas aposentados', error));
 // Guarda o estado da sessão ao vivo se a aba for fechada ou escondida.
 window.addEventListener('pagehide', () => void services.session.flush());
 document.addEventListener('visibilitychange', () => {

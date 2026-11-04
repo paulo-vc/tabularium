@@ -43,7 +43,19 @@ describe('TemplateCatalog', () => {
   it('lista os nativos e os instalados', async () => {
     await services.files.import(services.files.exportTemplate(homebrew()).content);
     const names = (await services.catalog.list()).map((t) => t.name);
-    expect(names).toEqual(['D&D 5ª Edição (SRD 5.1)', 'Lendas d20 (ORC)', 'Caixa Preta']);
+    expect(names).toEqual(['D&D 5ª Edição (SRD 5.1)', 'Caixa Preta']);
+  });
+
+  it('abre o Lendas d20, que saiu do app, e o instala como da comunidade se está em uso', async () => {
+    expect(await services.catalog.get('lendas-d20-orc')).toMatchObject({ source: 'community' });
+    await services.catalog.adoptRetired(['dnd5e-srd']);
+    expect((await services.catalog.list()).map((t) => t.id)).toEqual(['dnd5e-srd']);
+
+    await services.catalog.adoptRetired(['dnd5e-srd', 'lendas-d20-orc']);
+    const adopted = (await services.catalog.list()).find((t) => t.id === 'lendas-d20-orc');
+    expect(adopted).toMatchObject({ name: 'Lendas d20 (ORC)', source: 'community' });
+    // Instalado, pode ser removido como qualquer outro.
+    await services.catalog.remove('lendas-d20-orc');
   });
 });
 

@@ -21,7 +21,7 @@ O [guia de uso](docs/guia.md) mostra como mestrar, jogar e criar sistemas, com i
 ## O que ele faz
 
 - **Começo guiado:** na primeira vez, o app pergunta se você vai mestrar, jogar ou só montar uma ficha, e mostra uma ficha de exemplo já preenchida.
-- **Fichas** de D&D 5ª Edição (SRD 5.1) e **Lendas d20** (regras ORC), com os cálculos automáticos: modificadores, CA, perícias, carga, bônus de itens, maldições e bênçãos. Ataques, testes e dano rolam pela própria ficha; dá para imprimir ou salvar em PDF.
+- **Fichas** de D&D 5ª Edição (SRD 5.1), com os cálculos automáticos: modificadores, CA, perícias, carga, bônus de itens, maldições e bênçãos. Ataques, testes e dano rolam pela própria ficha; dá para imprimir ou salvar em PDF. Outros sistemas (Pathfinder 2e, Tormenta20, Ordem Paranormal, Chamado de Cthulhu, Dualidade…) se instalam pelo catálogo da comunidade, em um toque.
 - **Sessão ao vivo:** o Mestre cria a campanha e manda o convite (um código curto, para ditar ou mandar no grupo). Cada jogador entra com a própria ficha, e o Mestre vê tudo mudar na hora, pode alterar as fichas e guardar campos secretos.
 - **Combate:** ordem de turno com iniciativas, rodadas e criaturas ocultas; cada jogador recebe um aviso na vez dele.
 - **Dados em 3D:** toda rolagem cai na tela e para na face sorteada; a mesa vê os dados de todos, cada um na sua cor. Histórico de rolagens no chat.
@@ -39,7 +39,8 @@ Os participantes se conectam **diretamente** (WebRTC), sem servidor do Tabulariu
 ## Sistemas incluídos e licenças
 
 - **D&D 5ª Edição (SRD 5.1):** inclui material do System Reference Document 5.1 da Wizards of the Coast LLC, sob a [CC-BY-4.0](https://creativecommons.org/licenses/by/4.0/legalcode).
-- **Lendas d20 (ORC):** baseado no Player Core © 2023 Paizo Inc., sob a [ORC License](https://www.azoralaw.com/orclicense). Nomes, cenário e marcas da Paizo não são usados.
+
+As fichas do catálogo da comunidade ([`tabula-templates`](https://github.com/paulo-vc/tabula-templates)) são feitas por fãs e não são oficiais; cada uma traz a licença e os avisos do seu sistema.
 
 O Tabularium RPG não é afiliado, patrocinado nem endossado por nenhuma dessas empresas.
 
