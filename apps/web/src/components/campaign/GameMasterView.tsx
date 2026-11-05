@@ -6,8 +6,10 @@ import {
   CopyIcon,
   DicesIcon,
   ImageIcon,
+  LibraryBigIcon,
   MusicIcon,
   SettingsIcon,
+  SkullIcon,
   SwordsIcon,
   Trash2Icon,
   UserPlusIcon,
@@ -18,7 +20,9 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { encodeInvite } from '@/app/invite-link';
 import { useServices } from '@/app/services-context';
+import { CampaignBestiary } from '@/components/bestiary/CampaignBestiary';
 import { CampaignCoverEditor } from '@/components/campaign/CampaignCover';
+import { CodexReader } from '@/components/codex/CodexReader';
 import { CutscenePanel } from '@/components/campaign/CutscenePanel';
 import { MusicPanel } from '@/components/campaign/MusicPanel';
 import { DangerZone } from '@/components/campaign/DangerZone';
@@ -36,7 +40,16 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { publicAppUrl } from '@/lib/public-url';
 
-type Tab = 'jogadores' | 'combate' | 'rolagens' | 'cutscene' | 'musica' | 'diario' | 'campanha';
+type Tab =
+  | 'jogadores'
+  | 'combate'
+  | 'rolagens'
+  | 'bestiario'
+  | 'codice'
+  | 'cutscene'
+  | 'musica'
+  | 'diario'
+  | 'campanha';
 
 /** Abas que no computador ficam na coluna da direita (no celular, viram abas). */
 const SIDE: readonly Tab[] = ['combate', 'rolagens'];
@@ -89,6 +102,22 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
       label: (
         <>
           <DicesIcon className="size-4" /> Rolagens
+        </>
+      ),
+    },
+    {
+      id: 'bestiario',
+      label: (
+        <>
+          <SkullIcon className="size-4" /> Bestiário
+        </>
+      ),
+    },
+    {
+      id: 'codice',
+      label: (
+        <>
+          <LibraryBigIcon className="size-4" /> Códice
         </>
       ),
     },
@@ -155,6 +184,8 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
               <GameMasterPlayers campaign={campaign} />
             </>
           )}
+          {main === 'bestiario' && <CampaignBestiary campaign={campaign} template={template} />}
+          {main === 'codice' && <CodexReader pages={template?.codex ?? []} />}
           {main === 'cutscene' && <CutscenePanel campaignId={campaign.id} />}
           {main === 'musica' && <MusicPanel campaignId={campaign.id} />}
           {main === 'diario' && <GameMasterJournal campaignId={campaign.id} />}
@@ -199,6 +230,7 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
                 campaignId={campaign.id}
                 checkDice={template?.checkDice}
                 dice={template?.dice}
+                bestiary={{ campaign: campaign.bestiary ?? [], system: template?.bestiary ?? [] }}
               />
             ) : (
               <Card>

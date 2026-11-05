@@ -1,6 +1,7 @@
 import type { SystemTemplate } from '@tabula/domain';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
+  BookOpenIcon,
   DownloadIcon,
   GlobeIcon,
   PencilIcon,
@@ -126,6 +127,14 @@ export function SystemsPage() {
                   </p>
                 )}
                 <div className="flex flex-wrap gap-2">
+                  {(template.codex?.length ?? 0) + (template.bestiary?.length ?? 0) > 0 && (
+                    <Button variant="outline" size="sm" asChild>
+                      <Link href={`/sistemas/${template.id}`}>
+                        <BookOpenIcon />
+                        {template.codex?.length ? 'Códice' : 'Bestiário'}
+                      </Link>
+                    </Button>
+                  )}
                   <Button
                     variant="outline"
                     size="sm"

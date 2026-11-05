@@ -1,6 +1,7 @@
 import { collectRefs, parseFormula, type FormulaNode } from '../formula';
 import { parseDice } from '../dice/dice';
 import { topologicalSort } from '../graph/topological-sort';
+import { creatureProblems } from '../bestiary/check';
 import { checkFormula } from './check-formula';
 import { err, ok, type Issue, type Result } from '../result';
 import { LIMITS } from '../schema/primitives';
@@ -31,6 +32,12 @@ export interface CompiledTemplate {
   /** Fórmulas em ordem topológica: cada uma vem depois das que ela referencia. */
   formulas: readonly CompiledFormula[];
 }
+
+/**
+ * Tamanho máximo do sistema (JSON, em bytes). O Mestre o envia aos jogadores numa mensagem da
+ * sessão (até 512 KB): o códice e o bestiário têm de caber junto com o resto.
+ */
+export const TEMPLATE_MAX_BYTES = 450 * 1024;
 
 const issue = (code: string, path: Issue['path'], message: string): Issue => ({
   code,
@@ -321,6 +328,8 @@ export function compileTemplate(template: SystemTemplate): Result<CompiledTempla
     }
   }
 
+  validateCodexAndBestiary(template, issues);
+
   // Layouts.
   const fieldIds = new Set(fieldsById.keys());
   validateLayout(template.layouts.full, ['layouts', 'full'], fieldIds, issues);
@@ -341,4 +350,64 @@ export function compileTemplate(template: SystemTemplate): Result<CompiledTempla
 
   if (issues.length > 0) return err(issues);
   return ok({ template, fieldsById, fieldsByKey, formulas });
+}
+
+function validateCodexAndBestiary(template: SystemTemplate, issues: Issue[]) {
+  const pageIds = new Set<string>();
+  const titles = new Set<string>();
+  template.codex?.forEach((page, index) => {
+    if (pageIds.has(page.id)) {
+      issues.push(
+        issue('pagina-repetida', ['codex', index, 'id'], `Página repetida: "${page.id}"`),
+      );
+    }
+    pageIds.add(page.id);
+    // Os links `[[Título]]` acham a página pelo título.
+    const title = page.title.trim().toLowerCase();
+    if (titles.has(title)) {
+      issues.push(
+        issue(
+          'titulo-repetido',
+          ['codex', index, 'title'],
+          `Duas páginas do códice se chamam "${page.title}"`,
+        ),
+      );
+    }
+    titles.add(title);
+  });
+
+  const creatureIds = new Set<string>();
+  template.bestiary?.forEach((creature, index) => {
+    const path = ['bestiary', index];
+    if (creatureIds.has(creature.id)) {
+      issues.push(
+        issue('criatura-repetida', [...path, 'id'], `Criatura repetida: "${creature.id}"`),
+      );
+    }
+    creatureIds.add(creature.id);
+    for (const problem of creatureProblems(creature, template.checkDice, template.dice)) {
+      issues.push({ ...problem, path: [...path, ...problem.path] });
+    }
+  });
+
+  const bytes = utf8Length(JSON.stringify(template));
+  if (bytes > TEMPLATE_MAX_BYTES) {
+    issues.push(
+      issue(
+        'sistema-grande-demais',
+        [],
+        `O sistema tem ${Math.ceil(bytes / 1024)} KB, mais que os ${TEMPLATE_MAX_BYTES / 1024} KB que a sessão consegue enviar. Encurte o códice, o bestiário ou o ícone.`,
+      ),
+    );
+  }
+}
+
+/** Bytes do texto em UTF-8 (o domínio não depende do `TextEncoder` do navegador). */
+function utf8Length(text: string): number {
+  let bytes = 0;
+  for (const char of text) {
+    const code = char.codePointAt(0) ?? 0;
+    bytes += code < 0x80 ? 1 : code < 0x800 ? 2 : code < 0x10000 ? 3 : 4;
+  }
+  return bytes;
 }

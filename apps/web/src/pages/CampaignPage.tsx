@@ -10,6 +10,7 @@ import {
   ArrowLeftIcon,
   DownloadIcon,
   FileUpIcon,
+  LibraryBigIcon,
   LoaderCircleIcon,
   LogOutIcon,
   ScrollTextIcon,
@@ -36,12 +37,18 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 
 export function CampaignPage({ id }: { id: string }) {
-  const { campaignRepository } = useServices();
+  const { campaignRepository, catalog } = useServices();
   const campaign = useLiveQuery(
     async () => (await campaignRepository.get(id)) ?? null,
     [campaignRepository, id],
   );
   const deviceId = useDeviceId();
+  // Páginas do códice que o jogador pode ler (o Mestre tem a aba Códice no painel dele).
+  const playerPages = useLiveQuery(async () => {
+    if (!campaign) return 0;
+    const template = await catalog.get(campaign.templateRef.id);
+    return template?.codex?.filter((page) => !page.gmOnly).length ?? 0;
+  }, [catalog, campaign?.templateRef.id]);
 
   if (campaign === undefined || deviceId === undefined) return null;
   if (campaign === null) {
@@ -68,6 +75,13 @@ export function CampaignPage({ id }: { id: string }) {
         <h1 className="text-2xl font-bold tracking-tight">{campaign.name}</h1>
         <Badge variant="secondary">{campaign.templateName}</Badge>
         <Badge>{role === 'mestre' ? 'Você é o Mestre' : `Mestre: ${campaign.gmName}`}</Badge>
+        {role !== 'mestre' && (playerPages ?? 0) > 0 && (
+          <Button variant="outline" size="sm" className="ml-auto" asChild>
+            <Link href={`/campanhas/${campaign.id}/codice`}>
+              <LibraryBigIcon /> Códice do sistema
+            </Link>
+          </Button>
+        )}
       </div>
       <CampaignCover
         campaign={campaign}

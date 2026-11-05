@@ -195,3 +195,38 @@ describe('CampaignService', () => {
     expect(created.ok && (await player.sheetRepository.get(created.value.id))).toBeTruthy();
   });
 });
+
+describe('bestiário da campanha', () => {
+  const lobo = {
+    id: 'lobo',
+    name: 'Lobo',
+    hp: 11,
+    initiative: '+2',
+    stats: [{ label: 'CA', value: '13' }],
+    attacks: [{ id: 'mordida', name: 'Mordida', roll: '1d20+4', damage: '2d4+2' }],
+  };
+
+  it('o Mestre cria, altera e remove criaturas', async () => {
+    const campaign = await newCampaign();
+    expect(await gm.campaigns.saveCreature(campaign.id, lobo)).toMatchObject({ ok: true });
+    await gm.campaigns.saveCreature(campaign.id, { ...lobo, hp: 15 });
+    expect((await gm.campaignRepository.get(campaign.id))?.bestiary).toEqual([{ ...lobo, hp: 15 }]);
+    await gm.campaigns.removeCreature(campaign.id, 'lobo');
+    expect((await gm.campaignRepository.get(campaign.id))?.bestiary).toEqual([]);
+  });
+
+  it('recusa rolagens que não rolam e o jogador', async () => {
+    const { invite } = await inviteFromGm();
+    const broken = { ...lobo, attacks: [{ id: 'm', name: 'Mordida', damage: '2d4+x' }] };
+    expect(await gm.campaigns.saveCreature(invite.campaignId, broken)).toMatchObject({
+      ok: false,
+      error: { code: 'rolagem-de-criatura-invalida' },
+    });
+    const joined = await player.campaigns.join(invite, 'Ana');
+    if (!joined.ok) throw new Error(joined.error.message);
+    expect(await player.campaigns.saveCreature(invite.campaignId, lobo)).toMatchObject({
+      ok: false,
+      error: { code: 'nao-e-mestre' },
+    });
+  });
+});

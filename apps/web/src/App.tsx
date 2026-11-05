@@ -15,6 +15,7 @@ import { PlayerSheetPage } from '@/pages/PlayerSheetPage';
 import { SheetPage } from '@/pages/SheetPage';
 import { SettingsPage } from '@/pages/SettingsPage';
 import { SheetPrintPage } from '@/pages/SheetPrintPage';
+import { CampaignCodexPage, SystemPage } from '@/pages/SystemPage';
 import { SystemsPage } from '@/pages/SystemsPage';
 
 /**
@@ -34,6 +35,9 @@ export function App({ services }: { services: Services }) {
               <Route path="/sistemas/editor/:id">
                 {(params) => <EditorPage key={params.id} id={params.id} />}
               </Route>
+              <Route path="/sistemas/:id">
+                {(params) => <SystemPage key={params.id} id={params.id} />}
+              </Route>
               <Route path="/campanhas" component={CampaignsPage} />
               <Route path="/configuracoes" component={SettingsPage} />
               <Route path="/campanhas/:id/jogadores/:sheetId">
@@ -44,6 +48,9 @@ export function App({ services }: { services: Services }) {
                     sheetId={params.sheetId}
                   />
                 )}
+              </Route>
+              <Route path="/campanhas/:id/codice">
+                {(params) => <CampaignCodexPage key={params.id} campaignId={params.id} />}
               </Route>
               <Route path="/campanhas/:id">
                 {(params) => <CampaignPage key={params.id} id={params.id} />}

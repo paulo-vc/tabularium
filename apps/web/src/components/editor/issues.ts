@@ -19,6 +19,9 @@ const PROPERTY_NAMES: Record<string, string> = {
   checkDice: 'dado dos testes',
   dice: 'dados do sistema',
   faces: 'faces',
+  codex: 'códice',
+  bestiary: 'bestiário',
+  creatureStats: 'características das criaturas',
 };
 
 /**

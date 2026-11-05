@@ -1,5 +1,7 @@
 import {
   addCombatant,
+  CREATURE_HP_MAX,
+  damageCombatant,
   INITIATIVE_RANGE,
   nextTurn,
   parseInitiativeInput,
@@ -9,6 +11,8 @@ import {
   turnOrder,
   updateCombatant,
   type Combatant,
+  type Creature,
+  type CreatureOrigin,
   type CustomDie,
   type PublicTracker,
   type Tracker,
@@ -20,6 +24,7 @@ import {
   EyeIcon,
   EyeOffIcon,
   PlusIcon,
+  ScrollTextIcon,
   SkullIcon,
   SwordsIcon,
   Trash2Icon,
@@ -35,6 +40,16 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import {
+  Select,
+  SelectContent,
+  SelectGroup,
+  SelectItem,
+  SelectLabel,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
+import { CombatantHp, ConditionBadge, CreatureSheetDialog } from './CombatCreature';
 import { useDiceTray } from './DiceTray';
 import { useLiveSession } from './use-live-session';
 
@@ -99,18 +114,33 @@ function RoundTitle({ tracker }: { tracker: { phase: string; round: number } | n
 }
 
 const NO_DICE: readonly CustomDie[] = [];
+const NO_BESTIARY = { campaign: [], system: [] };
+/** Valor do seletor de criatura quando o Mestre digita uma avulsa. */
+const AVULSA = '__avulsa__';
+
+const pickKey = (origin: CreatureOrigin, id: string) => `${origin}:${id}`;
+
+const parseHp = (text: string): number | null => {
+  const value = Number(text.trim());
+  return text.trim() !== '' && Number.isInteger(value) && value >= 1 && value <= CREATURE_HP_MAX
+    ? value
+    : null;
+};
 
 /** Ordem de turno, do lado do Mestre: monta o combate, define iniciativas e passa a vez. */
 export function GameMasterInitiative({
   campaignId,
   checkDice = '1d20',
   dice = NO_DICE,
+  bestiary = NO_BESTIARY,
 }: {
   campaignId: string;
   /** Dado dos testes do sistema: um modificador ("+3") rola com ele. */
   checkDice?: string | undefined;
   /** Dados do sistema (`4dF`), aceitos nas iniciativas digitadas. */
   dice?: readonly CustomDie[] | undefined;
+  /** Criaturas prontas: do bestiário da campanha e do sistema. */
+  bestiary?: { campaign: readonly Creature[]; system: readonly Creature[] } | undefined;
 }) {
   const { session } = useServices();
   // Com os dados 3D, as rolagens já aparecem na bandeja: sem aviso repetido.
@@ -121,6 +151,9 @@ export function GameMasterInitiative({
   const [initiative, setInitiative] = useState('');
   const [quantity, setQuantity] = useState('1');
   const [hidden, setHidden] = useState(false);
+  const [hpText, setHpText] = useState('');
+  const [picked, setPicked] = useState<{ origin: CreatureOrigin; id: string } | null>(null);
+  const [sheetOf, setSheetOf] = useState<string | null>(null);
   const [adding, setAdding] = useState(false);
   const nameRef = useRef<HTMLInputElement>(null);
   if (live.kind !== 'mestre' || live.campaignId !== campaignId) return null;
@@ -141,6 +174,25 @@ export function GameMasterInitiative({
         })),
       ),
     );
+  const findCreature = (ref: { origin: CreatureOrigin; id: string } | undefined) =>
+    ref &&
+    (ref.origin === 'campanha' ? bestiary.campaign : bestiary.system).find((c) => c.id === ref.id);
+  const pick = (value: string) => {
+    if (value === AVULSA) {
+      setPicked(null);
+      return;
+    }
+    const [origin, id] = value.split(/:(.*)/s) as [CreatureOrigin, string];
+    const creature = findCreature({ origin, id });
+    if (!creature) return;
+    setPicked({ origin, id });
+    setName(creature.name);
+    setInitiative(creature.initiative ?? '');
+    setHpText(String(creature.hp));
+  };
+  const hasBestiary = bestiary.campaign.length + bestiary.system.length > 0;
+  const hpValue = parseHp(hpText);
+  const validHp = hpText.trim() === '' || hpValue !== null;
   const parsedInitiative = parseInitiativeInput(initiative, checkDice, dice);
   const count = Number(quantity);
   const validCount = Number.isInteger(count) && count >= 1 && count <= MAX_AT_ONCE;
@@ -150,7 +202,7 @@ export function GameMasterInitiative({
   const add = async (event: FormEvent) => {
     event.preventDefault();
     const baseName = name.trim();
-    if (!baseName || !parsedInitiative || !validCount || adding) return;
+    if (!baseName || !parsedInitiative || !validCount || !validHp || adding) return;
     setAdding(true);
     try {
       const created: Combatant[] = [];
@@ -176,6 +228,8 @@ export function GameMasterInitiative({
           initiative: initiativeValue,
           kind: 'npc',
           hidden,
+          ...(hpValue !== null ? { hp: { value: hpValue, max: hpValue } } : {}),
+          ...(picked ? { creature: picked } : {}),
         });
       }
       change((current) => current && created.reduce(addCombatant, current));
@@ -187,6 +241,8 @@ export function GameMasterInitiative({
       setName('');
       setInitiative('');
       setQuantity('1');
+      setHpText('');
+      setPicked(null);
       nameRef.current?.focus();
     } finally {
       setAdding(false);
@@ -319,10 +375,36 @@ export function GameMasterInitiative({
                       aria-label="Criatura"
                     />
                   )}
-                  <span className={cn('min-w-0 flex-1 truncate', current && 'font-semibold')}>
+                  <span
+                    className={cn(
+                      'min-w-0 flex-1 truncate',
+                      current && 'font-semibold',
+                      combatant.hp?.value === 0 && 'text-muted-foreground line-through',
+                    )}
+                  >
                     {combatant.name}
                   </span>
                   {current && <Badge className="hidden sm:inline-flex">Agora</Badge>}
+                  {combatant.hp && (
+                    <CombatantHp
+                      name={combatant.name}
+                      hp={combatant.hp}
+                      onDamage={(amount) =>
+                        change((t) => t && damageCombatant(t, combatant.id, amount))
+                      }
+                    />
+                  )}
+                  {findCreature(combatant.creature) && (
+                    <Button
+                      size="icon"
+                      variant="ghost"
+                      aria-label={`Ficha de ${combatant.name}`}
+                      title="Ficha da criatura (ataques e habilidades)"
+                      onClick={() => setSheetOf(combatant.id)}
+                    >
+                      <ScrollTextIcon />
+                    </Button>
+                  )}
                   {combatant.kind === 'npc' && (
                     <Button
                       size="icon"
@@ -360,6 +442,44 @@ export function GameMasterInitiative({
           onSubmit={(event) => void add(event)}
           className="flex flex-wrap items-end gap-2 border-t pt-3"
         >
+          {hasBestiary && (
+            <div className="w-full space-y-1">
+              <Label htmlFor={`${base}-bestiario`} className="text-xs">
+                Do bestiário
+              </Label>
+              <Select
+                value={picked ? pickKey(picked.origin, picked.id) : AVULSA}
+                onValueChange={pick}
+              >
+                <SelectTrigger id={`${base}-bestiario`} size="sm" className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={AVULSA}>Criatura avulsa (digitar)</SelectItem>
+                  {bestiary.campaign.length > 0 && (
+                    <SelectGroup>
+                      <SelectLabel>Da campanha</SelectLabel>
+                      {bestiary.campaign.map((creature) => (
+                        <SelectItem key={creature.id} value={pickKey('campanha', creature.id)}>
+                          {creature.name} · {creature.hp} PV
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  )}
+                  {bestiary.system.length > 0 && (
+                    <SelectGroup>
+                      <SelectLabel>Do sistema</SelectLabel>
+                      {bestiary.system.map((creature) => (
+                        <SelectItem key={creature.id} value={pickKey('sistema', creature.id)}>
+                          {creature.name} · {creature.hp} PV
+                        </SelectItem>
+                      ))}
+                    </SelectGroup>
+                  )}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
           <div className="min-w-32 flex-1 space-y-1">
             <Label htmlFor={`${base}-nome`} className="text-xs">
               Criatura
@@ -390,6 +510,21 @@ export function GameMasterInitiative({
             />
           </div>
           <div className="space-y-1">
+            <Label htmlFor={`${base}-pv`} className="text-xs">
+              PV
+            </Label>
+            <Input
+              id={`${base}-pv`}
+              inputMode="numeric"
+              value={hpText}
+              placeholder="—"
+              title="Pontos de vida (opcional): com eles, dano e cura pelo combate"
+              aria-invalid={!validHp}
+              className="h-8 w-14 text-center tabular-nums"
+              onChange={(event) => setHpText(event.target.value)}
+            />
+          </div>
+          <div className="space-y-1">
             <Label htmlFor={`${base}-qtd`} className="text-xs">
               Qtd.
             </Label>
@@ -416,7 +551,7 @@ export function GameMasterInitiative({
             type="submit"
             size="sm"
             variant="outline"
-            disabled={!name.trim() || !parsedInitiative || !validCount || adding}
+            disabled={!name.trim() || !parsedInitiative || !validCount || !validHp || adding}
           >
             <PlusIcon /> Adicionar
           </Button>
@@ -424,10 +559,22 @@ export function GameMasterInitiative({
             Iniciativa: um número (<span className="font-mono">15</span>), um modificador (
             <span className="font-mono">+2</span> rola{' '}
             <span className="font-mono">{checkDice}+2</span>) ou uma rolagem (
-            <span className="font-mono">2d6+1</span>). Com quantidade, cada criatura rola a sua.
+            <span className="font-mono">2d6+1</span>). Com quantidade, cada criatura rola a sua. Com
+            PV, dá dano e cura pelo combate; os jogadores veem só se ela está ferida.
           </p>
         </form>
       </CardContent>
+      {(() => {
+        const combatant = tracker.combatants.find((c) => c.id === sheetOf);
+        return (
+          <CreatureSheetDialog
+            name={combatant?.name ?? ''}
+            creature={findCreature(combatant?.creature) ?? null}
+            hp={combatant?.hp}
+            onClose={() => setSheetOf(null)}
+          />
+        );
+      })()}
     </Card>
   );
 }
@@ -503,7 +650,15 @@ export function PlayerInitiative({
                 <span className="text-muted-foreground w-8 text-right tabular-nums">
                   {combatant.initiative}
                 </span>
-                <span className="min-w-0 flex-1 truncate">{combatant.name}</span>
+                <span
+                  className={cn(
+                    'min-w-0 flex-1 truncate',
+                    combatant.condition === 'caida' && 'text-muted-foreground line-through',
+                  )}
+                >
+                  {combatant.name}
+                </span>
+                {combatant.condition && <ConditionBadge condition={combatant.condition} />}
                 {combatant.userId === userId && <Badge variant="outline">Você</Badge>}
                 {current && <Badge>Agora</Badge>}
               </li>
