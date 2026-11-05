@@ -7,7 +7,8 @@ import {
 
 /**
  * Todos os sistemas disponíveis: os nativos (embutidos no app) e os instalados pelo
- * usuário. Nativos têm prioridade e não podem ser substituídos.
+ * usuário. Nativos têm prioridade e não podem ser substituídos. Os aposentados (que já foram
+ * nativos) só entram quando alguém pede por eles: aí são instalados como da comunidade.
  */
 export class TemplateCatalog {
   private readonly compiled = new Map<string, CompiledTemplate>();
@@ -15,6 +16,7 @@ export class TemplateCatalog {
   constructor(
     private readonly installed: TemplateRepository,
     private readonly builtins: readonly SystemTemplate[],
+    private readonly retired: readonly SystemTemplate[] = [],
   ) {}
 
   isBuiltin(id: string): boolean {
@@ -22,7 +24,27 @@ export class TemplateCatalog {
   }
 
   async get(id: string): Promise<SystemTemplate | undefined> {
-    return this.builtins.find((template) => template.id === id) ?? this.installed.get(id);
+    return (
+      this.builtins.find((template) => template.id === id) ??
+      (await this.installed.get(id)) ??
+      // Ficha, campanha ou cópia de quando o sistema vinha no app: abre como antes. Sem
+      // gravar aqui (o `get` roda dentro de consultas ao vivo); quem instala é `adoptRetired`.
+      this.retired.find((template) => template.id === id)
+    );
+  }
+
+  /**
+   * Instala, como da comunidade, os aposentados que ainda estão em uso (pelos ids de
+   * sistema das fichas e campanhas). Daí em diante aparecem em Sistemas e recebem as versões
+   * novas pelo repositório. Roda ao abrir o app (a restauração de uma cópia recarrega).
+   */
+  async adoptRetired(inUse: Iterable<string>): Promise<void> {
+    const ids = new Set(inUse);
+    for (const template of this.retired) {
+      if (ids.has(template.id) && !(await this.installed.get(template.id))) {
+        await this.installed.save(template);
+      }
+    }
   }
 
   /** Remove um sistema instalado. Fichas que o usam não são apagadas. */

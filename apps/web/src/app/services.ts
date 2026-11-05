@@ -16,7 +16,7 @@ import {
 } from '@tabula/storage';
 import type { DieRoller } from '@tabula/domain';
 import { generateGmKeyPair, type GmKeyPair } from '@tabula/sync';
-import { BUILTIN_TEMPLATES } from '@tabula/templates';
+import { BUILTIN_TEMPLATES, RETIRED_TEMPLATES } from '@tabula/templates';
 import { CampaignService } from './campaigns';
 import { TemplateEditorService } from './editor';
 import { TemplateCatalog } from './catalog';
@@ -118,7 +118,7 @@ export function createServices(
   const templateRepository = new DexieTemplateRepository(db);
   const device = new DexieDeviceRepository(db, ids.newId);
   const campaignRepository = new DexieCampaignRepository(db);
-  const catalog = new TemplateCatalog(templateRepository, BUILTIN_TEMPLATES);
+  const catalog = new TemplateCatalog(templateRepository, BUILTIN_TEMPLATES, RETIRED_TEMPLATES);
   const sheets = new SheetService(sheetRepository, catalog, device, clock, ids, processImage);
   const sessionStates = new DexieSessionStateRepository(db);
   const secrets = new DexieSecretValuesRepository(db);
