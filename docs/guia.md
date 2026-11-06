@@ -30,9 +30,13 @@ A ficha calcula sozinha o que depende de outros valores (modificadores, perícia
 
 ![O Mestre com a sessão aberta](imagens/mestre-sessao.png)
 
-Na sessão, o Mestre também tem: o **combate** (ordem de turno, com criaturas ocultas que só ele vê), as **rolagens** (inclusive secretas), **cutscene** (imagens em tela cheia para a mesa), **música** (trilhas que tocam no aparelho de todos), o **diário** (notas só suas e entradas para a mesa) e a ficha de cada jogador, que ele pode alterar.
+Na sessão, o Mestre também tem: o **combate** (ordem de turno, com criaturas ocultas que só ele vê e criaturas com PV, dano e cura em um toque), as **rolagens** (inclusive secretas), **cutscene** (imagens em tela cheia para a mesa), **música** (trilhas que tocam no aparelho de todos), o **diário** (notas só suas e entradas para a mesa) e a ficha de cada jogador, que ele pode alterar.
 
 ![Combate com uma criatura](imagens/combate.png)
+
+**Bestiário.** Na aba **Bestiário** da campanha ficam as criaturas: as que vêm com o sistema (o D&D 5e traz algumas do SRD) e as suas, criadas ali ou copiadas do sistema para ajustar. Cada uma tem PV, iniciativa, características, ataques e habilidades. No combate, escolha a criatura em **Do bestiário**: nome, iniciativa e PV já vêm preenchidos. Na ordem de turno, toque no PV para dar dano ou curar, e na ficha da criatura para rolar os ataques dela (se quiser, em segredo). Os jogadores veem só se ela está ilesa, ferida, muito ferida ou caída.
+
+**Códice.** A aba **Códice** mostra as páginas de consulta do sistema (habilidades, regras, itens), com busca. Os jogadores leem pelo botão **Códice do sistema** na campanha, sem as páginas marcadas como "só o Mestre".
 
 ## Para o jogador
 
@@ -67,6 +71,8 @@ Em **Sistemas → Criar sistema**, comece de um modelo pronto (d20 ou 2d6), em b
 - **Campos:** números, textos, recursos (como PV), listas (ataques, inventário), escolhas e campos calculados por [fórmulas](formulas.md). O campo de fórmula traz exemplos prontos.
 - **Dados do sistema:** dados com faces próprias, como o dado Fate (`4dF`) ou Esperança e Medo.
 - **Ícone:** uma imagem pequena que aparece nas listas.
+- **Códice:** páginas de consulta para a mesa (habilidades, regras, itens, magias), com títulos, listas, tabelas, negrito e links entre páginas (`[[Fúria]]`). Uma página pode ser só do Mestre: some para os jogadores, mas quem abre o arquivo do sistema ainda a vê.
+- **Bestiário:** as características que toda criatura do sistema tem (CA, Deslocamento…) e criaturas prontas, que o Mestre usa no combate. O sistema inteiro, com códice e bestiário, tem de caber em 450 KB, o tamanho que a sessão consegue enviar.
 - **Importar:** em Sistemas → Importar sistema, escolha o arquivo ou cole o JSON (o exportado pelo app ou só o sistema). Os problemas aparecem com o lugar de cada um.
 
 Para dividir com outras pessoas, exporte o sistema ou publique na comunidade (Sistemas → Explorar comunidade).

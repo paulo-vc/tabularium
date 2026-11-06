@@ -161,10 +161,15 @@ export function CreatureSheetDialog({
           <DialogHeader>
             <DialogTitle>{name}</DialogTitle>
             <DialogDescription>
-              {hp ? `${hp.value} de ${hp.max} PV. ` : ''}Os ataques rolam em nome da criatura.
+              {[creature.kind, hp && `${hp.value} de ${hp.max} PV`].filter(Boolean).join(' · ')}
             </DialogDescription>
+            <p className="text-muted-foreground text-xs">Os ataques rolam em nome da criatura.</p>
           </DialogHeader>
-          <CreatureCard creature={creature} onRoll={(...args) => void roll(...args)} />
+          <CreatureCard
+            creature={creature}
+            header={false}
+            onRoll={(...args) => void roll(...args)}
+          />
           <div className="flex items-center gap-2 border-t pt-3">
             <Checkbox
               id={`${base}-segredo`}

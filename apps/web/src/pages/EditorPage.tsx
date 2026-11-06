@@ -216,7 +216,7 @@ export function EditorPage({ id }: { id: string }) {
       <div
         role="tablist"
         aria-label="Partes do editor"
-        className="flex gap-1 overflow-x-auto border-b"
+        className="flex gap-1 overflow-x-auto overflow-y-hidden border-b [scrollbar-width:none]"
       >
         {TABS.map((item) => (
           <button
