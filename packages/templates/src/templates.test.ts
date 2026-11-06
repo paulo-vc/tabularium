@@ -1,9 +1,13 @@
 import {
   type Bonus,
   compileTemplate,
+  type CodexBlock,
+  type CodexInline,
   computeDerived,
   createSheet,
+  findCodexPage,
   migrateSheet,
+  parseCodexText,
   type CompiledTemplate,
   type LayoutNode,
   type SystemTemplate,
@@ -16,6 +20,29 @@ function compile(template: SystemTemplate): CompiledTemplate {
   if (!result.ok) throw new Error(result.error.map((i) => i.message).join('\n'));
   return result.value;
 }
+
+const inlineLinks = (inlines: readonly CodexInline[]): string[] =>
+  inlines.flatMap((inline) =>
+    inline.kind === 'link'
+      ? [inline.title]
+      : inline.kind === 'texto'
+        ? []
+        : inlineLinks(inline.children),
+  );
+
+const blockLinks = (block: CodexBlock): string[] => {
+  switch (block.kind) {
+    case 'titulo':
+      return inlineLinks(block.content);
+    case 'paragrafo':
+    case 'citacao':
+      return block.lines.flatMap(inlineLinks);
+    case 'lista':
+      return block.items.flatMap(inlineLinks);
+    case 'tabela':
+      return [...block.header, ...block.rows.flat()].flatMap(inlineLinks);
+  }
+};
 
 const layoutFieldIds = (nodes: readonly LayoutNode[]): string[] =>
   nodes.flatMap((node) =>
@@ -40,6 +67,17 @@ describe.each(BUILTIN_TEMPLATES.map((template) => [template.id, template] as con
       const shown = new Set(layoutFieldIds(template.layouts.full));
       const missing = template.fields.filter((field) => !shown.has(field.id)).map((f) => f.id);
       expect(missing).toEqual([]);
+    });
+
+    it('os links do códice levam a páginas que existem', () => {
+      const pages = template.codex ?? [];
+      const broken = pages.flatMap((page) =>
+        parseCodexText(page.body)
+          .flatMap(blockLinks)
+          .filter((title) => !findCodexPage(pages, title))
+          .map((title) => `${page.title} → ${title}`),
+      );
+      expect(broken).toEqual([]);
     });
 
     it('calcula uma ficha nova sem erros', () => {

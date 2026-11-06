@@ -1,6 +1,6 @@
 import { codexByCategory, searchCodex, type CodexPage } from '@tabula/domain';
 import { ArrowLeftIcon, BookOpenIcon, EyeOffIcon, SearchIcon } from 'lucide-react';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
 import { cn } from '@/lib/utils';
@@ -19,6 +19,15 @@ export function CodexReader({ pages }: { pages: readonly CodexPage[] }) {
   const open = pages.find((page) => page.id === openId) ?? null;
   // Em telas largas, sempre há uma página aberta (a primeira, de início).
   const shown = open ?? pages[0] ?? null;
+  const article = useRef<HTMLElement>(null);
+  // Ao abrir uma página do fim da lista (ou, no celular, sair dela), o topo dela fica à vista.
+  useEffect(() => {
+    if (openId === null) return;
+    const box = article.current;
+    if (!box) return;
+    box.scrollTop = 0;
+    if (box.getBoundingClientRect().top < 0) box.scrollIntoView?.({ block: 'start' });
+  }, [openId]);
 
   if (pages.length === 0) {
     return (
@@ -84,8 +93,13 @@ export function CodexReader({ pages }: { pages: readonly CodexPage[] }) {
 
       {shown && (
         <article
+          ref={article}
           aria-label={shown.title}
-          className={cn('min-w-0 rounded-lg border p-4 sm:p-5', !open && 'max-lg:hidden')}
+          className={cn(
+            // Em telas largas, a página acompanha a rolagem da lista, logo abaixo do cabeçalho.
+            'min-w-0 scroll-mt-20 rounded-lg border p-4 sm:p-5 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:self-start lg:overflow-y-auto',
+            !open && 'max-lg:hidden',
+          )}
         >
           <button
             type="button"
