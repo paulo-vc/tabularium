@@ -104,7 +104,7 @@ export function CodexText({
           case 'tabela':
             return (
               <div key={index} className="overflow-x-auto rounded-md border">
-                <table className="w-full text-left text-sm">
+                <table className="w-full text-left text-sm wrap-break-word">
                   <thead className="bg-muted/60">
                     <tr>
                       {block.header.map((cell, cellIndex) => (

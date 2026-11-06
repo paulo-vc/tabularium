@@ -31,7 +31,7 @@ O que está em andamento e as ideias para depois. As fases já entregues ficam e
 
 ### Depois da 1.0
 
-Na próxima versão: textura dos dados e resultado da dualidade. Depois, YouTube ou Spotify na música e outras ideias abaixo.
+Na próxima versão: textura dos dados, resultado da dualidade, códice do sistema e bestiário (com as regras e criaturas do SRD no D&D 5e). Depois, YouTube ou Spotify na música e outras ideias abaixo.
 
 ### Decisões tomadas
 
@@ -49,7 +49,7 @@ Ideias levantadas em 2026-10, ainda sem desenho. A ordem não é de prioridade.
 
 ### Dados 3D: o que falta
 
-Os dados 3D e os dados com faces do sistema já existem. Já dá para criá-los pelo editor. A textura e o resultado dos dados de dualidade ("com Esperança" ou "com Medo") entram na próxima versão.
+Os dados 3D, os dados com faces do sistema, a textura e o resultado dos dados de dualidade ("com Esperança" ou "com Medo") já existem; os dois últimos chegam na próxima versão.
 
 ### Ferramentas do Mestre
 

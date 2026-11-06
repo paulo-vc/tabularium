@@ -10,6 +10,147 @@
   "source": "builtin",
   "initiative": "iniciativa",
   "bonusTab": "Combate",
+  "codex": [
+    {
+      "id": "vantagem",
+      "title": "Vantagem e desvantagem",
+      "category": "Regras",
+      "body": "Com **vantagem**, role dois d20 e use o maior; com **desvantagem**, o menor.\n\n- Várias fontes de vantagem não se somam: continua sendo um d20 a mais.\n- Se houver vantagem e desvantagem ao mesmo tempo, as duas se anulam e você rola um d20 só, por mais fontes que haja de cada lado."
+    },
+    {
+      "id": "testes",
+      "title": "Testes e CD",
+      "category": "Regras",
+      "body": "Para saber se algo dá certo, role **1d20 + modificador** contra uma **Classe de Dificuldade (CD)**. Igual ou maior que a CD, deu certo.\n\n| Tarefa | CD |\n|---|---|\n| Muito fácil | 5 |\n| Fácil | 10 |\n| Média | 15 |\n| Difícil | 20 |\n| Muito difícil | 25 |\n| Quase impossível | 30 |\n\n- **Teste de habilidade:** modificador do atributo, mais a proficiência se você tiver a perícia.\n- **Teste de resistência:** contra um efeito; a CD vem de quem o causou.\n- **Teste em grupo:** todos rolam; se metade ou mais conseguir, o grupo consegue.\n\nVeja também [[Vantagem e desvantagem]]."
+    },
+    {
+      "id": "acoes",
+      "title": "Ações em combate",
+      "category": "Combate",
+      "body": "No seu turno você tem **deslocamento**, **uma ação** e, às vezes, uma **ação bônus**. Fora do turno, uma **reação** por rodada (como o [[Ataque de oportunidade]]).\n\n- **Atacar:** um ataque corpo a corpo ou à distância (ou mais, com Ataque Extra).\n- **Conjurar uma magia** com tempo de conjuração de 1 ação.\n- **Disparada:** ganha deslocamento extra igual ao seu deslocamento.\n- **Desengajar:** seu movimento não provoca ataques de oportunidade neste turno.\n- **Esquivar:** até o seu próximo turno, ataques contra você têm desvantagem (se você puder ver o atacante) e você tem vantagem em resistências de Destreza.\n- **Ajudar:** um aliado tem vantagem no próximo teste ou ataque contra um alvo a até 1,5 m de você.\n- **Esconder-se:** teste de Destreza (Furtividade).\n- **Preparar:** escolha um gatilho e a ação; ela acontece como reação quando o gatilho ocorrer.\n- **Procurar:** teste de Sabedoria (Percepção) ou Inteligência (Investigação).\n- **Usar um objeto** que precise de ação.\n\nVeja também [[Cobertura]] e [[Cair a 0 PV]]."
+    },
+    {
+      "id": "oportunidade",
+      "title": "Ataque de oportunidade",
+      "category": "Combate",
+      "body": "Quando uma criatura hostil que você vê sai do seu alcance, você pode usar a **reação** para fazer um ataque corpo a corpo contra ela.\n\nNão provoca: usar a ação **Desengajar**, ser teleportado ou ser movido sem usar o próprio movimento (empurrado, por exemplo)."
+    },
+    {
+      "id": "cobertura",
+      "title": "Cobertura",
+      "category": "Combate",
+      "body": "| Cobertura | Efeito | Exemplo |\n|---|---|---|\n| Meia | +2 na CA e em resistências de Destreza | Mureta, móvel, outra criatura |\n| Três quartos | +5 na CA e em resistências de Destreza | Seteira, tronco grosso |\n| Total | Não pode ser alvo direto | Parede inteira |"
+    },
+    {
+      "id": "morte",
+      "title": "Cair a 0 PV",
+      "category": "Combate",
+      "body": "Com 0 PV você fica [[Inconsciente]] e começa a fazer **testes contra a morte** no início de cada turno: 1d20, sem modificador.\n\n- **10 ou mais:** sucesso. **9 ou menos:** falha.\n- **3 sucessos:** você fica estável (inconsciente, mas sem rolar mais).\n- **3 falhas:** você morre.\n- **1 natural:** conta como duas falhas. **20 natural:** você volta com 1 PV.\n- Sofrer dano a 0 PV conta uma falha; um acerto crítico, duas.\n\n> Se o dano que sobra depois de zerar os PV for igual ou maior que o seu PV máximo, a morte é instantânea.\n\nUm teste de Sabedoria (Medicina) CD 10, como ação, estabiliza uma criatura."
+    },
+    {
+      "id": "descanso",
+      "title": "Descanso",
+      "category": "Regras",
+      "body": "## Descanso curto\nPelo menos 1 hora sem nada cansativo. Você pode gastar **Dados de Vida**: cada um cura o resultado mais o modificador de Constituição.\n\n## Descanso longo\nPelo menos 8 horas, com no máximo 2 de atividade leve. Recupera todos os PV e metade dos Dados de Vida (no mínimo 1). Só um a cada 24 horas. Também tira um nível de [[Exaustão]]."
+    },
+    {
+      "id": "agarrado",
+      "title": "Agarrado",
+      "category": "Condições",
+      "body": "- Deslocamento 0, sem bônus de deslocamento.\n- Termina se quem agarra ficar [[Incapacitado]] ou se algo afastar a criatura do alcance dele.\n- Para se soltar: ação, teste de Força (Atletismo) ou Destreza (Acrobacia) contra o Atletismo de quem agarra."
+    },
+    {
+      "id": "amedrontado",
+      "title": "Amedrontado",
+      "category": "Condições",
+      "body": "- Desvantagem em testes e ataques enquanto a fonte do medo estiver à vista.\n- Não pode se aproximar da fonte do medo por vontade própria."
+    },
+    {
+      "id": "atordoado",
+      "title": "Atordoado",
+      "category": "Condições",
+      "body": "- [[Incapacitado]], não se move e mal consegue falar.\n- Falha automaticamente em resistências de Força e Destreza.\n- Ataques contra a criatura têm vantagem."
+    },
+    {
+      "id": "caido",
+      "title": "Caído",
+      "category": "Condições",
+      "body": "- Só se move rastejando, a não ser que se levante (custa metade do deslocamento).\n- Desvantagem nos próprios ataques.\n- Ataques contra a criatura têm vantagem se o atacante estiver a até 1,5 m; senão, desvantagem."
+    },
+    {
+      "id": "cego",
+      "title": "Cego",
+      "category": "Condições",
+      "body": "- Não enxerga: falha em testes que dependem da visão.\n- Ataques contra a criatura têm vantagem; os dela, desvantagem."
+    },
+    {
+      "id": "contido",
+      "title": "Contido",
+      "category": "Condições",
+      "body": "- Deslocamento 0.\n- Ataques contra a criatura têm vantagem; os dela, desvantagem.\n- Desvantagem em resistências de Destreza."
+    },
+    {
+      "id": "enfeiticado",
+      "title": "Enfeitiçado",
+      "category": "Condições",
+      "body": "- Não pode atacar quem a enfeitiçou nem mirá-lo com efeitos nocivos.\n- Quem a enfeitiçou tem vantagem em testes de interação social com ela."
+    },
+    {
+      "id": "envenenado",
+      "title": "Envenenado",
+      "category": "Condições",
+      "body": "- Desvantagem em ataques e testes de habilidade."
+    },
+    {
+      "id": "incapacitado",
+      "title": "Incapacitado",
+      "category": "Condições",
+      "body": "- Não pode fazer ações nem reações."
+    },
+    {
+      "id": "inconsciente",
+      "title": "Inconsciente",
+      "category": "Condições",
+      "body": "- [[Incapacitado]], não se move nem fala e não percebe o que acontece em volta.\n- Larga o que estiver segurando e fica [[Caído]].\n- Falha automaticamente em resistências de Força e Destreza.\n- Ataques contra a criatura têm vantagem; um acerto a até 1,5 m é crítico."
+    },
+    {
+      "id": "invisivel",
+      "title": "Invisível",
+      "category": "Condições",
+      "body": "- Não pode ser vista sem magia ou um sentido especial; para se esconder, conta como estar em escuridão total.\n- Ataques contra a criatura têm desvantagem; os dela, vantagem."
+    },
+    {
+      "id": "paralisado",
+      "title": "Paralisado",
+      "category": "Condições",
+      "body": "- [[Incapacitado]], não se move nem fala.\n- Falha automaticamente em resistências de Força e Destreza.\n- Ataques contra a criatura têm vantagem; um acerto a até 1,5 m é crítico."
+    },
+    {
+      "id": "petrificado",
+      "title": "Petrificado",
+      "category": "Condições",
+      "body": "- Vira pedra, com o que veste e carrega, e fica [[Incapacitado]], sem se mover nem falar.\n- Ataques contra a criatura têm vantagem; ela falha em resistências de Força e Destreza.\n- Resistência a todo dano; imune a veneno e doença (os que já tinha ficam suspensos)."
+    },
+    {
+      "id": "surdo",
+      "title": "Surdo",
+      "category": "Condições",
+      "body": "- Não ouve: falha em testes que dependem da audição."
+    },
+    {
+      "id": "exaustao",
+      "title": "Exaustão",
+      "category": "Condições",
+      "body": "A exaustão tem níveis, que se acumulam. Um [[Descanso|descanso longo]] tira um nível.\n\n## Regras de 2014\n| Nível | Efeito |\n|---|---|\n| 1 | Desvantagem em testes de habilidade |\n| 2 | Deslocamento pela metade |\n| 3 | Desvantagem em ataques e resistências |\n| 4 | PV máximo pela metade |\n| 5 | Deslocamento 0 |\n| 6 | Morte |\n\n## Regras de 2024 (5.5)\nCada nível tira **2** de todo teste de d20 e **1,5 m** do deslocamento. No nível 6, a criatura morre."
+    },
+    {
+      "id": "mestre",
+      "title": "Dicas para o Mestre",
+      "category": "Mestre",
+      "body": "## Encontros\nSome o XP das criaturas e compare com o grupo. Muitas criaturas pesam mais do que o XP sugere: vários inimigos fracos podem ser mais perigosos que um forte.\n\n## Na mesa\n- Uma falha não precisa travar a história: deixe que ela traga uma complicação.\n- Os PV das criaturas no combate ficam só com você; a mesa vê o estado (ferida, muito ferida…).\n\nAs CDs de referência estão em [[Testes e CD]].",
+      "gmOnly": true
+    }
+  ],
   "creatureStats": [
     "CA",
     "Deslocamento",
