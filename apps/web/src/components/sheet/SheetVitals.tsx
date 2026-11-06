@@ -1,5 +1,6 @@
 import {
   defaultValue,
+  type CodexPage,
   type CompiledTemplate,
   type DerivedValues,
   type FieldDef,
@@ -8,9 +9,10 @@ import {
   type ResourceValue,
   type SheetValues,
 } from '@tabula/domain';
-import { HeartIcon, PencilIcon, SwordIcon, XIcon } from 'lucide-react';
-import { useId, useState, type ReactNode } from 'react';
+import { HeartIcon, PencilIcon, SwordIcon } from 'lucide-react';
+import { useId, useMemo, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
+import { ConditionTags } from '@/components/codex/CodexPageDialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -274,30 +276,28 @@ function selected(field: FieldOf<'select'>, value: FieldValue | undefined): stri
 function MultiSelectVital({
   field,
   value,
+  pages,
   onChange,
 }: {
   field: FieldOf<'select'>;
   value: FieldValue | undefined;
+  /** Códice do sistema: a opção com página de mesmo nome (ex.: "Caído") abre a página. */
+  pages: readonly CodexPage[];
   onChange: (value: FieldValue) => void;
 }) {
   const active = selected(field, value);
+  const shown = field.options.filter((option) => active.includes(option.value));
   return (
     <div className="flex flex-wrap items-center gap-1.5" role="group" aria-label={field.label}>
-      {field.options
-        .filter((option) => active.includes(option.value))
-        .map((option) => (
-          <Badge key={option.value} variant="secondary" className="gap-1 pr-1">
-            {option.label}
-            <button
-              type="button"
-              aria-label={`Remover ${option.label}`}
-              className="hover:bg-foreground/10 rounded-sm"
-              onClick={() => onChange(active.filter((v) => v !== option.value))}
-            >
-              <XIcon className="size-3" />
-            </button>
-          </Badge>
-        ))}
+      <ConditionTags
+        conditions={shown.map((option) => option.label)}
+        pages={pages}
+        onRemove={(label) =>
+          onChange(
+            active.filter((v) => v !== shown.find((option) => option.label === label)?.value),
+          )
+        }
+      />
       <Popover>
         <PopoverTrigger asChild>
           <Button type="button" size="sm" variant="ghost" className="h-6 px-2 text-xs">
@@ -336,6 +336,10 @@ export function SheetVitals({
   hiddenFieldIds?: ReadonlySet<string> | undefined;
 }) {
   const fields = vitalFields(compiled, hiddenFieldIds);
+  const codexPages = useMemo(
+    () => (compiled.template.codex ?? []).filter((page) => !page.gmOnly),
+    [compiled.template.codex],
+  );
   if (fields.length === 0) return null;
 
   const resourceMax = (field: FieldOf<'resource'>, value: ResourceValue) => {
@@ -464,6 +468,7 @@ export function SheetVitals({
                   key={field.id}
                   field={field}
                   value={values[field.id]}
+                  pages={codexPages}
                   onChange={(next) => onChange(field.id, next)}
                 />
               );

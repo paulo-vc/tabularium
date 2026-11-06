@@ -11,6 +11,11 @@ import { IdSchema, LabelSchema } from '../schema/primitives';
 export const COMBATANT_LIMIT = 40;
 export const INITIATIVE_RANGE = 999;
 
+/** Condições marcadas num participante ("Caído", "Envenenado"): a mesa toda vê. */
+export const EFFECT_LIMIT = 12;
+export const EFFECT_MAX_LENGTH = 40;
+const EffectSchema = z.string().trim().min(1).max(EFFECT_MAX_LENGTH);
+
 const InitiativeSchema = z.number().int().min(-INITIATIVE_RANGE).max(INITIATIVE_RANGE);
 
 export const CombatantSchema = z.object({
@@ -34,6 +39,8 @@ export const CombatantSchema = z.object({
   creature: z
     .object({ origin: z.enum(['sistema', 'campanha'] satisfies CreatureOrigin[]), id: IdSchema })
     .optional(),
+  /** Condições do participante, na ordem em que foram marcadas. */
+  effects: z.array(EffectSchema).max(EFFECT_LIMIT).optional(),
 });
 export type Combatant = z.infer<typeof CombatantSchema>;
 
@@ -145,6 +152,35 @@ export function damageCombatant(tracker: Tracker, id: string, amount: number): T
           }
         : c,
     ),
+  };
+}
+
+/**
+ * Troca as condições de um participante: sem espaços sobrando, sem repetidas (maiúsculas e
+ * acentos não contam) e no máximo `EFFECT_LIMIT`. Sem nenhuma, o campo some.
+ */
+export function setCombatantEffects(
+  tracker: Tracker,
+  id: string,
+  effects: readonly string[],
+): Tracker {
+  const seen = new Set<string>();
+  const clean: string[] = [];
+  for (const raw of effects) {
+    const effect = raw.trim().slice(0, EFFECT_MAX_LENGTH).trim();
+    const key = effect.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    if (!effect || seen.has(key)) continue;
+    seen.add(key);
+    clean.push(effect);
+    if (clean.length === EFFECT_LIMIT) break;
+  }
+  return {
+    ...tracker,
+    combatants: tracker.combatants.map((c) => {
+      if (c.id !== id) return c;
+      const { effects: _old, ...rest } = c;
+      return clean.length > 0 ? { ...rest, effects: clean } : rest;
+    }),
   };
 }
 

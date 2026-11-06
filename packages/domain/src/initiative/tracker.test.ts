@@ -7,6 +7,8 @@ import {
   publicView,
   PublicTrackerSchema,
   removeCombatant,
+  setCombatantEffects,
+  EFFECT_LIMIT,
   startCombat,
   TrackerSchema,
   turnOrder,
@@ -111,6 +113,32 @@ describe('o que os jogadores veem', () => {
     expect(PublicTrackerSchema.safeParse({ ...view, activeId: 'fantasma' }).success).toBe(false);
     const dup = { ...view, combatants: [...view.combatants, view.combatants[0]] };
     expect(PublicTrackerSchema.safeParse(dup).success).toBe(false);
+  });
+});
+
+describe('condições no combate', () => {
+  it('limpa espaços, tira as repetidas (sem ligar para acento) e some quando vazia', () => {
+    let tracker = setCombatantEffects(table(), 'goblin', [' Caído ', 'caido', 'Envenenado', '']);
+    expect(tracker.combatants.find((c) => c.id === 'goblin')?.effects).toEqual([
+      'Caído',
+      'Envenenado',
+    ]);
+    tracker = setCombatantEffects(tracker, 'goblin', []);
+    expect(tracker.combatants.find((c) => c.id === 'goblin')).not.toHaveProperty('effects');
+  });
+
+  it('respeita o limite e passa no schema', () => {
+    const many = Array.from({ length: EFFECT_LIMIT + 5 }, (_, i) => `Efeito ${i}`);
+    const tracker = setCombatantEffects(table(), 'ana', many);
+    expect(tracker.combatants.find((c) => c.id === 'ana')?.effects).toHaveLength(EFFECT_LIMIT);
+    expect(TrackerSchema.safeParse(tracker).success).toBe(true);
+  });
+
+  it('os jogadores veem as condições (de jogadores e de criaturas)', () => {
+    const tracker = setCombatantEffects(table(), 'goblin', ['Amedrontado']);
+    const goblin = publicView(tracker).combatants.find((c) => c.id === 'goblin');
+    expect(goblin?.effects).toEqual(['Amedrontado']);
+    expect(PublicTrackerSchema.safeParse(publicView(tracker)).success).toBe(true);
   });
 });
 

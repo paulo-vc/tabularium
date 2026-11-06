@@ -106,6 +106,54 @@ describe('bestiário e criaturas no combate', () => {
     expect(within(sheet).getByText(/2 de 7 PV/)).toBeInTheDocument();
   });
 
+  it('o Mestre marca condições do códice; a mesa vê e abre a página', async () => {
+    const campaign = await setUpTable();
+    const user = renderApp(gm, `#/campanhas/${campaign.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Iniciar sessão' }));
+    await player.session.joinAsPlayer(campaign.id);
+    await user.click(await screen.findByRole('button', { name: 'Iniciar combate' }));
+    await user.type(screen.getByRole('textbox', { name: 'Criatura' }), 'Orc');
+    await user.type(screen.getByRole('textbox', { name: 'Iniciativa' }), '12');
+    await user.click(screen.getByRole('button', { name: 'Adicionar' }));
+
+    await user.click(await screen.findByRole('button', { name: 'Condições de Orc' }));
+    const picker = await screen.findByRole('dialog', { name: 'Condições de Orc' });
+    await user.click(within(picker).getByRole('button', { name: 'Caído' }));
+    await user.type(
+      within(picker).getByRole('textbox', { name: 'Outra condição' }),
+      'Marcado{Enter}',
+    );
+    await user.keyboard('{Escape}');
+
+    await until(() => {
+      const snapshot = player.session.getSnapshot();
+      const orc =
+        snapshot.kind === 'jogador'
+          ? snapshot.initiative?.combatants.find((c) => c.name === 'Orc')
+          : undefined;
+      expect(orc?.effects).toEqual(['Caído', 'Marcado']);
+    });
+
+    // "Caído" tem página no códice do D&D; "Marcado" é só uma etiqueta.
+    await user.click(await screen.findByRole('button', { name: 'Caído: ver no códice' }));
+    const page = await screen.findByRole('dialog', { name: 'Caído' });
+    expect(page).toHaveTextContent('rastejando');
+    await user.keyboard('{Escape}');
+    expect(
+      screen.queryByRole('button', { name: 'Marcado: ver no códice' }),
+    ).not.toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: 'Remover Marcado' }));
+    await until(() => {
+      const snapshot = player.session.getSnapshot();
+      const orc =
+        snapshot.kind === 'jogador'
+          ? snapshot.initiative?.combatants.find((c) => c.name === 'Orc')
+          : undefined;
+      expect(orc?.effects).toEqual(['Caído']);
+    });
+  });
+
   it('o Mestre copia uma criatura do sistema para a campanha e a ajusta', async () => {
     const campaign = await setUpTable();
     const user = renderApp(gm, `#/campanhas/${campaign.id}`);

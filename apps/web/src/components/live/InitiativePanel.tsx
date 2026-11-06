@@ -1,5 +1,6 @@
 import {
   addCombatant,
+  codexConditions,
   CREATURE_HP_MAX,
   damageCombatant,
   INITIATIVE_RANGE,
@@ -7,9 +8,11 @@ import {
   parseInitiativeInput,
   previousTurn,
   removeCombatant,
+  setCombatantEffects,
   startCombat,
   turnOrder,
   updateCombatant,
+  type CodexPage,
   type Combatant,
   type Creature,
   type CreatureOrigin,
@@ -30,7 +33,7 @@ import {
   Trash2Icon,
   UserIcon,
 } from 'lucide-react';
-import { useId, useRef, useState, type FormEvent } from 'react';
+import { useId, useMemo, useRef, useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { useServices } from '@/app/services-context';
@@ -49,7 +52,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
-import { CombatantHp, ConditionBadge, CreatureSheetDialog } from './CombatCreature';
+import { ConditionTags } from '@/components/codex/CodexPageDialog';
+import {
+  CombatantConditions,
+  CombatantHp,
+  ConditionBadge,
+  CreatureSheetDialog,
+} from './CombatCreature';
 import { useDiceTray } from './DiceTray';
 import { useLiveSession } from './use-live-session';
 
@@ -115,6 +124,7 @@ function RoundTitle({ tracker }: { tracker: { phase: string; round: number } | n
 
 const NO_DICE: readonly CustomDie[] = [];
 const NO_BESTIARY = { campaign: [], system: [] };
+const NO_PAGES: readonly CodexPage[] = [];
 /** Valor do seletor de criatura quando o Mestre digita uma avulsa. */
 const AVULSA = '__avulsa__';
 
@@ -133,6 +143,7 @@ export function GameMasterInitiative({
   checkDice = '1d20',
   dice = NO_DICE,
   bestiary = NO_BESTIARY,
+  codex = NO_PAGES,
 }: {
   campaignId: string;
   /** Dado dos testes do sistema: um modificador ("+3") rola com ele. */
@@ -141,7 +152,10 @@ export function GameMasterInitiative({
   dice?: readonly CustomDie[] | undefined;
   /** Criaturas prontas: do bestiário da campanha e do sistema. */
   bestiary?: { campaign: readonly Creature[]; system: readonly Creature[] } | undefined;
+  /** Códice do sistema: as condições sugeridas e a página de cada uma. */
+  codex?: readonly CodexPage[] | undefined;
 }) {
+  const suggestions = useMemo(() => codexConditions(codex), [codex]);
   const { session } = useServices();
   // Com os dados 3D, as rolagens já aparecem na bandeja: sem aviso repetido.
   const { enabled: tray } = useDiceTray();
@@ -351,7 +365,9 @@ export function GameMasterInitiative({
                   key={combatant.id}
                   aria-current={current ? 'step' : undefined}
                   className={cn(
-                    'flex items-center gap-2 rounded-md border px-2 py-1',
+                    // Sem espaço (coluna estreita, celular), os botões descem para a linha de
+                    // baixo e o nome continua inteiro.
+                    'flex flex-wrap items-center gap-x-2 rounded-md border px-2 py-1',
                     current && 'border-primary bg-primary/10',
                     combatant.hidden && 'border-dashed',
                   )}
@@ -375,14 +391,32 @@ export function GameMasterInitiative({
                       aria-label="Criatura"
                     />
                   )}
-                  <span
-                    className={cn(
-                      'min-w-0 flex-1 truncate',
-                      current && 'font-semibold',
-                      combatant.hp?.value === 0 && 'text-muted-foreground line-through',
-                    )}
-                  >
-                    {combatant.name}
+                  <span className="min-w-24 flex-1">
+                    <span
+                      className={cn(
+                        'block truncate',
+                        current && 'font-semibold',
+                        combatant.hp?.value === 0 && 'text-muted-foreground line-through',
+                      )}
+                    >
+                      {combatant.name}
+                    </span>
+                    <ConditionTags
+                      conditions={combatant.effects ?? []}
+                      pages={codex}
+                      className="pb-0.5"
+                      onRemove={(condition) =>
+                        change(
+                          (t) =>
+                            t &&
+                            setCombatantEffects(
+                              t,
+                              combatant.id,
+                              (combatant.effects ?? []).filter((e) => e !== condition),
+                            ),
+                        )
+                      }
+                    />
                   </span>
                   {current && <Badge className="hidden sm:inline-flex">Agora</Badge>}
                   {combatant.hp && (
@@ -394,44 +428,56 @@ export function GameMasterInitiative({
                       }
                     />
                   )}
-                  {findCreature(combatant.creature) && (
+                  <span className="ml-auto flex shrink-0 items-center">
+                    <CombatantConditions
+                      name={combatant.name}
+                      effects={combatant.effects ?? []}
+                      suggestions={suggestions}
+                      onChange={(effects) =>
+                        change((t) => t && setCombatantEffects(t, combatant.id, effects))
+                      }
+                    />
+                    {findCreature(combatant.creature) && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        aria-label={`Ficha de ${combatant.name}`}
+                        title="Ficha da criatura (ataques e habilidades)"
+                        onClick={() => setSheetOf(combatant.id)}
+                      >
+                        <ScrollTextIcon />
+                      </Button>
+                    )}
+                    {combatant.kind === 'npc' && (
+                      <Button
+                        size="icon"
+                        variant="ghost"
+                        aria-pressed={combatant.hidden}
+                        aria-label={`${combatant.hidden ? 'Mostrar' : 'Ocultar'} ${combatant.name} para os jogadores`}
+                        title={
+                          combatant.hidden
+                            ? 'Oculto para os jogadores'
+                            : 'Visível para os jogadores'
+                        }
+                        onClick={() =>
+                          change(
+                            (t) =>
+                              t && updateCombatant(t, combatant.id, { hidden: !combatant.hidden }),
+                          )
+                        }
+                      >
+                        {combatant.hidden ? <EyeOffIcon /> : <EyeIcon />}
+                      </Button>
+                    )}
                     <Button
                       size="icon"
                       variant="ghost"
-                      aria-label={`Ficha de ${combatant.name}`}
-                      title="Ficha da criatura (ataques e habilidades)"
-                      onClick={() => setSheetOf(combatant.id)}
+                      aria-label={`Tirar ${combatant.name} do combate`}
+                      onClick={() => change((t) => t && removeCombatant(t, combatant.id))}
                     >
-                      <ScrollTextIcon />
+                      <Trash2Icon />
                     </Button>
-                  )}
-                  {combatant.kind === 'npc' && (
-                    <Button
-                      size="icon"
-                      variant="ghost"
-                      aria-pressed={combatant.hidden}
-                      aria-label={`${combatant.hidden ? 'Mostrar' : 'Ocultar'} ${combatant.name} para os jogadores`}
-                      title={
-                        combatant.hidden ? 'Oculto para os jogadores' : 'Visível para os jogadores'
-                      }
-                      onClick={() =>
-                        change(
-                          (t) =>
-                            t && updateCombatant(t, combatant.id, { hidden: !combatant.hidden }),
-                        )
-                      }
-                    >
-                      {combatant.hidden ? <EyeOffIcon /> : <EyeIcon />}
-                    </Button>
-                  )}
-                  <Button
-                    size="icon"
-                    variant="ghost"
-                    aria-label={`Tirar ${combatant.name} do combate`}
-                    onClick={() => change((t) => t && removeCombatant(t, combatant.id))}
-                  >
-                    <Trash2Icon />
-                  </Button>
+                  </span>
                 </li>
               );
             })}
@@ -583,8 +629,11 @@ export function GameMasterInitiative({
 export function PlayerInitiative({
   campaignId,
   initiativeRoll,
+  codex = NO_PAGES,
 }: {
   campaignId: string;
+  /** Páginas do códice que o jogador pode ler: as condições abrem a página delas. */
+  codex?: readonly CodexPage[] | undefined;
   /** Rolagem de iniciativa da ficha do jogador (ex.: "1d20+2"), se o sistema define uma. */
   initiativeRoll?: string | null | undefined;
 }) {
@@ -650,13 +699,20 @@ export function PlayerInitiative({
                 <span className="text-muted-foreground w-8 text-right tabular-nums">
                   {combatant.initiative}
                 </span>
-                <span
-                  className={cn(
-                    'min-w-0 flex-1 truncate',
-                    combatant.condition === 'caida' && 'text-muted-foreground line-through',
-                  )}
-                >
-                  {combatant.name}
+                <span className="min-w-0 flex-1">
+                  <span
+                    className={cn(
+                      'block truncate',
+                      combatant.condition === 'caida' && 'text-muted-foreground line-through',
+                    )}
+                  >
+                    {combatant.name}
+                  </span>
+                  <ConditionTags
+                    conditions={combatant.effects ?? []}
+                    pages={codex}
+                    className="pb-0.5 font-normal"
+                  />
                 </span>
                 {combatant.condition && <ConditionBadge condition={combatant.condition} />}
                 {combatant.userId === userId && <Badge variant="outline">Você</Badge>}
