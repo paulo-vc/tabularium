@@ -15,6 +15,9 @@ export const INITIATIVE_RANGE = 999;
 export const EFFECT_LIMIT = 12;
 export const EFFECT_MAX_LENGTH = 40;
 const EffectSchema = z.string().trim().min(1).max(EFFECT_MAX_LENGTH);
+/** Duração de uma condição, em rodadas (ex.: "Atordoado por 1 rodada"). */
+export const EFFECT_ROUNDS_MAX = 99;
+const ROUND_MAX = 9999;
 
 const InitiativeSchema = z.number().int().min(-INITIATIVE_RANGE).max(INITIATIVE_RANGE);
 
@@ -41,6 +44,20 @@ export const CombatantSchema = z.object({
     .optional(),
   /** Condições do participante, na ordem em que foram marcadas. */
   effects: z.array(EffectSchema).max(EFFECT_LIMIT).optional(),
+  /**
+   * Condições com duração: a última rodada em que a condição ainda vale. Ela acaba quando
+   * termina a vez do participante nessa rodada.
+   */
+  effectUntil: z
+    .record(
+      EffectSchema,
+      z
+        .number()
+        .int()
+        .min(1)
+        .max(ROUND_MAX + EFFECT_ROUNDS_MAX),
+    )
+    .optional(),
 });
 export type Combatant = z.infer<typeof CombatantSchema>;
 
@@ -54,7 +71,7 @@ const uniqueIds = (combatants: readonly { id: string }[]) =>
 export const TrackerSchema = z
   .object({
     phase: z.enum(['preparando', 'combate']),
-    round: z.number().int().min(1).max(9999),
+    round: z.number().int().min(1).max(ROUND_MAX),
     activeId: IdSchema.nullable(),
     combatants: z.array(CombatantSchema).max(COMBATANT_LIMIT),
   })
@@ -72,13 +89,29 @@ export type Tracker = z.infer<typeof TrackerSchema>;
 export const PublicTrackerSchema = z
   .object({
     phase: z.enum(['preparando', 'combate']),
-    round: z.number().int().min(1).max(9999),
+    round: z.number().int().min(1).max(ROUND_MAX),
     activeId: IdSchema.nullable(),
     combatants: z
       .array(
-        CombatantSchema.omit({ hidden: true, hp: true, creature: true }).extend({
+        CombatantSchema.omit({
+          hidden: true,
+          hp: true,
+          creature: true,
+          effectUntil: true,
+        }).extend({
           /** Estado aproximado de uma criatura com PV ("ferida"), no lugar do número. */
           condition: z.enum(WOUND_CONDITIONS).optional(),
+          /** Rodadas que faltam das condições com duração (só as que ainda valem). */
+          effectRounds: z
+            .record(
+              EffectSchema,
+              z
+                .number()
+                .int()
+                .min(1)
+                .max(ROUND_MAX + EFFECT_ROUNDS_MAX),
+            )
+            .optional(),
         }),
       )
       .max(COMBATANT_LIMIT),
@@ -155,31 +188,80 @@ export function damageCombatant(tracker: Tracker, id: string, amount: number): T
   };
 }
 
+/** Uma condição que vale agora; `rounds`: as vezes do participante que ela ainda pega. */
+export interface ActiveEffect {
+  name: string;
+  rounds?: number;
+}
+
+/** A vez do participante já terminou nesta rodada? (Na preparação, ninguém agiu.) */
+function turnDone(tracker: Tracker, id: string): boolean {
+  if (tracker.phase !== 'combate') return false;
+  const order = turnOrder(tracker.combatants);
+  const active = order.findIndex((c) => c.id === tracker.activeId);
+  const own = order.findIndex((c) => c.id === id);
+  return active !== -1 && own !== -1 && active > own;
+}
+
+/**
+ * As condições que valem agora, na ordem em que foram marcadas. As com duração somem sozinhas
+ * quando termina a vez do participante na última rodada; voltar a vez traz de volta.
+ */
+export function combatantEffects(tracker: Tracker, combatant: Combatant): ActiveEffect[] {
+  const done = turnDone(tracker, combatant.id);
+  const result: ActiveEffect[] = [];
+  for (const name of combatant.effects ?? []) {
+    const until = combatant.effectUntil?.[name];
+    if (until === undefined) {
+      result.push({ name });
+      continue;
+    }
+    const rounds = until - tracker.round + (done ? 0 : 1);
+    if (rounds >= 1) result.push({ name, rounds });
+  }
+  return result;
+}
+
+const effectKey = (effect: string) => effect.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+
 /**
  * Troca as condições de um participante: sem espaços sobrando, sem repetidas (maiúsculas e
- * acentos não contam) e no máximo `EFFECT_LIMIT`. Sem nenhuma, o campo some.
+ * acentos não contam) e no máximo `EFFECT_LIMIT`. Com `rounds`, a condição pega as próximas
+ * vezes do participante (contando a atual, se ele ainda está nela) e depois some. Sem
+ * nenhuma, os campos somem.
  */
 export function setCombatantEffects(
   tracker: Tracker,
   id: string,
-  effects: readonly string[],
+  effects: readonly (string | ActiveEffect)[],
 ): Tracker {
+  const done = turnDone(tracker, id);
   const seen = new Set<string>();
   const clean: string[] = [];
-  for (const raw of effects) {
+  const until: Record<string, number> = {};
+  for (const item of effects) {
+    const raw = typeof item === 'string' ? item : item.name;
     const effect = raw.trim().slice(0, EFFECT_MAX_LENGTH).trim();
-    const key = effect.normalize('NFD').replace(/[̀-ͯ]/g, '').toLowerCase();
+    const key = effectKey(effect);
     if (!effect || seen.has(key)) continue;
     seen.add(key);
     clean.push(effect);
+    const rounds = typeof item === 'string' ? undefined : item.rounds;
+    if (rounds !== undefined && Number.isFinite(rounds)) {
+      const turns = Math.max(1, Math.min(EFFECT_ROUNDS_MAX, Math.trunc(rounds)));
+      until[effect] = Math.max(1, tracker.round + turns - (done ? 0 : 1));
+    }
     if (clean.length === EFFECT_LIMIT) break;
   }
   return {
     ...tracker,
     combatants: tracker.combatants.map((c) => {
       if (c.id !== id) return c;
-      const { effects: _old, ...rest } = c;
-      return clean.length > 0 ? { ...rest, effects: clean } : rest;
+      const { effects: _old, effectUntil: _oldUntil, ...rest } = c;
+      if (clean.length === 0) return rest;
+      return Object.keys(until).length > 0
+        ? { ...rest, effects: clean, effectUntil: until }
+        : { ...rest, effects: clean };
     }),
   };
 }
@@ -207,7 +289,7 @@ export function nextTurn(tracker: Tracker): Tracker {
   const wraps = index === order.length - 1;
   return {
     ...tracker,
-    round: wraps ? Math.min(tracker.round + 1, 9999) : tracker.round,
+    round: wraps ? Math.min(tracker.round + 1, ROUND_MAX) : tracker.round,
     activeId: order[wraps ? 0 : index + 1]?.id ?? null,
   };
 }
@@ -232,8 +314,25 @@ export function publicView(tracker: Tracker): PublicTracker {
     phase: tracker.phase,
     round: tracker.round,
     activeId: activeVisible ? tracker.activeId : null,
-    combatants: visible.map(({ hidden: _hidden, hp, creature: _creature, ...rest }) =>
-      hp ? { ...rest, condition: woundCondition(hp.value, hp.max) } : rest,
-    ),
+    combatants: visible.map((combatant) => {
+      const {
+        hidden: _hidden,
+        hp,
+        creature: _creature,
+        effects: _effects,
+        effectUntil: _until,
+        ...rest
+      } = combatant;
+      const active = combatantEffects(tracker, combatant);
+      const rounds = Object.fromEntries(
+        active.flatMap((e) => (e.rounds === undefined ? [] : [[e.name, e.rounds]])),
+      );
+      return {
+        ...rest,
+        ...(active.length > 0 ? { effects: active.map((e) => e.name) } : {}),
+        ...(Object.keys(rounds).length > 0 ? { effectRounds: rounds } : {}),
+        ...(hp ? { condition: woundCondition(hp.value, hp.max) } : {}),
+      };
+    }),
   };
 }

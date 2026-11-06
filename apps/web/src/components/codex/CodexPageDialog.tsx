@@ -60,11 +60,14 @@ export function CodexPageDialog({
 export function ConditionTags({
   conditions,
   pages,
+  rounds,
   onRemove,
   className,
 }: {
   conditions: readonly string[];
   pages: readonly CodexPage[];
+  /** Rodadas que faltam das condições com duração. */
+  rounds?: Readonly<Record<string, number>> | undefined;
   onRemove?: ((condition: string) => void) | undefined;
   className?: string | undefined;
 }) {
@@ -93,6 +96,15 @@ export function ConditionTags({
                 </button>
               ) : (
                 condition
+              )}
+              {rounds?.[condition] !== undefined && (
+                <span
+                  className="text-muted-foreground font-mono"
+                  title={`Faltam ${rounds[condition]} rodada(s)`}
+                  aria-label={`faltam ${rounds[condition]} rodada(s)`}
+                >
+                  {rounds[condition]}
+                </span>
               )}
               {onRemove && (
                 <button

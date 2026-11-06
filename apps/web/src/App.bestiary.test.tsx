@@ -154,6 +154,41 @@ describe('bestiário e criaturas no combate', () => {
     });
   });
 
+  it('uma condição com duração some sozinha quando a vez passa', async () => {
+    const campaign = await setUpTable();
+    const user = renderApp(gm, `#/campanhas/${campaign.id}`);
+    await user.click(await screen.findByRole('button', { name: 'Iniciar sessão' }));
+    await player.session.joinAsPlayer(campaign.id);
+    await user.click(await screen.findByRole('button', { name: 'Iniciar combate' }));
+    await user.type(screen.getByRole('textbox', { name: 'Criatura' }), 'Orc');
+    await user.type(screen.getByRole('textbox', { name: 'Iniciativa' }), '12');
+    await user.click(screen.getByRole('button', { name: 'Adicionar' }));
+    await user.click(screen.getByRole('button', { name: /Começar/ })); // vez do Orc
+
+    await user.click(await screen.findByRole('button', { name: 'Condições de Orc' }));
+    const picker = await screen.findByRole('dialog', { name: 'Condições de Orc' });
+    await user.click(within(picker).getByRole('button', { name: '1 rodada' }));
+    await user.click(within(picker).getByRole('button', { name: 'Atordoado' }));
+    await user.keyboard('{Escape}');
+
+    const orcOf = () => {
+      const snapshot = player.session.getSnapshot();
+      return snapshot.kind === 'jogador'
+        ? snapshot.initiative?.combatants.find((c) => c.name === 'Orc')
+        : undefined;
+    };
+    await until(() => expect(orcOf()?.effectRounds).toEqual({ Atordoado: 1 }));
+    expect(screen.getByLabelText('faltam 1 rodada(s)')).toBeInTheDocument();
+
+    await user.click(screen.getByRole('button', { name: /Próximo turno/ }));
+    await until(() => expect(orcOf()).not.toHaveProperty('effects'));
+    expect(screen.queryByRole('button', { name: 'Atordoado: ver no códice' })).toBeNull();
+
+    // Um clique a mais: voltar a vez traz a condição de volta.
+    await user.click(screen.getByRole('button', { name: 'Turno anterior' }));
+    await until(() => expect(orcOf()?.effects).toEqual(['Atordoado']));
+  });
+
   it('o Mestre copia uma criatura do sistema para a campanha e a ajusta', async () => {
     const campaign = await setUpTable();
     const user = renderApp(gm, `#/campanhas/${campaign.id}`);

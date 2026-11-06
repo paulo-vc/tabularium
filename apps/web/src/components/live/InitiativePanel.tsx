@@ -1,6 +1,7 @@
 import {
   addCombatant,
   codexConditions,
+  combatantEffects,
   CREATURE_HP_MAX,
   damageCombatant,
   INITIATIVE_RANGE,
@@ -360,6 +361,10 @@ export function GameMasterInitiative({
           <ol aria-label="Ordem de turno" className="space-y-1">
             {order.map((combatant) => {
               const current = combatant.id === tracker.activeId;
+              const effects = combatantEffects(tracker, combatant);
+              const rounds = Object.fromEntries(
+                effects.flatMap((e) => (e.rounds === undefined ? [] : [[e.name, e.rounds]])),
+              );
               return (
                 <li
                   key={combatant.id}
@@ -402,7 +407,8 @@ export function GameMasterInitiative({
                       {combatant.name}
                     </span>
                     <ConditionTags
-                      conditions={combatant.effects ?? []}
+                      conditions={effects.map((e) => e.name)}
+                      rounds={rounds}
                       pages={codex}
                       className="pb-0.5"
                       onRemove={(condition) =>
@@ -412,7 +418,7 @@ export function GameMasterInitiative({
                             setCombatantEffects(
                               t,
                               combatant.id,
-                              (combatant.effects ?? []).filter((e) => e !== condition),
+                              effects.filter((e) => e.name !== condition),
                             ),
                         )
                       }
@@ -431,7 +437,7 @@ export function GameMasterInitiative({
                   <span className="ml-auto flex shrink-0 items-center">
                     <CombatantConditions
                       name={combatant.name}
-                      effects={combatant.effects ?? []}
+                      effects={effects}
                       suggestions={suggestions}
                       onChange={(effects) =>
                         change((t) => t && setCombatantEffects(t, combatant.id, effects))
@@ -710,6 +716,7 @@ export function PlayerInitiative({
                   </span>
                   <ConditionTags
                     conditions={combatant.effects ?? []}
+                    rounds={combatant.effectRounds}
                     pages={codex}
                     className="pb-0.5 font-normal"
                   />

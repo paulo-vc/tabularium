@@ -3,6 +3,7 @@ import {
   EFFECT_MAX_LENGTH,
   WOUND_LABELS,
   woundCondition,
+  type ActiveEffect,
   type Creature,
   type CreatureAttack,
   type WoundCondition,
@@ -192,6 +193,11 @@ export function CreatureSheetDialog({
  * Marcar condições num participante (Mestre): as do códice do sistema num toque e qualquer
  * outra digitada ("Abençoado", "Concentrado em Bênção").
  */
+/** Durações que o Mestre escolhe antes de marcar (em rodadas; `null` = até tirar). */
+const DURATIONS = [null, 1, 2, 3, 10] as const;
+
+const roundsLabel = (rounds: number) => (rounds === 1 ? '1 rodada' : `${rounds} rodadas`);
+
 export function CombatantConditions({
   name,
   effects,
@@ -199,26 +205,30 @@ export function CombatantConditions({
   onChange,
 }: {
   name: string;
-  effects: readonly string[];
+  /** As condições que valem agora. */
+  effects: readonly ActiveEffect[];
   /** As condições do códice do sistema. */
   suggestions: readonly string[];
-  onChange: (effects: string[]) => void;
+  onChange: (effects: ActiveEffect[]) => void;
 }) {
   const base = useId();
   const [other, setOther] = useState('');
-  const active = new Set(effects.map(conditionKey));
+  const [duration, setDuration] = useState<number | null>(null);
+  const active = new Map(effects.map((effect) => [conditionKey(effect.name), effect]));
+  const mark = (condition: string): ActiveEffect =>
+    duration === null ? { name: condition } : { name: condition, rounds: duration };
   const toggle = (condition: string) =>
     onChange(
       active.has(conditionKey(condition))
-        ? effects.filter((effect) => conditionKey(effect) !== conditionKey(condition))
-        : [...effects, condition],
+        ? effects.filter((effect) => conditionKey(effect.name) !== conditionKey(condition))
+        : [...effects, mark(condition)],
     );
   // As digitadas, que não estão entre as sugestões, também aparecem para desmarcar.
   const options = [
     ...suggestions,
-    ...effects.filter(
-      (effect) => !suggestions.some((s) => conditionKey(s) === conditionKey(effect)),
-    ),
+    ...effects
+      .map((effect) => effect.name)
+      .filter((effect) => !suggestions.some((s) => conditionKey(s) === conditionKey(effect))),
   ];
   const full = effects.length >= EFFECT_LIMIT;
   return (
@@ -238,22 +248,43 @@ export function CombatantConditions({
           <span className="font-medium">{name}</span>{' '}
           <span className="text-muted-foreground">· a mesa vê as condições</span>
         </p>
+        <div role="group" aria-label="Duração" className="flex flex-wrap items-center gap-1">
+          <span className="text-muted-foreground mr-1 text-xs">Duração</span>
+          {DURATIONS.map((option) => (
+            <Button
+              key={option ?? 'livre'}
+              type="button"
+              size="sm"
+              variant={duration === option ? 'secondary' : 'ghost'}
+              aria-pressed={duration === option}
+              className="h-6 px-1.5 text-xs"
+              onClick={() => setDuration(option)}
+            >
+              {option === null ? 'Até tirar' : option === 1 ? '1 rodada' : option}
+            </Button>
+          ))}
+        </div>
         {options.length > 0 && (
           <div className="flex flex-wrap gap-1">
             {options.map((condition) => {
-              const on = active.has(conditionKey(condition));
+              const current = active.get(conditionKey(condition));
               return (
                 <Button
                   key={condition}
                   type="button"
                   size="sm"
-                  variant={on ? 'default' : 'outline'}
-                  aria-pressed={on}
-                  disabled={!on && full}
+                  variant={current ? 'default' : 'outline'}
+                  aria-pressed={current !== undefined}
+                  disabled={!current && full}
                   className="h-7 px-2 text-xs"
                   onClick={() => toggle(condition)}
                 >
                   {condition}
+                  {current?.rounds !== undefined && (
+                    <span className="font-mono opacity-75" aria-label={roundsLabel(current.rounds)}>
+                      {current.rounds}
+                    </span>
+                  )}
                 </Button>
               );
             })}
@@ -264,7 +295,7 @@ export function CombatantConditions({
           onSubmit={(event: FormEvent) => {
             event.preventDefault();
             if (!other.trim() || full) return;
-            onChange([...effects, other]);
+            onChange([...effects, mark(other)]);
             setOther('');
           }}
         >
@@ -283,6 +314,12 @@ export function CombatantConditions({
             <PlusIcon /> Marcar
           </Button>
         </form>
+        {duration !== null && (
+          <p className="text-muted-foreground text-xs">
+            Some sozinha quando termina a {duration === 1 ? 'próxima vez' : `${duration}ª vez`} de{' '}
+            {name}.
+          </p>
+        )}
       </PopoverContent>
     </Popover>
   );
