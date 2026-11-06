@@ -13,6 +13,8 @@ import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
 import { Link, useLocation } from 'wouter';
 import { useServices } from '@/app/services-context';
+import { BestiaryEditor } from '@/components/editor/BestiaryEditor';
+import { CodexEditor } from '@/components/editor/CodexEditor';
 import { EditorPreview } from '@/components/editor/EditorPreview';
 import { FieldDialog } from '@/components/editor/FieldDialog';
 import { EditorSteps } from '@/components/editor/EditorSteps';
@@ -36,11 +38,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
-type Tab = 'estrutura' | 'informacoes' | 'previa';
+type Tab = 'estrutura' | 'informacoes' | 'codice' | 'bestiario' | 'previa';
 
 const TABS: { id: Tab; label: string; className?: string }[] = [
   { id: 'estrutura', label: 'Campos e seções' },
   { id: 'informacoes', label: 'Informações' },
+  { id: 'codice', label: 'Códice' },
+  { id: 'bestiario', label: 'Bestiário' },
   // Em telas largas a prévia fica sempre ao lado.
   { id: 'previa', label: 'Prévia', className: 'lg:hidden' },
 ];
@@ -209,7 +213,11 @@ export function EditorPage({ id }: { id: string }) {
 
       <EditorSteps template={template} saved={saved !== undefined} onGo={setTab} />
 
-      <div role="tablist" aria-label="Partes do editor" className="flex gap-1 border-b">
+      <div
+        role="tablist"
+        aria-label="Partes do editor"
+        className="flex gap-1 overflow-x-auto overflow-y-hidden border-b [scrollbar-width:none]"
+      >
         {TABS.map((item) => (
           <button
             key={item.id}
@@ -217,7 +225,7 @@ export function EditorPage({ id }: { id: string }) {
             type="button"
             aria-selected={tab === item.id}
             className={cn(
-              '-mb-px border-b-2 px-3 py-2 text-sm font-medium',
+              '-mb-px shrink-0 border-b-2 px-3 py-2 text-sm font-medium',
               tab === item.id
                 ? 'border-primary text-foreground'
                 : 'text-muted-foreground hover:text-foreground border-transparent',
@@ -235,7 +243,23 @@ export function EditorPage({ id }: { id: string }) {
         ))}
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
+      {(tab === 'codice' || tab === 'bestiario') && validation.general.length > 0 && (
+        <ul className="border-destructive/40 bg-destructive/5 text-destructive space-y-1 rounded-md border p-3 text-sm">
+          {validation.general.map((issue, index) => (
+            <li key={index}>{describeIssue(template, issue)}</li>
+          ))}
+        </ul>
+      )}
+      {tab === 'codice' && <CodexEditor template={template} apply={apply} />}
+      {tab === 'bestiario' && <BestiaryEditor template={template} apply={apply} />}
+
+      {/* Códice e bestiário ocupam a largura toda: a prévia da ficha não tem a ver com eles. */}
+      <div
+        className={cn(
+          'grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]',
+          (tab === 'codice' || tab === 'bestiario') && 'hidden',
+        )}
+      >
         <div className={cn('min-w-0 space-y-4', tab === 'previa' && 'hidden lg:block')}>
           {validation.general.length > 0 && (
             <ul className="border-destructive/40 bg-destructive/5 text-destructive space-y-1 rounded-md border p-3 text-sm">

@@ -39,6 +39,7 @@ Na próxima versão: textura dos dados e resultado da dualidade. Depois, YouTube
 - Sem retransmissão (TURN): só conexão direta, com a falha bem explicada.
 - Custo zero também para o projeto: Android pelo APK nas releases, sem Play Store.
 - O app traz só o D&D 5e (SRD); os outros sistemas vivem no repositório da comunidade como fichas de fã, com o nome original quando a política do dono permite (decidido em 2026-11-03).
+- Sem mapa de batalha (grid com fichas arrastáveis) no Tabularium (decidido em 2026-11-05).
 - Sem soundboard no Tabularium (decidido em 2026-11-03): o autor já tem um projeto à parte para isso.
 - O criador de sistemas mais fácil e a importação de sistemas entram na 1.0.
 

@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import { MAX_FORMULA_LENGTH } from '../formula';
+import { BestiarySchema, CREATURE_STAT_LIMIT } from '../bestiary/schema';
+import { CODEX_PAGE_LIMIT, CodexPageSchema } from '../codex/schema';
 import { CustomDieSchema } from '../dice/custom';
 import { SystemIconSchema } from './icon';
 import {
@@ -246,6 +248,12 @@ export const SystemTemplateSchema = z.object({
   icon: SystemIconSchema.optional(),
   /** Versão mínima do app capaz de abrir este template. */
   minAppVersion: SemVerSchema.optional(),
+  /** Códice: páginas de consulta (habilidades, regras, itens…), lidas por toda a mesa. */
+  codex: z.array(CodexPageSchema).max(CODEX_PAGE_LIMIT).optional(),
+  /** Criaturas prontas do sistema, para o Mestre usar no combate ou copiar para a campanha. */
+  bestiary: BestiarySchema.optional(),
+  /** Características de uma criatura nova (ex.: "CA", "Deslocamento"); sem isso, as padrão. */
+  creatureStats: z.array(z.string().trim().min(1).max(40)).max(CREATURE_STAT_LIMIT).optional(),
   fields: z.array(FieldDefSchema).min(1).max(LIMITS.fields),
   layouts: z.object({
     /** Ficha completa. */

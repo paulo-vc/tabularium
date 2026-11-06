@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { BestiarySchema } from '../bestiary/schema';
 import { IdSchema, LabelSchema, LIMITS, TimestampSchema } from '../schema/primitives';
 import { embeddedImageSchema } from '../image/embedded';
 import { TemplateRefSchema } from '../template/schema';
@@ -65,6 +66,8 @@ export const CampaignSchema = z.object({
   cover: CoverSchema.optional(),
   secret: CampaignSecretSchema,
   members: z.array(CampaignMemberSchema).max(LIMITS.members),
+  /** Bestiário da campanha (só no Mestre): criaturas dele, criadas ou copiadas do sistema. */
+  bestiary: BestiarySchema.optional(),
   createdAt: TimestampSchema,
   updatedAt: TimestampSchema,
 });

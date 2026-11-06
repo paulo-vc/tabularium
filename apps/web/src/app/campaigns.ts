@@ -1,5 +1,9 @@
 import {
+  BESTIARY_LIMIT,
   createCampaign,
+  CreatureSchema,
+  creatureProblems,
+  type Creature,
   err,
   inviteFor,
   joinCampaign,
@@ -202,6 +206,48 @@ export class CampaignService {
   async removeCover(campaignId: string): Promise<void> {
     const campaign = await this.campaigns.get(campaignId);
     if (campaign) await this.campaigns.save(withCover(campaign, null, this.clock.now()));
+  }
+
+  /**
+   * Cria ou altera uma criatura do bestiário da campanha (só o Mestre). A criatura passa pelo
+   * mesmo formato e pelas mesmas rolagens que o bestiário de um sistema.
+   */
+  async saveCreature(campaignId: string, input: Creature): Promise<Result<Creature, Issue>> {
+    const campaign = await this.campaigns.get(campaignId);
+    if (!campaign) return failure('campanha-ausente', 'Campanha não encontrada.');
+    if (roleOf(campaign, await this.device.getDeviceId()) !== 'mestre') {
+      return failure('nao-e-mestre', 'Só o Mestre mexe no bestiário.');
+    }
+    const parsed = CreatureSchema.safeParse(input);
+    if (!parsed.success) {
+      return failure('criatura-invalida', parsed.error.issues[0]?.message ?? 'Criatura inválida.');
+    }
+    const template = await this.catalog.get(campaign.templateRef.id);
+    const [problem] = creatureProblems(parsed.data, template?.checkDice, template?.dice);
+    if (problem) return err(problem);
+    const bestiary = campaign.bestiary ?? [];
+    const exists = bestiary.some((creature) => creature.id === parsed.data.id);
+    if (!exists && bestiary.length >= BESTIARY_LIMIT) {
+      return failure('bestiario-cheio', `O bestiário tem o limite de ${BESTIARY_LIMIT} criaturas.`);
+    }
+    await this.campaigns.save({
+      ...campaign,
+      bestiary: exists
+        ? bestiary.map((creature) => (creature.id === parsed.data.id ? parsed.data : creature))
+        : [...bestiary, parsed.data],
+      updatedAt: this.clock.now(),
+    });
+    return ok(parsed.data);
+  }
+
+  async removeCreature(campaignId: string, creatureId: string): Promise<void> {
+    const campaign = await this.campaigns.get(campaignId);
+    if (!campaign?.bestiary) return;
+    await this.campaigns.save({
+      ...campaign,
+      bestiary: campaign.bestiary.filter((creature) => creature.id !== creatureId),
+      updatedAt: this.clock.now(),
+    });
   }
 
   /** Apaga a campanha deste dispositivo (o Mestre encerra; o jogador sai). Fichas ficam. */

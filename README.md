@@ -26,8 +26,8 @@ O [guia de uso](docs/guia.md) mostra como mestrar, jogar e criar sistemas, com i
 - **Combate:** ordem de turno com iniciativas, rodadas e criaturas ocultas; cada jogador recebe um aviso na vez dele.
 - **Dados em 3D:** toda rolagem cai na tela e para na face sorteada; a mesa vê os dados de todos, cada um na sua cor. Histórico de rolagens no chat.
 - **Chat:** falas de personagem, ações, rolagens com `/r` e sussurros; entre jogadores, cifrados de ponta a ponta.
-- **Para o Mestre:** cutscene (imagens em tela cheia), música para a mesa, diário da campanha e rolagens secretas.
-- **Criador de sistemas:** monte o seu sistema a partir de um modelo pronto, com fórmulas, dados próprios (como `4dF`) e prévia ao vivo, sem programar. Instale sistemas da comunidade e publique os seus.
+- **Para o Mestre:** bestiário com criaturas que entram no combate com PV e ataques que rolam, cutscene (imagens em tela cheia), música para a mesa, diário da campanha e rolagens secretas.
+- **Criador de sistemas:** monte o seu sistema a partir de um modelo pronto, com fórmulas, dados próprios (como `4dF`) e prévia ao vivo, sem programar. Escreva o **códice** (habilidades, regras, itens) que a mesa consulta durante o jogo e o bestiário do sistema. Instale sistemas da comunidade e publique os seus.
 - **Seus dados com você:** tudo fica no aparelho, com cópia de segurança completa para trocar de computador ou celular.
 
 ![Dados em 3D e o resultado de cada rolagem](docs/imagens/dados.png)

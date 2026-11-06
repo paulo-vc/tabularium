@@ -1,6 +1,6 @@
 {
   "id": "dnd5e-srd",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "name": "D&D 5ª Edição (SRD 5.1)",
   "description": "Ficha para personagens de D&D 5ª edição, com opção para as regras de 2024 (5.5): maestria de armas, talento de origem e a Exaustão nova. This work includes material taken from the System Reference Document 5.1 (\"SRD 5.1\") by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode. Termos traduzidos para o português e organizados como ficha pelo projeto Tabularium. This work includes material from the System Reference Document 5.2 (\"SRD 5.2\") by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd. The SRD 5.2 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode.",
   "author": "Tabularium",
@@ -10,6 +10,401 @@
   "source": "builtin",
   "initiative": "iniciativa",
   "bonusTab": "Combate",
+  "creatureStats": [
+    "CA",
+    "Deslocamento",
+    "FOR",
+    "DES",
+    "CON",
+    "INT",
+    "SAB",
+    "CAR",
+    "Sentidos",
+    "ND"
+  ],
+  "bestiary": [
+    {
+      "id": "bandido",
+      "name": "Bandido",
+      "kind": "Humanoide médio, qualquer tendência não leal",
+      "hp": 11,
+      "initiative": "+1",
+      "stats": [
+        {
+          "label": "CA",
+          "value": "12 (armadura de couro)"
+        },
+        {
+          "label": "Deslocamento",
+          "value": "9 m"
+        },
+        {
+          "label": "FOR",
+          "value": "11 (+0)"
+        },
+        {
+          "label": "DES",
+          "value": "12 (+1)"
+        },
+        {
+          "label": "CON",
+          "value": "12 (+1)"
+        },
+        {
+          "label": "INT",
+          "value": "10 (+0)"
+        },
+        {
+          "label": "SAB",
+          "value": "10 (+0)"
+        },
+        {
+          "label": "CAR",
+          "value": "10 (+0)"
+        },
+        {
+          "label": "Sentidos",
+          "value": "Percepção passiva 10"
+        },
+        {
+          "label": "ND",
+          "value": "1/8 (25 XP)"
+        }
+      ],
+      "attacks": [
+        {
+          "id": "cimitarra",
+          "name": "Cimitarra",
+          "roll": "1d20+3",
+          "damage": "1d6+1",
+          "notes": "cortante, alcance 1,5 m"
+        },
+        {
+          "id": "besta-leve",
+          "name": "Besta leve",
+          "roll": "1d20+3",
+          "damage": "1d8+1",
+          "notes": "perfurante, distância 24/96 m"
+        }
+      ]
+    },
+    {
+      "id": "esqueleto",
+      "name": "Esqueleto",
+      "kind": "Morto-vivo médio, leal e mau",
+      "hp": 13,
+      "initiative": "+2",
+      "stats": [
+        {
+          "label": "CA",
+          "value": "13 (restos de armadura)"
+        },
+        {
+          "label": "Deslocamento",
+          "value": "9 m"
+        },
+        {
+          "label": "FOR",
+          "value": "10 (+0)"
+        },
+        {
+          "label": "DES",
+          "value": "14 (+2)"
+        },
+        {
+          "label": "CON",
+          "value": "15 (+2)"
+        },
+        {
+          "label": "INT",
+          "value": "6 (−2)"
+        },
+        {
+          "label": "SAB",
+          "value": "8 (−1)"
+        },
+        {
+          "label": "CAR",
+          "value": "5 (−3)"
+        },
+        {
+          "label": "Sentidos",
+          "value": "Visão no escuro 18 m, Percepção passiva 9"
+        },
+        {
+          "label": "ND",
+          "value": "1/4 (50 XP)"
+        }
+      ],
+      "attacks": [
+        {
+          "id": "espada-curta",
+          "name": "Espada curta",
+          "roll": "1d20+4",
+          "damage": "1d6+2",
+          "notes": "perfurante, alcance 1,5 m"
+        },
+        {
+          "id": "arco-curto",
+          "name": "Arco curto",
+          "roll": "1d20+4",
+          "damage": "1d6+2",
+          "notes": "perfurante, distância 24/96 m"
+        }
+      ],
+      "text": "**Vulnerável** a dano de concussão. **Imune** a dano de veneno; não pode ser envenenado nem ficar exausto.\n\nEntende os idiomas que conhecia em vida, mas não fala."
+    },
+    {
+      "id": "goblin",
+      "name": "Goblin",
+      "kind": "Humanoide pequeno (goblinoide), neutro e mau",
+      "hp": 7,
+      "initiative": "+2",
+      "stats": [
+        {
+          "label": "CA",
+          "value": "15 (armadura de couro, escudo)"
+        },
+        {
+          "label": "Deslocamento",
+          "value": "9 m"
+        },
+        {
+          "label": "FOR",
+          "value": "8 (−1)"
+        },
+        {
+          "label": "DES",
+          "value": "14 (+2)"
+        },
+        {
+          "label": "CON",
+          "value": "10 (+0)"
+        },
+        {
+          "label": "INT",
+          "value": "10 (+0)"
+        },
+        {
+          "label": "SAB",
+          "value": "8 (−1)"
+        },
+        {
+          "label": "CAR",
+          "value": "8 (−1)"
+        },
+        {
+          "label": "Sentidos",
+          "value": "Visão no escuro 18 m, Percepção passiva 9"
+        },
+        {
+          "label": "ND",
+          "value": "1/4 (50 XP)"
+        }
+      ],
+      "attacks": [
+        {
+          "id": "cimitarra",
+          "name": "Cimitarra",
+          "roll": "1d20+4",
+          "damage": "1d6+2",
+          "notes": "cortante, alcance 1,5 m"
+        },
+        {
+          "id": "arco-curto",
+          "name": "Arco curto",
+          "roll": "1d20+4",
+          "damage": "1d6+2",
+          "notes": "perfurante, distância 24/96 m"
+        }
+      ],
+      "text": "**Fuga Ágil.** Pode usar a ação Desengajar ou Esconder como ação bônus em cada um dos seus turnos.\n\nPerícia: Furtividade +6."
+    },
+    {
+      "id": "lobo",
+      "name": "Lobo",
+      "kind": "Fera média, sem tendência",
+      "hp": 11,
+      "initiative": "+2",
+      "stats": [
+        {
+          "label": "CA",
+          "value": "13 (armadura natural)"
+        },
+        {
+          "label": "Deslocamento",
+          "value": "12 m"
+        },
+        {
+          "label": "FOR",
+          "value": "12 (+1)"
+        },
+        {
+          "label": "DES",
+          "value": "15 (+2)"
+        },
+        {
+          "label": "CON",
+          "value": "12 (+1)"
+        },
+        {
+          "label": "INT",
+          "value": "3 (−4)"
+        },
+        {
+          "label": "SAB",
+          "value": "12 (+1)"
+        },
+        {
+          "label": "CAR",
+          "value": "6 (−2)"
+        },
+        {
+          "label": "Sentidos",
+          "value": "Percepção passiva 13"
+        },
+        {
+          "label": "ND",
+          "value": "1/4 (50 XP)"
+        }
+      ],
+      "attacks": [
+        {
+          "id": "mordida",
+          "name": "Mordida",
+          "roll": "1d20+4",
+          "damage": "2d4+2",
+          "notes": "perfurante; o alvo faz um teste de resistência de Força CD 11 ou fica caído"
+        }
+      ],
+      "text": "**Audição e Faro Aguçados.** Vantagem em testes de Sabedoria (Percepção) que usem a audição ou o olfato.\n\n**Táticas de Matilha.** Vantagem nas jogadas de ataque contra uma criatura se pelo menos um aliado do lobo, que não esteja incapacitado, estiver a até 1,5 m dela."
+    },
+    {
+      "id": "orc",
+      "name": "Orc",
+      "kind": "Humanoide médio (orc), caótico e mau",
+      "hp": 15,
+      "initiative": "+1",
+      "stats": [
+        {
+          "label": "CA",
+          "value": "13 (gibão de peles)"
+        },
+        {
+          "label": "Deslocamento",
+          "value": "9 m"
+        },
+        {
+          "label": "FOR",
+          "value": "16 (+3)"
+        },
+        {
+          "label": "DES",
+          "value": "12 (+1)"
+        },
+        {
+          "label": "CON",
+          "value": "16 (+3)"
+        },
+        {
+          "label": "INT",
+          "value": "7 (−2)"
+        },
+        {
+          "label": "SAB",
+          "value": "11 (+0)"
+        },
+        {
+          "label": "CAR",
+          "value": "10 (+0)"
+        },
+        {
+          "label": "Sentidos",
+          "value": "Visão no escuro 18 m, Percepção passiva 10"
+        },
+        {
+          "label": "ND",
+          "value": "1/2 (100 XP)"
+        }
+      ],
+      "attacks": [
+        {
+          "id": "machado-grande",
+          "name": "Machado grande",
+          "roll": "1d20+5",
+          "damage": "1d12+3",
+          "notes": "cortante, alcance 1,5 m"
+        },
+        {
+          "id": "azagaia",
+          "name": "Azagaia",
+          "roll": "1d20+5",
+          "damage": "1d6+3",
+          "notes": "perfurante, alcance 1,5 m ou distância 9/36 m"
+        }
+      ],
+      "text": "**Agressivo.** Como ação bônus, pode se mover até o seu deslocamento em direção a uma criatura hostil que consiga ver."
+    },
+    {
+      "id": "zumbi",
+      "name": "Zumbi",
+      "kind": "Morto-vivo médio, neutro e mau",
+      "hp": 22,
+      "initiative": "-2",
+      "stats": [
+        {
+          "label": "CA",
+          "value": "8"
+        },
+        {
+          "label": "Deslocamento",
+          "value": "6 m"
+        },
+        {
+          "label": "FOR",
+          "value": "13 (+1)"
+        },
+        {
+          "label": "DES",
+          "value": "6 (−2)"
+        },
+        {
+          "label": "CON",
+          "value": "16 (+3)"
+        },
+        {
+          "label": "INT",
+          "value": "3 (−4)"
+        },
+        {
+          "label": "SAB",
+          "value": "6 (−2)"
+        },
+        {
+          "label": "CAR",
+          "value": "5 (−3)"
+        },
+        {
+          "label": "Sentidos",
+          "value": "Visão no escuro 18 m, Percepção passiva 8"
+        },
+        {
+          "label": "ND",
+          "value": "1/4 (50 XP)"
+        }
+      ],
+      "attacks": [
+        {
+          "id": "pancada",
+          "name": "Pancada",
+          "roll": "1d20+3",
+          "damage": "1d6+1",
+          "notes": "concussão, alcance 1,5 m"
+        }
+      ],
+      "text": "**Fortitude de Morto-Vivo.** Se o dano reduzir o zumbi a 0 PV, ele faz um teste de resistência de Constituição com CD 5 + o dano sofrido, a menos que o dano seja radiante ou de um acerto crítico. Se passar, fica com 1 PV.\n\n**Imune** a dano de veneno; não pode ser envenenado."
+    }
+  ],
   "fields": [
     {
       "id": "nome",

@@ -1,4 +1,10 @@
 import { z } from 'zod';
+import {
+  CREATURE_HP_MAX,
+  WOUND_CONDITIONS,
+  woundCondition,
+  type CreatureOrigin,
+} from '../bestiary/schema';
 import { IdSchema, LabelSchema } from '../schema/primitives';
 
 /** Participantes de um combate (jogadores + inimigos e aliados do Mestre). */
@@ -17,6 +23,17 @@ export const CombatantSchema = z.object({
   userId: IdSchema.optional(),
   /** Só o Mestre vê (ex.: o monstro que ainda não apareceu). */
   hidden: z.boolean(),
+  /** PV da criatura (só o Mestre vê o número; os jogadores, o estado aproximado). */
+  hp: z
+    .object({
+      value: z.number().int().min(0).max(CREATURE_HP_MAX),
+      max: z.number().int().min(1).max(CREATURE_HP_MAX),
+    })
+    .optional(),
+  /** Criatura de um bestiário: abre a ficha dela (ataques, habilidades) no painel do Mestre. */
+  creature: z
+    .object({ origin: z.enum(['sistema', 'campanha'] satisfies CreatureOrigin[]), id: IdSchema })
+    .optional(),
 });
 export type Combatant = z.infer<typeof CombatantSchema>;
 
@@ -50,7 +67,14 @@ export const PublicTrackerSchema = z
     phase: z.enum(['preparando', 'combate']),
     round: z.number().int().min(1).max(9999),
     activeId: IdSchema.nullable(),
-    combatants: z.array(CombatantSchema.omit({ hidden: true })).max(COMBATANT_LIMIT),
+    combatants: z
+      .array(
+        CombatantSchema.omit({ hidden: true, hp: true, creature: true }).extend({
+          /** Estado aproximado de uma criatura com PV ("ferida"), no lugar do número. */
+          condition: z.enum(WOUND_CONDITIONS).optional(),
+        }),
+      )
+      .max(COMBATANT_LIMIT),
   })
   .refine((t) => uniqueIds(t.combatants), 'Participante repetido')
   .refine(
@@ -95,11 +119,32 @@ export function addCombatant(tracker: Tracker, combatant: Combatant): Tracker {
 export function updateCombatant(
   tracker: Tracker,
   id: string,
-  changes: Partial<Pick<Combatant, 'name' | 'initiative' | 'hidden'>>,
+  changes: Partial<Pick<Combatant, 'name' | 'initiative' | 'hidden' | 'hp'>>,
 ): Tracker {
   return {
     ...tracker,
     combatants: tracker.combatants.map((c) => (c.id === id ? { ...c, ...changes } : c)),
+  };
+}
+
+/**
+ * Dano (positivo) ou cura (negativo) numa criatura com PV, entre 0 e o máximo. Sem PV, nada
+ * muda.
+ */
+export function damageCombatant(tracker: Tracker, id: string, amount: number): Tracker {
+  return {
+    ...tracker,
+    combatants: tracker.combatants.map((c) =>
+      c.id === id && c.hp
+        ? {
+            ...c,
+            hp: {
+              ...c.hp,
+              value: Math.max(0, Math.min(c.hp.max, c.hp.value - Math.trunc(amount))),
+            },
+          }
+        : c,
+    ),
   };
 }
 
@@ -151,6 +196,8 @@ export function publicView(tracker: Tracker): PublicTracker {
     phase: tracker.phase,
     round: tracker.round,
     activeId: activeVisible ? tracker.activeId : null,
-    combatants: visible.map(({ hidden: _hidden, ...rest }) => rest),
+    combatants: visible.map(({ hidden: _hidden, hp, creature: _creature, ...rest }) =>
+      hp ? { ...rest, condition: woundCondition(hp.value, hp.max) } : rest,
+    ),
   };
 }
