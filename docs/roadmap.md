@@ -31,7 +31,7 @@ O que está em andamento e as ideias para depois. As fases já entregues ficam e
 
 ### Depois da 1.0
 
-Na próxima versão: textura dos dados, resultado da dualidade, códice do sistema e bestiário (com as regras e criaturas do SRD no D&D 5e). Depois, YouTube ou Spotify na música e outras ideias abaixo.
+Na próxima versão: textura dos dados, resultado da dualidade, códice do sistema e bestiário (com as regras e criaturas do SRD no D&D 5e) e condições no combate, com duração.
 
 ### Decisões tomadas
 
@@ -41,19 +41,12 @@ Na próxima versão: textura dos dados, resultado da dualidade, códice do siste
 - O app traz só o D&D 5e (SRD); os outros sistemas vivem no repositório da comunidade como fichas de fã, com o nome original quando a política do dono permite (decidido em 2026-11-03).
 - Sem mapa de batalha (grid com fichas arrastáveis) no Tabularium (decidido em 2026-11-05).
 - Sem soundboard no Tabularium (decidido em 2026-11-03): o autor já tem um projeto à parte para isso.
+- Sem YouTube nem Spotify na música (decidido em 2026-11-07): o player do YouTube precisa ficar visível em cada aparelho (no mínimo 200×200), não pode tocar escondido nem só como áudio e, no app desktop e no Android, exige uma identificação que o app não manda; o Spotify exige conta Premium de cada jogador. A música da mesa segue com as trilhas MP3/OGG do Mestre.
 - O criador de sistemas mais fácil e a importação de sistemas entram na 1.0.
 
 ## Depois (sem data)
 
-Ideias levantadas em 2026-10, ainda sem desenho. A ordem não é de prioridade.
-
-### Dados 3D: o que falta
-
-Os dados 3D, os dados com faces do sistema, a textura e o resultado dos dados de dualidade ("com Esperança" ou "com Medo") já existem; os dois últimos chegam na próxima versão.
-
-### Ferramentas do Mestre
-
-- **Links do YouTube ou Spotify** na música: dependem dos termos e dos players oficiais de cada serviço, e o Spotify exige conta.
+As ideias levantadas em 2026-10 já foram feitas ou descartadas (veja as decisões acima). Ideias novas entram aqui.
 
 ## Já existe
 
