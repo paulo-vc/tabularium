@@ -179,3 +179,27 @@
     display: none;
   }
 }
+
+/*
+ * Ficha de papel: nas seções comuns da ficha, texto, número e escolha viram linhas, como os
+ * campos de uma ficha impressa. Itens de lista (ataques, inventário) mantêm as caixas, que
+ * ali separam as colunas. Fora de camada para valer sobre os utilitários do componente.
+ */
+.ficha-linhas :is([data-slot='input'], [data-slot='select-trigger']):not(li *) {
+  border-color: transparent;
+  border-bottom-color: var(--color-border);
+  border-radius: 0;
+  background-color: transparent;
+  padding-inline: 0.125rem;
+}
+.ficha-linhas :is([data-slot='input'], [data-slot='select-trigger']):not(li *):hover {
+  border-bottom-color: var(--color-muted-foreground);
+}
+.ficha-linhas :is([data-slot='input'], [data-slot='select-trigger']):not(li *):focus-visible {
+  border-bottom-color: var(--color-ring);
+  box-shadow: 0 1px 0 0 var(--color-ring);
+}
+.ficha-linhas
+  :is([data-slot='input'], [data-slot='select-trigger']):not(li *)[aria-invalid='true'] {
+  border-bottom-color: var(--color-destructive);
+}

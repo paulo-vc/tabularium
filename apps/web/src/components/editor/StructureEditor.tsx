@@ -68,6 +68,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Dialog,
   DialogContent,
@@ -699,6 +700,19 @@ function SectionCard({
               ))}
             </datalist>
           </>
+        )}
+        {!nested && (
+          <label className="text-muted-foreground flex h-8 items-center gap-1.5 text-sm">
+            <Checkbox
+              checked={node.width === 'metade'}
+              onCheckedChange={(checked) =>
+                apply((t) =>
+                  updateSection(t, path, { width: checked === true ? 'metade' : undefined }),
+                )
+              }
+            />
+            Meia página
+          </label>
         )}
         <Select
           value={node.display ?? 'padrao'}

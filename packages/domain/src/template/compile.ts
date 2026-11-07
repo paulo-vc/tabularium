@@ -215,6 +215,22 @@ export function compileTemplate(template: SystemTemplate): Result<CompiledTempla
   const fieldsById = new Map(fields.map((field) => [field.id, field]));
   const fieldsByKey = new Map(fields.map((field) => [field.key, field]));
 
+  // "Só aparece quando": o campo de referência é um sim/não da ficha, e não o próprio.
+  fields.forEach((field, index) => {
+    const when = field.visibleWhen;
+    if (!when) return;
+    const target = fieldsById.get(when.field);
+    if (target?.type !== 'boolean' || target.id === field.id) {
+      issues.push(
+        issue(
+          'condicao-invalida',
+          ['fields', index, 'visibleWhen', 'field'],
+          'A condição precisa ser outro campo sim/não da ficha',
+        ),
+      );
+    }
+  });
+
   // Fórmulas: análise sintática e referências.
   const formulas: CompiledFormula[] = [];
   const dependencies = new Map<string, string[]>();
