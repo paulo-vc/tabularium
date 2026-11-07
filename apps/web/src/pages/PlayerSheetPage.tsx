@@ -18,7 +18,7 @@ import {
 } from '@/components/sheet/Bonuses';
 import { pinnedFieldIds, SheetVitals } from '@/components/sheet/SheetVitals';
 import { useSheetEditing } from '@/components/sheet/use-sheet-editing';
-import { RollContext } from '@/components/sheet/roll-context';
+import { RollContext, type GroupRoll } from '@/components/sheet/roll-context';
 import { useRoller } from '@/components/live/use-roller';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -140,7 +140,7 @@ function PlayerSheet({
       ...roller,
       roll: (label: string, expression: string) =>
         roller.roll(`${player.sheet.name}: ${label}`, expression),
-      rollAll: (title: string, rolls: readonly { name: string; expression: string }[]) =>
+      rollAll: (title: string, rolls: readonly GroupRoll[]) =>
         roller.rollAll(`${player.sheet.name}: ${title}`, rolls),
     }),
     [roller, player.sheet.name],

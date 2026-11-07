@@ -2,7 +2,10 @@ import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import {
   checkExpression,
+  criticalDamage,
   describeRoll,
+  isCriticalRoll,
+  supportsRollMode,
   DICE_LIMITS,
   parseDice,
   printDice,
@@ -84,6 +87,33 @@ describe('rollDice', () => {
     expect(checkExpression('1d20', 5)).toBe('1d20+5');
     expect(checkExpression('2d12', -1)).toBe('2d12-1');
     expect(checkExpression('1d20', 0)).toBe('1d20');
+  });
+
+  it('vantagem e desvantagem: dois dados, o maior ou o menor, só com um dado nos testes', () => {
+    expect(checkExpression('1d20', 5, 'vantagem')).toBe('2d20kh1+5');
+    expect(checkExpression('1d20', -1, 'desvantagem')).toBe('2d20kl1-1');
+    expect(checkExpression('d20', 0, 'vantagem')).toBe('2d20kh1');
+    expect(checkExpression('2d6', 1, 'vantagem')).toBe('2d6+1');
+    expect(supportsRollMode('1d20')).toBe(true);
+    expect(supportsRollMode('2d6')).toBe(false);
+    expect(supportsRollMode('1d20+1')).toBe(false);
+  });
+
+  it('crítico: o dado que vale na face máxima', () => {
+    expect(isCriticalRoll(roll('1d20+5', sequence(20)))).toBe(true);
+    expect(isCriticalRoll(roll('1d20+5', sequence(19)))).toBe(false);
+    expect(isCriticalRoll(roll('2d20kh1+5', sequence(3, 20)))).toBe(true);
+    // Com desvantagem, o 20 descartado não vale.
+    expect(isCriticalRoll(roll('2d20kl1', sequence(20, 7)))).toBe(false);
+    expect(isCriticalRoll(roll('2d6', sequence(6, 6)))).toBe(false);
+  });
+
+  it('dano de crítico: o dobro de dados, o resto igual', () => {
+    expect(criticalDamage('1d8+3')).toBe('2d8 + 3');
+    expect(criticalDamage('2d6 + 1d4 - 1')).toBe('4d6 + 2d4 - 1');
+    expect(criticalDamage('4d6kh3')).toBe('8d6kh6');
+    expect(criticalDamage('5')).toBe('5');
+    expect(criticalDamage('60d6')).toBe('60d6');
   });
 
   it('o resultado fica sempre entre o mínimo e o máximo da expressão', () => {

@@ -227,10 +227,67 @@ export function faceText(term: Pick<DiceTerm, 'custom'>, face: number): string {
   return term.custom ? (term.custom.faces[face - 1]?.label ?? '?') : String(face);
 }
 
-/** Rolagem de um teste: o dado do sistema (ex.: 1d20) mais o modificador. */
-export function checkExpression(checkDice: string, modifier: number): string {
-  if (modifier === 0) return checkDice;
-  return `${checkDice}${modifier > 0 ? '+' : '-'}${Math.abs(modifier)}`;
+/** Como rolar um teste: normal, com vantagem (dois dados, o maior) ou desvantagem (o menor). */
+export type RollMode = 'normal' | 'vantagem' | 'desvantagem';
+
+/** O dado dos testes, se for um só dado comum ("1d20"): só aí valem vantagem e crítico. */
+function singleCheckDie(checkDice: string): DiceTerm | null {
+  const parsed = parseDice(checkDice);
+  if (!parsed.ok || parsed.value.length !== 1) return null;
+  const [term] = parsed.value;
+  return term?.kind === 'dados' && term.sign === 1 && term.count === 1 && !term.keep ? term : null;
+}
+
+/** O sistema rola os testes com um dado só ("1d20")? Aí a ficha oferece vantagem. */
+export function supportsRollMode(checkDice: string): boolean {
+  return singleCheckDie(checkDice) !== null;
+}
+
+/**
+ * Rolagem de um teste: o dado do sistema (ex.: 1d20) mais o modificador. Com vantagem ou
+ * desvantagem, dois dados ficando com o maior ou o menor ("2d20kh1+5"), se o dado dos testes
+ * for um só; senão, a rolagem fica normal.
+ */
+export function checkExpression(
+  checkDice: string,
+  modifier: number,
+  mode: RollMode = 'normal',
+): string {
+  const single = mode === 'normal' ? null : singleCheckDie(checkDice);
+  const base = single ? `2d${single.sides}${mode === 'vantagem' ? 'kh1' : 'kl1'}` : checkDice;
+  if (modifier === 0) return base;
+  return `${base}${modifier > 0 ? '+' : '-'}${Math.abs(modifier)}`;
+}
+
+/**
+ * Acerto crítico: no primeiro termo, um dado só valendo (o que ficou, com vantagem) e na face
+ * máxima, como o 20 natural no d20. Dados do sistema e várias faces somadas não contam.
+ */
+export function isCriticalRoll(result: RollResult): boolean {
+  const first = result.terms[0];
+  if (!first || first.kind !== 'dados' || first.custom || first.sign !== 1) return false;
+  const kept = first.results.filter((die) => !die.dropped);
+  return kept.length === 1 && first.sides > 1 && kept[0]?.value === first.sides;
+}
+
+/**
+ * Dano de crítico: o dobro de dados em cada termo de dados ("1d8+3" → "2d8 + 3"). Se passar do
+ * limite de dados, fica como está.
+ */
+export function criticalDamage(expression: string, custom: readonly CustomDie[] = []): string {
+  const parsed = parseDice(expression, custom);
+  if (!parsed.ok) return expression;
+  let total = 0;
+  const doubled = parsed.value.map((term) => {
+    if (term.kind !== 'dados') return term;
+    total += term.count * 2;
+    return {
+      ...term,
+      count: term.count * 2,
+      keep: term.keep && { ...term.keep, count: term.keep.count * 2 },
+    };
+  });
+  return total > DICE_LIMITS.dice ? expression : printDice(doubled);
 }
 
 /** O resultado de dados que se comparam: o texto e, se houver, a cor do dado que venceu. */

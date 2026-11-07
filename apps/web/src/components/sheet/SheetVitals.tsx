@@ -21,7 +21,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { NumberInput, PrimitiveInput } from './fields';
 import { formatNumber, parseNumber } from './format';
 import { markCount, Marks } from './Marks';
-import { CheckButton } from './roll-context';
+import { CheckButton, RollModeBar } from './roll-context';
 
 /** Campos em destaque: os do card do Mestre (`gmSummary`) ou, sem ele, os recursos. */
 export function vitalFields(compiled: CompiledTemplate, hidden?: ReadonlySet<string>): FieldDef[] {
@@ -448,42 +448,42 @@ export function SheetVitals({
           ))}
         </div>
       </div>
-      {states.length > 0 && (
-        <div className="mt-2 flex flex-wrap items-center gap-1.5" aria-label="Estados">
-          {states.map((field) => {
-            if (field.type === 'boolean') {
-              const on = (values[field.id] ?? defaultValue(field)) === true;
-              return (
-                <Badge key={field.id} asChild variant={on ? 'default' : 'outline'}>
-                  <button type="button" aria-pressed={on} onClick={() => onChange(field.id, !on)}>
-                    {field.label}
-                  </button>
-                </Badge>
-              );
-            }
-            if (field.type !== 'select') return null;
-            if (field.multiple) {
-              return (
-                <MultiSelectVital
-                  key={field.id}
-                  field={field}
-                  value={values[field.id]}
-                  pages={codexPages}
-                  onChange={(next) => onChange(field.id, next)}
-                />
-              );
-            }
-            const labels = field.options
-              .filter((o) => selected(field, values[field.id]).includes(o.value))
-              .map((o) => o.label);
-            return labels.map((label) => (
-              <Badge key={`${field.id}-${label}`} variant="secondary">
-                {label}
+      {/* Sem estados nem vantagem (sistema sem d20), a linha some. */}
+      <div className="mt-2 flex flex-wrap items-center gap-1.5 empty:hidden" aria-label="Estados">
+        {states.map((field) => {
+          if (field.type === 'boolean') {
+            const on = (values[field.id] ?? defaultValue(field)) === true;
+            return (
+              <Badge key={field.id} asChild variant={on ? 'default' : 'outline'}>
+                <button type="button" aria-pressed={on} onClick={() => onChange(field.id, !on)}>
+                  {field.label}
+                </button>
               </Badge>
-            ));
-          })}
-        </div>
-      )}
+            );
+          }
+          if (field.type !== 'select') return null;
+          if (field.multiple) {
+            return (
+              <MultiSelectVital
+                key={field.id}
+                field={field}
+                value={values[field.id]}
+                pages={codexPages}
+                onChange={(next) => onChange(field.id, next)}
+              />
+            );
+          }
+          const labels = field.options
+            .filter((o) => selected(field, values[field.id]).includes(o.value))
+            .map((o) => o.label);
+          return labels.map((label) => (
+            <Badge key={`${field.id}-${label}`} variant="secondary">
+              {label}
+            </Badge>
+          ));
+        })}
+        <RollModeBar className="ml-auto" />
+      </div>
     </section>
   );
 }

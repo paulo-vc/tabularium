@@ -16,6 +16,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FieldLine, SecondaryValue, StatTile, type CompactFieldProps } from './compact';
 import { BonusSection } from './Bonuses';
 import { AddItemButton, FieldControl } from './fields';
+import { RollModeBar } from './roll-context';
 
 type Columns = 1 | 2 | 3 | 4;
 type SectionNode = Extract<LayoutNode, { kind: 'section' }>;
@@ -344,6 +345,9 @@ export function SheetLayout({
         ),
       );
 
+  // Vantagem e desvantagem: no painel fixo, quando há um; senão, junto das abas.
+  const rollModeHere = (pinnedFieldIds?.size ?? 0) === 0;
+
   // A seção "Bônus e efeitos" fica no fim da aba que o sistema escolheu (`bonusTab`).
   const bonusTab = compiled.template.bonusTab;
   const withBonuses = (name: string | undefined) =>
@@ -352,6 +356,7 @@ export function SheetLayout({
   if (tabs.length === 1) {
     return (
       <div className="grid gap-4">
+        {rollModeHere && <RollModeBar className="justify-self-end" />}
         {renderTop(tabs[0]?.nodes ?? [])}
         {withBonuses(tabs[0]?.name)}
       </div>
@@ -360,38 +365,42 @@ export function SheetLayout({
 
   return (
     <div className="space-y-4">
-      <div
-        role="tablist"
-        aria-label="Partes da ficha"
-        className="flex gap-1 overflow-x-auto overflow-y-hidden border-b"
-        onKeyDown={(event) => {
-          // Setas trocam de aba (padrão de abas acessíveis).
-          if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
-          const next = (active + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
-          setSelected(next);
-          document.getElementById(`${base}-aba-${next}`)?.focus();
-        }}
-      >
-        {tabs.map((tab, index) => (
-          <button
-            key={tab.name}
-            id={`${base}-aba-${index}`}
-            type="button"
-            role="tab"
-            aria-selected={index === active}
-            aria-controls={`${base}-painel`}
-            tabIndex={index === active ? 0 : -1}
-            className={cn(
-              '-mb-px shrink-0 border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap',
-              index === active
-                ? 'border-primary text-foreground'
-                : 'text-muted-foreground hover:text-foreground border-transparent',
-            )}
-            onClick={() => setSelected(index)}
-          >
-            {tab.name}
-          </button>
-        ))}
+      <div className="flex flex-wrap-reverse items-end gap-x-2 gap-y-1 border-b">
+        <div
+          role="tablist"
+          aria-label="Partes da ficha"
+          className="-mb-px flex min-w-0 flex-1 gap-1 overflow-x-auto overflow-y-hidden"
+          onKeyDown={(event) => {
+            // Setas trocam de aba (padrão de abas acessíveis).
+            if (event.key !== 'ArrowRight' && event.key !== 'ArrowLeft') return;
+            const next =
+              (active + (event.key === 'ArrowRight' ? 1 : -1) + tabs.length) % tabs.length;
+            setSelected(next);
+            document.getElementById(`${base}-aba-${next}`)?.focus();
+          }}
+        >
+          {tabs.map((tab, index) => (
+            <button
+              key={tab.name}
+              id={`${base}-aba-${index}`}
+              type="button"
+              role="tab"
+              aria-selected={index === active}
+              aria-controls={`${base}-painel`}
+              tabIndex={index === active ? 0 : -1}
+              className={cn(
+                '-mb-px shrink-0 border-b-2 px-3 py-2 text-sm font-medium whitespace-nowrap',
+                index === active
+                  ? 'border-primary text-foreground'
+                  : 'text-muted-foreground hover:text-foreground border-transparent',
+              )}
+              onClick={() => setSelected(index)}
+            >
+              {tab.name}
+            </button>
+          ))}
+        </div>
+        {rollModeHere && <RollModeBar className="mb-1 ml-auto" />}
       </div>
       <div
         id={`${base}-painel`}
