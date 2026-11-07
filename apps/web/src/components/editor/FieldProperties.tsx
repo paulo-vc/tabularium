@@ -11,6 +11,7 @@ import {
   type FieldOf,
   type ItemFieldType,
   type ListItemFieldDef,
+  type RestRecovery,
 } from '@tabula/domain';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, Trash2Icon } from 'lucide-react';
 import { useId, useState } from 'react';
@@ -120,6 +121,91 @@ function CheckRow({
 function set<T extends object, K extends keyof T>(object: T, key: K, value: T[K] | undefined): T {
   const { [key]: _, ...rest } = object;
   return value === undefined || value === '' ? (rest as T) : ({ ...rest, [key]: value } as T);
+}
+
+// ---------- Descanso ----------
+
+/**
+ * O que o campo recupera num descanso: em qual (curto também vale no longo) e quanto (tudo,
+ * metade do máximo, só num recurso, ou um passo, como -1 na exaustão).
+ */
+function RecoverEditor({
+  field,
+  onChange,
+}: {
+  field: FieldOf<'number'> | FieldOf<'resource'>;
+  onChange: (field: FieldDef) => void;
+}) {
+  const base = useId();
+  const recover = field.recover;
+  const amount = recover?.amount ?? 'tudo';
+  const kind = typeof amount === 'number' ? 'passo' : amount;
+  const update = (next: RestRecovery | undefined) =>
+    onChange(set(field, 'recover', next) as FieldDef);
+  return (
+    <Row>
+      <Field label="No descanso" htmlFor={`${base}-descanso`}>
+        <Select
+          value={recover?.rest ?? 'nenhum'}
+          onValueChange={(value) =>
+            update(
+              value === 'nenhum' ? undefined : { ...recover, rest: value as RestRecovery['rest'] },
+            )
+          }
+        >
+          <SelectTrigger id={`${base}-descanso`} className="w-full">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="nenhum">Não recupera</SelectItem>
+            <SelectItem value="curto">Curto e longo</SelectItem>
+            <SelectItem value="longo">Só no longo</SelectItem>
+          </SelectContent>
+        </Select>
+      </Field>
+      {recover && (
+        <Field label="Quanto" htmlFor={`${base}-quanto`}>
+          <Select
+            value={kind}
+            onValueChange={(value) =>
+              update({
+                rest: recover.rest,
+                ...(value === 'metade'
+                  ? { amount: 'metade' as const }
+                  : value === 'passo'
+                    ? { amount: field.type === 'number' ? -1 : 1 }
+                    : {}),
+              })
+            }
+          >
+            <SelectTrigger id={`${base}-quanto`} className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="tudo">
+                {field.type === 'resource' ? 'Enche' : 'Volta ao valor inicial'}
+              </SelectItem>
+              {field.type === 'resource' && (
+                <SelectItem value="metade">Metade do máximo</SelectItem>
+              )}
+              <SelectItem value="passo">Soma um valor</SelectItem>
+            </SelectContent>
+          </Select>
+        </Field>
+      )}
+      {recover && typeof amount === 'number' && (
+        <Field label="Valor (ex.: -1)" htmlFor={`${base}-passo`}>
+          <OptionalNumber
+            id={`${base}-passo`}
+            value={amount}
+            onChange={(value) =>
+              update({ rest: recover.rest, amount: Math.trunc(value ?? 0) || -1 })
+            }
+          />
+        </Field>
+      )}
+    </Row>
+  );
 }
 
 // ---------- Escolha ----------
@@ -366,6 +452,7 @@ function ItemFieldsEditor({
                 </Field>
                 <FieldProperties
                   field={item}
+                  inList
                   fields={[]}
                   formulaInvalid={false}
                   onChange={(next) =>
@@ -409,9 +496,12 @@ export function FieldProperties({
   onChange,
   fields,
   formulaInvalid,
+  inList = false,
 }: {
   field: AnyField;
   onChange: (field: AnyField) => void;
+  /** Campo de um item de lista: sem descanso (só os campos da ficha recuperam). */
+  inList?: boolean;
   /** Campos do sistema, para sugerir referências nas fórmulas. */
   fields: readonly FieldDef[];
   formulaInvalid: boolean;
@@ -475,6 +565,7 @@ export function FieldProperties({
           >
             Mostrar como marcadores (bolinhas), de 0 até o máximo (no máximo {MAX_MARKS})
           </CheckRow>
+          {!inList && <RecoverEditor field={field} onChange={onChange} />}
         </div>
       );
     case 'text':
@@ -531,6 +622,7 @@ export function FieldProperties({
               />
             </Field>
           )}
+          <RecoverEditor field={field} onChange={onChange} />
         </div>
       );
     case 'computed':

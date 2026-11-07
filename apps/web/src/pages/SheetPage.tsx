@@ -14,6 +14,7 @@ import { toast } from 'sonner';
 import { Link, useLocation } from 'wouter';
 import type { OpenedSheet } from '@/app/sheets';
 import { useServices } from '@/app/services-context';
+import { RestButton } from '@/components/sheet/RestButton';
 import { SheetLayout } from '@/components/sheet/SheetLayout';
 import { pinnedFieldIds, SheetVitals } from '@/components/sheet/SheetVitals';
 import { useDraft } from '@/components/sheet/use-draft';
@@ -200,6 +201,7 @@ function SheetEditor({ id, compiled }: { id: string; compiled: OpenedReady['comp
         />
         <Badge variant="secondary">{template.name}</Badge>
         <div className="ml-auto flex items-center gap-1">
+          <RestButton compiled={compiled} values={values} derived={derived} onChange={onChange} />
           {/* Sem aba própria no sistema, os bônus ficam neste botão. */}
           {!template.bonusTab && <BonusesButton editor={bonusEditor} />}
           <DropdownMenu>

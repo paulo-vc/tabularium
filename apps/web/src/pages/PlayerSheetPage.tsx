@@ -18,6 +18,7 @@ import {
 } from '@/components/sheet/Bonuses';
 import { pinnedFieldIds, SheetVitals } from '@/components/sheet/SheetVitals';
 import { useSheetEditing } from '@/components/sheet/use-sheet-editing';
+import { RestButton } from '@/components/sheet/RestButton';
 import { RollContext, type GroupRoll } from '@/components/sheet/roll-context';
 import { useRoller } from '@/components/live/use-roller';
 import { Badge } from '@/components/ui/badge';
@@ -164,11 +165,10 @@ function PlayerSheet({
         <Badge variant={player.online ? 'default' : 'outline'}>
           {player.online ? 'Online' : 'Offline'}
         </Badge>
-        {!compiled.template.bonusTab && (
-          <div className="ml-auto">
-            <BonusesButton editor={bonusEditor} />
-          </div>
-        )}
+        <div className="ml-auto flex items-center gap-1">
+          <RestButton compiled={compiled} values={values} derived={derived} onChange={onChange} />
+          {!compiled.template.bonusTab && <BonusesButton editor={bonusEditor} />}
+        </div>
       </div>
       <p className="text-muted-foreground text-sm" role="status">
         {player.online
