@@ -2,11 +2,14 @@ import fc from 'fast-check';
 import { describe, expect, it } from 'vitest';
 import {
   addCombatant,
+  combatantEffects,
   nextTurn,
   previousTurn,
   publicView,
   PublicTrackerSchema,
   removeCombatant,
+  setCombatantEffects,
+  EFFECT_LIMIT,
   startCombat,
   TrackerSchema,
   turnOrder,
@@ -111,6 +114,84 @@ describe('o que os jogadores veem', () => {
     expect(PublicTrackerSchema.safeParse({ ...view, activeId: 'fantasma' }).success).toBe(false);
     const dup = { ...view, combatants: [...view.combatants, view.combatants[0]] };
     expect(PublicTrackerSchema.safeParse(dup).success).toBe(false);
+  });
+});
+
+describe('condições no combate', () => {
+  it('limpa espaços, tira as repetidas (sem ligar para acento) e some quando vazia', () => {
+    let tracker = setCombatantEffects(table(), 'goblin', [' Caído ', 'caido', 'Envenenado', '']);
+    expect(tracker.combatants.find((c) => c.id === 'goblin')?.effects).toEqual([
+      'Caído',
+      'Envenenado',
+    ]);
+    tracker = setCombatantEffects(tracker, 'goblin', []);
+    expect(tracker.combatants.find((c) => c.id === 'goblin')).not.toHaveProperty('effects');
+  });
+
+  it('respeita o limite e passa no schema', () => {
+    const many = Array.from({ length: EFFECT_LIMIT + 5 }, (_, i) => `Efeito ${i}`);
+    const tracker = setCombatantEffects(table(), 'ana', many);
+    expect(tracker.combatants.find((c) => c.id === 'ana')?.effects).toHaveLength(EFFECT_LIMIT);
+    expect(TrackerSchema.safeParse(tracker).success).toBe(true);
+  });
+
+  it('os jogadores veem as condições (de jogadores e de criaturas)', () => {
+    const tracker = setCombatantEffects(table(), 'goblin', ['Amedrontado']);
+    const goblin = publicView(tracker).combatants.find((c) => c.id === 'goblin');
+    expect(goblin?.effects).toEqual(['Amedrontado']);
+    expect(PublicTrackerSchema.safeParse(publicView(tracker)).success).toBe(true);
+  });
+});
+
+describe('condições com duração', () => {
+  const effectsOf = (tracker: Tracker, id: string) => {
+    const combatant = tracker.combatants.find((c) => c.id === id);
+    return combatant ? combatantEffects(tracker, combatant) : [];
+  };
+
+  it('quem ainda não agiu fica com a condição na própria vez e ela some depois', () => {
+    // Rodada 1, vez de Ana; o goblin age em seguida.
+    let tracker = nextTurn(table());
+    tracker = setCombatantEffects(tracker, 'goblin', [{ name: 'Atordoado', rounds: 1 }, 'Caído']);
+    expect(effectsOf(tracker, 'goblin')).toEqual([
+      { name: 'Atordoado', rounds: 1 },
+      { name: 'Caído' },
+    ]);
+    tracker = nextTurn(tracker); // vez do goblin: ainda atordoado
+    expect(effectsOf(tracker, 'goblin').map((e) => e.name)).toContain('Atordoado');
+    tracker = nextTurn(tracker); // vez de Bia: acabou
+    expect(effectsOf(tracker, 'goblin')).toEqual([{ name: 'Caído' }]);
+    expect(publicView(tracker).combatants.find((c) => c.id === 'goblin')?.effects).toEqual([
+      'Caído',
+    ]);
+    // Voltar a vez traz a condição de volta.
+    tracker = previousTurn(tracker);
+    expect(effectsOf(tracker, 'goblin')).toContainEqual({ name: 'Atordoado', rounds: 1 });
+  });
+
+  it('quem já agiu fica com a condição até a próxima vez', () => {
+    let tracker = nextTurn(nextTurn(table())); // vez do goblin; Ana já agiu
+    tracker = setCombatantEffects(tracker, 'ana', [{ name: 'Envenenado', rounds: 2 }]);
+    expect(effectsOf(tracker, 'ana')).toEqual([{ name: 'Envenenado', rounds: 2 }]);
+    tracker = nextTurn(nextTurn(tracker)); // rodada 2, vez de Ana
+    expect(effectsOf(tracker, 'ana')).toEqual([{ name: 'Envenenado', rounds: 2 }]);
+    tracker = nextTurn(tracker);
+    expect(effectsOf(tracker, 'ana')).toEqual([{ name: 'Envenenado', rounds: 1 }]);
+    tracker = nextTurn(nextTurn(nextTurn(tracker))); // rodada 3, depois da vez de Ana
+    expect(effectsOf(tracker, 'ana')).toEqual([]);
+  });
+
+  it('remarcar com o que vale agora não muda a duração; os jogadores veem as rodadas', () => {
+    let tracker = nextTurn(table());
+    tracker = setCombatantEffects(tracker, 'bia', [{ name: 'Abençoado', rounds: 10 }]);
+    const before = tracker.combatants.find((c) => c.id === 'bia')?.effectUntil;
+    tracker = setCombatantEffects(tracker, 'bia', [...effectsOf(tracker, 'bia'), 'Caído']);
+    expect(tracker.combatants.find((c) => c.id === 'bia')?.effectUntil).toEqual(before);
+    const bia = publicView(tracker).combatants.find((c) => c.id === 'bia');
+    expect(bia).toMatchObject({ effects: ['Abençoado', 'Caído'], effectRounds: { Abençoado: 10 } });
+    expect(bia).not.toHaveProperty('effectUntil');
+    expect(TrackerSchema.safeParse(tracker).success).toBe(true);
+    expect(PublicTrackerSchema.safeParse(publicView(tracker)).success).toBe(true);
   });
 });
 

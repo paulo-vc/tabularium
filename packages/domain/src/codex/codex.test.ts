@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import {
   codexByCategory,
+  codexConditions,
   findCodexPage,
   parseCodexText,
   parseInline,
@@ -95,5 +96,17 @@ describe('páginas do códice', () => {
   it('acha a página de um link pelo título', () => {
     expect(findCodexPage(pages, 'furia')?.id).toBe('a');
     expect(findCodexPage(pages, 'Nenhuma')).toBeUndefined();
+  });
+});
+
+describe('condições do códice', () => {
+  it('são as páginas da categoria Condições (com ou sem acento), sem as do Mestre', () => {
+    const pages = [
+      page('caido', 'Caído', 'Condições'),
+      page('cego', 'Cego', 'condicoes'),
+      page('fúria', 'Fúria', 'Habilidades'),
+      { ...page('segredo', 'Amaldiçoado', 'Condições'), gmOnly: true },
+    ];
+    expect(codexConditions(pages)).toEqual(['Caído', 'Cego']);
   });
 });

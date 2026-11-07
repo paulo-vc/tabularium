@@ -111,6 +111,11 @@ function PlayerView({ campaign, userId }: { campaign: Campaign; userId: string }
     async () => Boolean(await catalog.get(campaign.templateRef.id)),
     [catalog, campaign.templateRef.id],
   );
+  // Páginas do códice que o jogador lê: as condições do combate abrem a página delas.
+  const codex = useLiveQuery(
+    async () => (await catalog.get(campaign.templateRef.id))?.codex?.filter((page) => !page.gmOnly),
+    [catalog, campaign.templateRef.id],
+  );
   const [choosing, setChoosing] = useState(false);
   const importFile = useImport();
   // Rolagem de iniciativa da ficha vinculada (ex.: "1d20+2"), se o sistema define uma.
@@ -184,7 +189,7 @@ function PlayerView({ campaign, userId }: { campaign: Campaign; userId: string }
       </Card>
 
       <PlayerSession campaign={campaign} hasSheet={Boolean(linked)} />
-      <PlayerInitiative campaignId={campaign.id} initiativeRoll={initiativeRoll} />
+      <PlayerInitiative campaignId={campaign.id} initiativeRoll={initiativeRoll} codex={codex} />
       <RollLog campaignId={campaign.id} isGameMaster={false} />
       <PlayerJournal campaignId={campaign.id} />
 

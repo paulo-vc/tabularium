@@ -57,6 +57,16 @@ export function findCodexPage(pages: readonly CodexPage[], title: string): Codex
   return pages.find((page) => normalize(page.title.trim()) === wanted);
 }
 
+/**
+ * Condições que o sistema descreve no códice (páginas da categoria "Condições"): viram as
+ * sugestões ao marcar condições no combate, e cada uma abre a própria página.
+ */
+export function codexConditions(pages: readonly CodexPage[]): string[] {
+  return pages
+    .filter((page) => !page.gmOnly && normalize(page.category ?? '').trim() === 'condicoes')
+    .map((page) => page.title.trim());
+}
+
 // ---------- Texto ----------
 
 /** Trecho de uma linha: texto, **negrito**, *itálico* ou um link para outra página. */

@@ -231,6 +231,7 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
                 checkDice={template?.checkDice}
                 dice={template?.dice}
                 bestiary={{ campaign: campaign.bestiary ?? [], system: template?.bestiary ?? [] }}
+                codex={template?.codex}
               />
             ) : (
               <Card>
