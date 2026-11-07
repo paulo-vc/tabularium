@@ -1,5 +1,5 @@
-import { describeRoll, type CompiledTemplate } from '@tabula/domain';
-import { useMemo } from 'react';
+import { describeRoll, isCriticalRoll, type CompiledTemplate, type RollMode } from '@tabula/domain';
+import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useServices } from '@/app/services-context';
 import { useDiceTray } from './DiceTray';
@@ -15,10 +15,13 @@ export function useRoller(compiled: CompiledTemplate): Roller {
   const { enabled: tray } = useDiceTray();
   const checkDice = compiled.template.checkDice ?? '1d20';
   const dice = compiled.template.dice;
+  const [mode, setMode] = useState<RollMode>('normal');
   return useMemo(
     () => ({
       checkDice,
       dice,
+      mode,
+      setMode,
       roll: (label, expression) => {
         void session.roll({ label, expression, dice }).then((result) => {
           if (result.ok) {
@@ -34,17 +37,22 @@ export function useRoller(compiled: CompiledTemplate): Roller {
       rollAll: (title, rolls) => {
         void (async () => {
           const results = [];
-          for (const roll of rolls) {
+          let critical = false;
+          for (const [index, roll] of rolls.entries()) {
+            // No crítico da primeira (o 20 natural do ataque), as seguintes rolam o dobro de dados.
+            const crit = critical && roll.critical !== undefined;
+            const name = crit ? `${roll.name} crítico` : roll.name;
             const result = await session.roll({
-              label: `${title}: ${roll.name}`,
-              expression: roll.expression,
+              label: `${title}: ${name}`,
+              expression: crit ? (roll.critical ?? roll.expression) : roll.expression,
               dice,
             });
             if (!result.ok) {
               toast.error('Não foi possível rolar', { description: result.error.message });
               return;
             }
-            results.push({ name: roll.name, entry: result.value });
+            if (index === 0) critical = isCriticalRoll(result.value.result);
+            results.push({ name, entry: result.value });
           }
           if (tray) return;
           // "Espada longa: ataque 17 · dano 9", com a conta de cada um embaixo.
@@ -57,6 +65,6 @@ export function useRoller(compiled: CompiledTemplate): Roller {
         })();
       },
     }),
-    [session, checkDice, dice, tray],
+    [session, checkDice, dice, tray, mode],
   );
 }

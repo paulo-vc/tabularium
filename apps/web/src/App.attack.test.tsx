@@ -8,12 +8,15 @@ import { createServices, type Services } from './app/services';
 
 let db: TabulaDatabase;
 let services: Services;
+/** Que face sai em cada dado (padrão: sempre 4). */
+let face: (sides: number) => number;
 
 beforeEach(() => {
   window.location.hash = '';
   db = new TabulaDatabase(`ui-ataque-${crypto.randomUUID()}`);
-  // Dados previsíveis: sempre 4.
-  services = createServices(db, { dieRoller: () => 4 });
+  // Dados previsíveis: sempre 4, a não ser que o teste troque.
+  face = () => 4;
+  services = createServices(db, { dieRoller: (sides) => face(sides) });
 });
 
 afterEach(async () => {
@@ -90,6 +93,28 @@ describe('ataques pela ficha', () => {
     // Ataque 4 + 5; dano 1d8 (4) + 3.
     expect(await screen.findByText('Espada longa: ataque 9 · dano 7')).toBeInTheDocument();
     expect(screen.getByText('1d20 + 5 → [4] + 5 = 9 | 1d8 + 3 → [4] + 3 = 7')).toBeInTheDocument();
+  });
+
+  it('com vantagem, o ataque rola dois d20 e a escolha volta a "Normal"', async () => {
+    await services.sounds.update({ dice3d: false });
+    const user = await openSheet();
+    await user.click(await screen.findByRole('button', { name: 'Vantagem' }));
+    await user.click(screen.getByRole('button', { name: 'Atacar com Espada longa' }));
+    expect(await screen.findByText('2d20kh1 + 5 → [4, (4)] + 5 = 9')).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Normal' })).toHaveAttribute('aria-pressed', 'true');
+  });
+
+  it('no 20 natural, "Ataque + dano" rola o dobro de dados no dano', async () => {
+    await services.sounds.update({ dice3d: false });
+    face = (sides) => sides;
+    const user = await openSheet();
+    await user.click(
+      await screen.findByRole('button', { name: 'Atacar com Espada longa e rolar o dano' }),
+    );
+    // Ataque 20 + 5; dano 2d8 (8 e 8) + 3.
+    expect(
+      await screen.findByText('Espada longa: ataque 25 · dano crítico 19'),
+    ).toBeInTheDocument();
   });
 
   it('sem dano preenchido, o item só tem "Ataque"', async () => {
