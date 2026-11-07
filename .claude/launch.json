@@ -1,0 +1,17 @@
+{
+  "version": "0.0.1",
+  "configurations": [
+    {
+      "name": "web",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": ["pnpm", "--filter", "@tabula/web", "dev"],
+      "port": 5173
+    },
+    {
+      "name": "web-5175",
+      "runtimeExecutable": "corepack",
+      "runtimeArgs": ["pnpm", "--dir", "apps/web", "exec", "vite", "--port", "5175"],
+      "port": 5175
+    }
+  ]
+}

@@ -36,6 +36,21 @@ const fieldBase = {
 export const FIELD_DISPLAYS = ['marcadores'] as const;
 export const MAX_MARKS = 10;
 
+/** Descansos da ficha: o curto e o longo. O que volta no curto também volta no longo. */
+export const REST_KINDS = ['curto', 'longo'] as const;
+export type RestKind = (typeof REST_KINDS)[number];
+
+/**
+ * O que um número ou recurso recupera num descanso. `amount`: `tudo` (o recurso enche; o
+ * número volta ao padrão), `metade` (o recurso ganha metade do máximo, no mínimo 1) ou um
+ * passo (ex.: -1 na exaustão). Sem `amount`, `tudo`.
+ */
+export const RestRecoverySchema = z.object({
+  rest: z.enum(REST_KINDS),
+  amount: z.union([z.enum(['tudo', 'metade']), z.number().int().min(-1000).max(1000)]).optional(),
+});
+export type RestRecovery = z.infer<typeof RestRecoverySchema>;
+
 const NumberFieldSchema = z.object({
   ...fieldBase,
   type: z.literal('number'),
@@ -44,6 +59,8 @@ const NumberFieldSchema = z.object({
   max: FiniteNumberSchema.optional(),
   integer: z.boolean().optional(),
   display: z.enum(FIELD_DISPLAYS).optional(),
+  /** O que volta num descanso (ex.: os testes contra a morte zeram). */
+  recover: RestRecoverySchema.optional(),
 });
 
 const TextFieldSchema = z.object({
@@ -95,6 +112,8 @@ const ResourceFieldSchema = z.object({
   /** Valor inicial (atual e, se não houver fórmula, também do máximo). */
   default: FiniteNumberSchema.optional(),
   display: z.enum(FIELD_DISPLAYS).optional(),
+  /** O que volta num descanso (ex.: os PV enchem no descanso longo). */
+  recover: RestRecoverySchema.optional(),
 });
 
 /** Campo derivado: nunca é armazenado na ficha, é sempre calculado. */

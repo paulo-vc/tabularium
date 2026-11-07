@@ -16,6 +16,7 @@ export * from './sheet/bonuses';
 export { embeddedImageSchema } from './image/embedded';
 export { defaultValue, listItemValue, valueProblem } from './sheet/values';
 export { computeDerived, type DerivedValues } from './sheet/compute';
+export { restChanges, restFields, type RestChange } from './sheet/rest';
 export { createSheet, validateSheetValues, type NewSheetInput } from './sheet/operations';
 export {
   checkCompatibility,
