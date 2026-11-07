@@ -25,6 +25,12 @@ const fieldBase = {
   description: DescriptionSchema.optional(),
   /** `gm`: visível apenas para o Mestre durante a sessão. */
   visibility: z.enum(['all', 'gm']).optional(),
+  /**
+   * Só aparece quando um campo sim/não da ficha está marcado (`value: true`) ou desmarcado
+   * (`false`): uma regra opcional que troca campos, como a Determinação no lugar de PE e
+   * Sanidade. O valor continua guardado e nas fórmulas.
+   */
+  visibleWhen: z.object({ field: IdSchema, value: z.boolean() }).optional(),
 };
 
 /**
@@ -173,6 +179,11 @@ export type LayoutNode =
       /** Aba da ficha em que a seção aparece (só nas seções de primeiro nível). */
       tab?: string | undefined;
       display?: SectionDisplay | undefined;
+      /**
+       * `metade`: em telas largas, a seção ocupa meia página e fica ao lado da seguinte,
+       * como os blocos de uma ficha de papel (só nas seções de primeiro nível).
+       */
+      width?: 'metade' | undefined;
     }
   | {
       kind: 'field';
@@ -193,6 +204,7 @@ export const LayoutNodeSchema: z.ZodType<LayoutNode> = z.lazy(() =>
       children: z.array(LayoutNodeSchema).max(LIMITS.layoutNodes),
       tab: z.string().trim().min(1).max(40).optional(),
       display: z.enum(SECTION_DISPLAYS).optional(),
+      width: z.literal('metade').optional(),
     }),
     z.object({
       kind: z.literal('field'),

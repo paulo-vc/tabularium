@@ -1,4 +1,5 @@
 import {
+  conditionallyHidden,
   defaultValue,
   type CompiledTemplate,
   type DerivedValues,
@@ -116,8 +117,15 @@ export function SheetLayout({
   const base = useId();
   const [selected, setSelected] = useState(0);
 
+  // Regra opcional (ex.: Determinação no lugar de PE e Sanidade): some o que ela troca.
+  const byCondition = conditionallyHidden(compiled, values);
   const visible = (fieldId: string | undefined): FieldDef | undefined => {
-    if (fieldId === undefined || hiddenFieldIds?.has(fieldId) || pinnedFieldIds?.has(fieldId))
+    if (
+      fieldId === undefined ||
+      hiddenFieldIds?.has(fieldId) ||
+      pinnedFieldIds?.has(fieldId) ||
+      byCondition.has(fieldId)
+    )
       return undefined;
     return compiled.fieldsById.get(fieldId);
   };
@@ -150,7 +158,15 @@ export function SheetLayout({
 
   /** Seção em blocos compactos (ex.: atributos). */
   const renderTiles = (section: SectionNode) => (
-    <div className={cn('grid gap-2', TILE_GRID[section.columns])}>
+    <div
+      className={cn(
+        'grid gap-2',
+        // Em meia página, quantos blocos couberem por linha (a grade fixa os espremeria).
+        section.width === 'metade'
+          ? 'grid-cols-[repeat(auto-fill,minmax(4.5rem,1fr))]'
+          : TILE_GRID[section.columns],
+      )}
+    >
       {section.children.map((node, index) => {
         if (node.kind === 'section')
           return hasContent(node.children) ? (
@@ -211,7 +227,8 @@ export function SheetLayout({
   };
 
   const renderGrid = (nodes: readonly LayoutNode[], columns: Columns, depth: number) => (
-    <div className={cn('grid gap-x-4 gap-y-3', GRID[columns])}>
+    // `ficha-linhas`: os campos viram linhas de ficha de papel (ver index.css).
+    <div className={cn('ficha-linhas grid gap-x-4 gap-y-3', GRID[columns])}>
       {nodes.map((node, index) => {
         if (node.kind === 'section') {
           return hasContent(node.children) ? (
@@ -320,7 +337,7 @@ export function SheetLayout({
   // Campos que o template não posicionou no layout continuam acessíveis.
   const shown = new Set(layoutFieldIds(full));
   const others = compiled.template.fields.filter(
-    (field) => !shown.has(field.id) && !hiddenFieldIds?.has(field.id),
+    (field) => !shown.has(field.id) && !hiddenFieldIds?.has(field.id) && !byCondition.has(field.id),
   );
   const tabs = groupTabs(full);
   if (others.length > 0) {
@@ -338,20 +355,32 @@ export function SheetLayout({
       .filter((node) => hasContent([node]))
       .map((node, index) =>
         node.kind === 'section' ? (
-          <div key={`${node.title}-${index}`}>{renderSection(node, 0)}</div>
+          // Meia página: lado a lado com a seção vizinha em telas largas, como na ficha de papel.
+          <div
+            key={`${node.title}-${index}`}
+            className={cn('min-w-0', node.width !== 'metade' && 'lg:col-span-2')}
+          >
+            {renderSection(node, 0)}
+          </div>
         ) : (
-          <div key={node.fieldId}>{renderGrid([node], 1, 0)}</div>
+          <div key={node.fieldId} className="min-w-0 lg:col-span-2">
+            {renderGrid([node], 1, 0)}
+          </div>
         ),
       );
 
   // A seção "Bônus e efeitos" fica no fim da aba que o sistema escolheu (`bonusTab`).
   const bonusTab = compiled.template.bonusTab;
   const withBonuses = (name: string | undefined) =>
-    bonusTab !== undefined && (tabs.length === 1 || name === bonusTab) ? <BonusSection /> : null;
+    bonusTab !== undefined && (tabs.length === 1 || name === bonusTab) ? (
+      <div className="min-w-0 lg:col-span-2">
+        <BonusSection />
+      </div>
+    ) : null;
 
   if (tabs.length === 1) {
     return (
-      <div className="grid gap-4">
+      <div className="grid items-start gap-4 lg:grid-cols-2">
         {renderTop(tabs[0]?.nodes ?? [])}
         {withBonuses(tabs[0]?.name)}
       </div>
@@ -397,7 +426,7 @@ export function SheetLayout({
         id={`${base}-painel`}
         role="tabpanel"
         aria-labelledby={`${base}-aba-${active}`}
-        className="grid gap-4"
+        className="grid items-start gap-4 lg:grid-cols-2"
       >
         {renderTop(tabs[active]?.nodes ?? [])}
         {withBonuses(tabs[active]?.name)}

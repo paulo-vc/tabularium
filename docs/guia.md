@@ -70,7 +70,8 @@ Em **Sistemas → Criar sistema**, comece de um modelo pronto (d20 ou 2d6), em b
 
 ![O criador de sistemas](imagens/criador.png)
 
-- **Campos:** números, textos, recursos (como PV), listas (ataques, inventário), escolhas e campos calculados por [fórmulas](formulas.md). O campo de fórmula traz exemplos prontos.
+- **Campos:** números, textos, recursos (como PV), listas (ataques, inventário), escolhas e campos calculados por [fórmulas](formulas.md). O campo de fórmula traz exemplos prontos. Para uma regra opcional, use **Aparece na ficha**: o campo só aparece com um sim/não marcado (ou desmarcado), como a Determinação no lugar de PE e Sanidade.
+- **Seções lado a lado:** marque **Meia página** numa seção para ela ficar ao lado da seguinte em telas largas, como os blocos de uma ficha de papel.
 - **Dados do sistema:** dados com faces próprias, como o dado Fate (`4dF`) ou Esperança e Medo.
 - **Ícone:** uma imagem pequena que aparece nas listas.
 - **Códice:** páginas de consulta para a mesa (habilidades, regras, itens, magias), com títulos, listas, tabelas, negrito e links entre páginas (`[[Fúria]]`). Uma página pode ser só do Mestre: some para os jogadores, mas quem abre o arquivo do sistema ainda a vê. As páginas da categoria **Condições** viram as sugestões ao marcar condições no combate.

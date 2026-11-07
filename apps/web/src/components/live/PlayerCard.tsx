@@ -1,4 +1,5 @@
 import {
+  conditionallyHidden,
   computeDerived,
   defaultValue,
   type CompiledTemplate,
@@ -7,6 +8,7 @@ import {
   type FieldDef,
   type FieldValue,
   type ResourceValue,
+  type SheetValues,
 } from '@tabula/domain';
 import type { ConnectionInfo, HostPlayer } from '@tabula/sync';
 import { useMemo } from 'react';
@@ -23,12 +25,14 @@ const okValue = (result: Result<number, EvaluationError> | undefined) =>
   result?.ok ? result.value : undefined;
 
 /** Campos mostrados no card: o `gmSummary` do template ou, sem ele, os recursos. */
-function summaryFields(compiled: CompiledTemplate): FieldDef[] {
+function summaryFields(compiled: CompiledTemplate, values: SheetValues): FieldDef[] {
+  // Sem os campos que a regra opcional da ficha troca (ex.: PE e Sanidade com Determinação).
+  const hidden = conditionallyHidden(compiled, values);
   const ids = compiled.template.layouts.gmSummary;
-  if (ids?.length) {
-    return ids.map((id) => compiled.fieldsById.get(id)).filter((f): f is FieldDef => Boolean(f));
-  }
-  return compiled.template.fields.filter((f) => f.type === 'resource').slice(0, 4);
+  const fields = ids?.length
+    ? ids.map((id) => compiled.fieldsById.get(id)).filter((f): f is FieldDef => Boolean(f))
+    : compiled.template.fields.filter((f) => f.type === 'resource' && !hidden.has(f.id));
+  return fields.filter((f) => !hidden.has(f.id)).slice(0, ids?.length ? undefined : 4);
 }
 
 function ResourceSummary({
@@ -156,7 +160,7 @@ export function PlayerCard({
       {compiled && player.sheet && (
         <CardContent>
           <dl className="grid grid-cols-2 gap-x-4 gap-y-2">
-            {summaryFields(compiled).map((field) => {
+            {summaryFields(compiled, values ?? {}).map((field) => {
               const value = player.sheet?.values[field.id];
               if (field.type === 'resource') {
                 const resource = (value ?? defaultValue(field)) as ResourceValue;

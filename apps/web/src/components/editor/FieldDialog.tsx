@@ -55,6 +55,8 @@ interface Settings {
   secondary: string | undefined;
 }
 
+/** Sem condição: o campo aparece sempre. */
+const ALWAYS = '__sempre__';
 const NO_SECONDARY = '__nenhum';
 
 function settingsOf(template: SystemTemplate, fieldId: string): Settings | null {
@@ -251,6 +253,49 @@ function FieldForm({
           Ex.: no modificador de Força, mostre o valor de Força pequeno embaixo.
         </p>
       </div>
+
+      {template.fields.some((other) => other.type === 'boolean' && other.id !== field.id) && (
+        <div className="space-y-1.5">
+          <Label htmlFor={`${base}-quando`}>Aparece na ficha</Label>
+          <Select
+            value={
+              field.visibleWhen
+                ? `${field.visibleWhen.value ? 'sim' : 'nao'}:${field.visibleWhen.field}`
+                : ALWAYS
+            }
+            onValueChange={(value) => {
+              const { visibleWhen: _, ...rest } = field;
+              const [state, target] = value.split(':');
+              changeField(
+                value === ALWAYS || !target
+                  ? (rest as FieldDef)
+                  : { ...field, visibleWhen: { field: target, value: state === 'sim' } },
+              );
+            }}
+          >
+            <SelectTrigger id={`${base}-quando`} className="w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value={ALWAYS}>Sempre</SelectItem>
+              {template.fields
+                .filter((other) => other.type === 'boolean' && other.id !== field.id)
+                .flatMap((other) => [
+                  <SelectItem key={`sim:${other.id}`} value={`sim:${other.id}`}>
+                    Só com “{other.label || other.key}” marcado
+                  </SelectItem>,
+                  <SelectItem key={`nao:${other.id}`} value={`nao:${other.id}`}>
+                    Só com “{other.label || other.key}” desmarcado
+                  </SelectItem>,
+                ])}
+            </SelectContent>
+          </Select>
+          <p className="text-muted-foreground text-xs">
+            Para regras opcionais: ex.: Determinação só com “Usar Determinação” marcado, e Sanidade
+            só com ele desmarcado.
+          </p>
+        </div>
+      )}
 
       <div className="space-y-1.5">
         <Label htmlFor={`${base}-ajuda`}>Texto de ajuda (opcional)</Label>
