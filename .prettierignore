@@ -6,3 +6,4 @@ LICENSE
 dist-e2e/
 test-results/
 playwright-report/
+.claude/
