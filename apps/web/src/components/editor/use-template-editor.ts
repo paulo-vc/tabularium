@@ -67,18 +67,26 @@ export function useTemplateEditor(draftId: string) {
 
   // Grava o que faltar ao sair da tela. Sem ninguém para avisar, uma falha aqui (ex.: banco
   // já fechado) só perde a última fração de segundo de edição.
-  useEffect(
-    () => () => {
+  const mounted = useRef(true);
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
       flush().catch(() => {});
-    },
-    [flush],
-  );
+    };
+  }, [flush]);
 
   const persist = useCallback(
     (template: SystemTemplate) => {
       pending.current = template;
       clearTimeout(timer.current);
-      timer.current = setTimeout(() => void flush(), SAVE_DELAY_MS);
+      timer.current = setTimeout(() => {
+        // A gravação do timer pode ainda estar em andamento quando a tela fecha (e o banco
+        // com ela); depois de sair, a falha segue a mesma regra do flush de saída.
+        flush().catch((error: unknown) => {
+          if (mounted.current) throw error;
+        });
+      }, SAVE_DELAY_MS);
     },
     [flush],
   );
