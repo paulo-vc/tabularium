@@ -448,7 +448,13 @@ export function addSection(
 export function updateSection(
   template: SystemTemplate,
   path: NodePath,
-  change: { title?: string; columns?: Columns; tab?: string; display?: SectionDisplay },
+  change: {
+    title?: string;
+    columns?: Columns;
+    tab?: string;
+    display?: SectionDisplay;
+    width?: 'metade' | undefined;
+  },
 ): SystemTemplate {
   return withFull(
     template,
@@ -458,6 +464,7 @@ export function updateSection(
       // Valores vazios (aba sem nome, exibição padrão) saem do arquivo.
       if (!next.tab?.trim()) delete next.tab;
       if (next.display === 'padrao') delete next.display;
+      if (next.width === undefined) delete next.width;
       return next;
     }),
   );

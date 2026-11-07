@@ -1,4 +1,5 @@
 import {
+  conditionallyHidden,
   defaultValue,
   type CodexPage,
   type CompiledTemplate,
@@ -335,7 +336,8 @@ export function SheetVitals({
   onChange: (fieldId: string, value: FieldValue) => void;
   hiddenFieldIds?: ReadonlySet<string> | undefined;
 }) {
-  const fields = vitalFields(compiled, hiddenFieldIds);
+  const byCondition = conditionallyHidden(compiled, values);
+  const fields = vitalFields(compiled, hiddenFieldIds).filter((f) => !byCondition.has(f.id));
   const codexPages = useMemo(
     () => (compiled.template.codex ?? []).filter((page) => !page.gmOnly),
     [compiled.template.codex],

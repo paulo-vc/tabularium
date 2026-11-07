@@ -1,4 +1,4 @@
-import { computeDerived, type CompiledTemplate } from '@tabula/domain';
+import { computeDerived, conditionallyHidden, type CompiledTemplate } from '@tabula/domain';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { ArrowLeftIcon, PrinterIcon } from 'lucide-react';
 import { useEffect, useMemo, useState } from 'react';
@@ -34,12 +34,14 @@ export function SheetPrintPage({ id }: { id: string }) {
   // Como na tela: na ficha de jogador numa campanha, os campos secretos são do Mestre.
   const hidden = useMemo(
     () =>
-      new Set(
-        compiled && isPlayerSheet !== false
+      new Set([
+        ...(compiled && isPlayerSheet !== false
           ? compiled.template.fields.filter((f) => f.visibility === 'gm').map((f) => f.id)
-          : [],
-      ),
-    [compiled, isPlayerSheet],
+          : []),
+        // E o que a regra opcional da ficha troca (ex.: PE e Sanidade com Determinação).
+        ...(compiled && sheet ? conditionallyHidden(compiled, sheet.values) : []),
+      ]),
+    [compiled, isPlayerSheet, sheet],
   );
   const derived = useMemo(
     () => (compiled && sheet ? computeDerived(compiled, sheet.values, sheet.bonuses) : undefined),
