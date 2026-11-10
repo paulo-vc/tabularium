@@ -134,7 +134,7 @@ function PlayerSheet({
     },
     newId: () => crypto.randomUUID(),
   };
-  const roller = useRoller(compiled);
+  const roller = useRoller(compiled, { values, derived });
   // O Mestre rolando pela ficha do jogador: o registro mostra de quem é o teste.
   const playerRoller = useMemo(
     () => ({

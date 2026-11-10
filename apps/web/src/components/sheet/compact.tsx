@@ -45,7 +45,9 @@ function BigComputed({
       >
         {text}
       </output>
-      {field.signed && derived?.ok && <CheckButton label={field.label} modifier={derived.value} />}
+      {field.signed && derived?.ok && (
+        <CheckButton label={field.label} modifier={derived.value} fieldId={field.id} />
+      )}
       <BonusMark field={field} />
     </span>
   );

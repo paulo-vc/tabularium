@@ -299,7 +299,7 @@ function ComputedDisplay({ field, derived }: { field: FieldOf<'computed'>; deriv
     <div className="flex items-center gap-1">
       <div className="min-w-0 flex-1">{output}</div>
       <BonusMark field={field} />
-      <CheckButton label={field.label} modifier={derived.value} />
+      <CheckButton label={field.label} modifier={derived.value} fieldId={field.id} />
     </div>
   );
 }

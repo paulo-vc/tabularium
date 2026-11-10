@@ -99,6 +99,19 @@ describe('rollDice', () => {
     expect(supportsRollMode('1d20+1')).toBe(false);
   });
 
+  it('dados pelo atributo: fica o maior; com 0, dois e fica o menor', () => {
+    expect(checkExpression('1d20', 5, 'normal', 3)).toBe('3d20kh1+5');
+    expect(checkExpression('1d20', 0, 'normal', 1)).toBe('1d20');
+    expect(checkExpression('1d20', 2, 'normal', 0)).toBe('2d20kl1+2');
+    expect(checkExpression('1d20', 0, 'normal', -1)).toBe('3d20kl1');
+    // Vantagem soma um dado; desvantagem tira um.
+    expect(checkExpression('1d20', 0, 'vantagem', 2)).toBe('3d20kh1');
+    expect(checkExpression('1d20', 0, 'desvantagem', 1)).toBe('2d20kl1');
+    expect(checkExpression('1d20', 0, 'normal', 99)).toBe('20d20kh1');
+    // Sistema que não rola um dado só: fica como está.
+    expect(checkExpression('2d6', 1, 'normal', 3)).toBe('2d6+1');
+  });
+
   it('crítico: o dado que vale na face máxima', () => {
     expect(isCriticalRoll(roll('1d20+5', sequence(20)))).toBe(true);
     expect(isCriticalRoll(roll('1d20+5', sequence(19)))).toBe(false);

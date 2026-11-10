@@ -137,7 +137,7 @@ function SheetEditor({ id, compiled }: { id: string; compiled: OpenedReady['comp
     sheet?.bonuses,
   );
   const bonusEffects = useBonusEffects(sheet?.bonuses);
-  const roller = useRoller(compiled);
+  const roller = useRoller(compiled, { values, derived });
   // Ficha de jogador numa campanha: os campos secretos são do Mestre. Escondidos também
   // enquanto a consulta carrega, para não piscarem na tela.
   const deviceId = useDeviceId();

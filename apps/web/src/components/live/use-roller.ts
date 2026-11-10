@@ -1,4 +1,12 @@
-import { describeRoll, isCriticalRoll, type CompiledTemplate, type RollMode } from '@tabula/domain';
+import {
+  checkDiceCount,
+  describeRoll,
+  isCriticalRoll,
+  type CompiledTemplate,
+  type DerivedValues,
+  type RollMode,
+  type SheetValues,
+} from '@tabula/domain';
 import { useMemo, useState } from 'react';
 import { toast } from 'sonner';
 import { useServices } from '@/app/services-context';
@@ -9,7 +17,11 @@ import type { Roller } from '@/components/sheet/roll-context';
  * Rolagens feitas pela ficha: entram no registro da sessão (se houver uma) e o resultado
  * aparece num aviso.
  */
-export function useRoller(compiled: CompiledTemplate): Roller {
+export function useRoller(
+  compiled: CompiledTemplate,
+  /** Com a ficha, os testes que rolam pelo valor de um campo (ex.: o atributo) sabem quantos. */
+  sheet?: { values: SheetValues; derived: DerivedValues },
+): Roller {
   const { session } = useServices();
   // Com os dados 3D, o resultado aparece na bandeja, à direita: sem aviso repetido.
   const { enabled: tray } = useDiceTray();
@@ -22,6 +34,8 @@ export function useRoller(compiled: CompiledTemplate): Roller {
       dice,
       mode,
       setMode,
+      checkCount: (fieldId: string) =>
+        sheet ? checkDiceCount(compiled, sheet.values, sheet.derived, fieldId) : undefined,
       roll: (label, expression) => {
         void session.roll({ label, expression, dice }).then((result) => {
           if (result.ok) {
@@ -65,6 +79,6 @@ export function useRoller(compiled: CompiledTemplate): Roller {
         })();
       },
     }),
-    [session, checkDice, dice, tray, mode],
+    [session, checkDice, dice, tray, mode, compiled, sheet],
   );
 }

@@ -129,6 +129,11 @@ const ComputedFieldSchema = z.object({
   formula: FormulaSourceSchema,
   /** Exibe o sinal também em positivos (ex.: "+3"), como em modificadores. */
   signed: z.boolean().optional(),
+  /**
+   * Quantos dados do teste rolar: o valor deste outro campo (ex.: o atributo, na Ordem
+   * Paranormal). Fica o maior; com 0 ou menos, rola dois e fica o menor. Sem isso, um dado.
+   */
+  checkDiceFrom: IdSchema.optional(),
 });
 
 /** Campos permitidos dentro de itens de lista (sem fórmulas nem listas aninhadas). */

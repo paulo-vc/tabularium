@@ -1,4 +1,5 @@
 import { checkExpression, parseDice } from '../dice/dice';
+import { checkDiceCount } from '../sheet/check';
 import type { DerivedValues } from '../sheet/compute';
 import type { SheetValues } from '../sheet/schema';
 import type { CompiledTemplate } from '../template/compile';
@@ -25,7 +26,13 @@ export function initiativeExpression(
     modifier = typeof value === 'number' ? value : (field.default ?? 0);
   }
   if (modifier === null || !Number.isFinite(modifier)) return null;
-  const expression = checkExpression(compiled.template.checkDice ?? '1d20', Math.trunc(modifier));
+  // Na Ordem Paranormal, a iniciativa rola tantos d20 quanto a Agilidade.
+  const expression = checkExpression(
+    compiled.template.checkDice ?? '1d20',
+    Math.trunc(modifier),
+    'normal',
+    checkDiceCount(compiled, values, derived, fieldId),
+  );
   return parseDice(expression, compiled.template.dice).ok ? expression : null;
 }
 

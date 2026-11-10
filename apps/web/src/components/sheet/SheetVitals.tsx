@@ -371,7 +371,7 @@ export function SheetVitals({
               {result?.ok ? formatNumber(result.value, field.signed) : '—'}
             </span>
             {field.signed && result?.ok && (
-              <CheckButton label={field.label} modifier={result.value} />
+              <CheckButton label={field.label} modifier={result.value} fieldId={field.id} />
             )}
           </span>
         );
