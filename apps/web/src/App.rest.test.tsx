@@ -89,3 +89,26 @@ describe('descanso na ficha', () => {
     });
   });
 });
+
+describe('painel da ficha', () => {
+  it('−1 e +1 mudam o recurso sem digitar, sem passar do máximo', async () => {
+    const { user, id } = await openSheet();
+    await user.click(await screen.findByRole('button', { name: 'Tirar 1 de PV' }));
+    await user.click(screen.getByRole('button', { name: 'Tirar 1 de PV' }));
+    await waitFor(async () =>
+      expect((await services.sheetRepository.get(id))?.values['pv']).toEqual({
+        current: 3,
+        max: 20,
+      }),
+    );
+    for (let i = 0; i < 4; i++) {
+      await user.click(screen.getByRole('button', { name: 'Somar 1 a Foco' }));
+    }
+    await waitFor(async () =>
+      expect((await services.sheetRepository.get(id))?.values['foco']).toEqual({
+        current: 3,
+        max: 3,
+      }),
+    );
+  });
+});

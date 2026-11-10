@@ -4,6 +4,7 @@ As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos
 
 ## Próxima versão
 
+- **Painel da ficha em coluna:** em telas largas, PV, recursos, condições e a vantagem ficam numa coluna fixa à esquerda da ficha, sempre à vista ao rolar; em telas menores, continuam na faixa do topo. Cada recurso ganhou −1 e +1 ao lado do número, para o dano e a cura mais comuns sem digitar.
 - **Testes com vários dados:** um campo calculado pode rolar tantos dados do teste quanto o valor de outro campo, ficando com o maior ("Dados do teste", no editor de campos). Com 0 ou menos, rola dois e fica com o menor; vantagem soma um dado e desvantagem tira um. Vale também para a iniciativa. É a regra da Ordem Paranormal: Acrobacia com Agilidade 3 rola 3d20 e fica com o maior.
 - **Descanso curto e longo:** o botão **Descansar**, no topo da ficha, mostra o que volta em cada descanso e recupera ao confirmar. No D&D 5e (1.9.0), o descanso longo enche os PV e os espaços de magia, devolve metade dos Dados de Vida e tira um nível de Exaustão; os dois zeram os testes contra a morte. Quem cria sistemas marca, em cada número ou recurso, se ele volta no descanso curto ou só no longo, e quanto: tudo, metade do máximo ou um valor (como -1). O Mestre também pode descansar a ficha de um jogador pela sessão.
 - **Ficha com cara de papel:** nas seções comuns, os campos de texto, número e escolha viram linhas, como numa ficha impressa, e os sistemas podem pôr duas seções lado a lado em telas largas ("Meia página" no editor de seções), para montar a ficha como no PDF.

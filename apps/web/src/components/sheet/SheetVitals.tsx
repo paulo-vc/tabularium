@@ -176,30 +176,51 @@ function ResourceVital({
   };
 
   return (
-    <div className="min-w-56 flex-1 space-y-1">
+    <div className="min-w-56 flex-1 space-y-1 xl:min-w-0 xl:flex-none">
       <div className="flex items-baseline justify-between gap-2 text-sm">
         <span className="text-muted-foreground">{field.label}</span>
-        <Popover>
-          <PopoverTrigger asChild>
-            <button
-              type="button"
-              aria-label={`Ajustar ${field.label}`}
-              title="Ajustar valores"
-              className="hover:bg-muted focus-visible:ring-ring/50 relative -mx-1 rounded px-1 font-semibold tabular-nums outline-none focus-visible:ring-[3px] pointer-coarse:after:absolute pointer-coarse:after:-inset-x-2 pointer-coarse:after:-inset-y-3"
-            >
-              {formatNumber(value.current)}
-              {max !== undefined && (
-                <span className="text-muted-foreground font-normal"> / {formatNumber(max)}</span>
-              )}
-              {value.temp ? (
-                <span className="text-sky-500"> +{formatNumber(value.temp)}</span>
-              ) : null}
-            </button>
-          </PopoverTrigger>
-          <PopoverContent align="end" aria-label={`Ajustar ${field.label}`}>
-            <ResourceEditor field={field} value={value} max={max} onChange={onChange} />
-          </PopoverContent>
-        </Popover>
+        {/* Um ponto a menos ou a mais, sem digitar: o mais comum no meio do combate. */}
+        <span className="ml-auto flex items-baseline gap-0.5">
+          <button
+            type="button"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground rounded px-1.5 tabular-nums pointer-coarse:px-2.5"
+            aria-label={`Tirar 1 de ${field.label}`}
+            title="−1"
+            onClick={() => onChange(applyToResource(value, 1, 'dano', max))}
+          >
+            −1
+          </button>
+          <Popover>
+            <PopoverTrigger asChild>
+              <button
+                type="button"
+                aria-label={`Ajustar ${field.label}`}
+                title="Ajustar valores"
+                className="hover:bg-muted focus-visible:ring-ring/50 relative -mx-1 rounded px-1 font-semibold tabular-nums outline-none focus-visible:ring-[3px] pointer-coarse:after:absolute pointer-coarse:after:-inset-x-2 pointer-coarse:after:-inset-y-3"
+              >
+                {formatNumber(value.current)}
+                {max !== undefined && (
+                  <span className="text-muted-foreground font-normal"> / {formatNumber(max)}</span>
+                )}
+                {value.temp ? (
+                  <span className="text-sky-500"> +{formatNumber(value.temp)}</span>
+                ) : null}
+              </button>
+            </PopoverTrigger>
+            <PopoverContent align="end" aria-label={`Ajustar ${field.label}`}>
+              <ResourceEditor field={field} value={value} max={max} onChange={onChange} />
+            </PopoverContent>
+          </Popover>
+          <button
+            type="button"
+            className="text-muted-foreground hover:bg-muted hover:text-foreground rounded px-1.5 tabular-nums pointer-coarse:px-2.5"
+            aria-label={`Somar 1 a ${field.label}`}
+            title="+1"
+            onClick={() => onChange(applyToResource(value, 1, 'cura', max))}
+          >
+            +1
+          </button>
+        </span>
       </div>
       <div
         role="meter"
@@ -425,9 +446,9 @@ export function SheetVitals({
   return (
     <section
       aria-label="Resumo do personagem"
-      className="bg-background/95 sticky top-14 z-[5] -mx-4 border-b px-4 py-3 backdrop-blur"
+      className="bg-background/95 sticky top-14 z-[5] -mx-4 border-b px-4 py-3 backdrop-blur xl:top-20 xl:mx-0 xl:max-h-[calc(100dvh-6rem)] xl:overflow-y-auto xl:rounded-xl xl:border xl:p-4"
     >
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-3">
+      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 xl:flex-col xl:items-stretch">
         {bars.map((field) => {
           const value = resourceValue(field);
           return (
@@ -442,7 +463,7 @@ export function SheetVitals({
         })}
         {/* No celular, os números ficam numa linha só, com rolagem lateral: o painel fixo
             não pode tomar a tela. */}
-        <div className="-mx-1 flex max-w-full gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0">
+        <div className="-mx-1 flex max-w-full gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0 xl:mx-0 xl:grid xl:grid-cols-2 xl:px-0 xl:[&>*]:min-w-0">
           {tiles.map((field) => (
             <Tile key={field.id} label={field.label}>
               {tile(field)}
@@ -451,7 +472,10 @@ export function SheetVitals({
         </div>
       </div>
       {/* Sem estados nem vantagem (sistema sem d20), a linha some. */}
-      <div className="mt-2 flex flex-wrap items-center gap-1.5 empty:hidden" aria-label="Estados">
+      <div
+        className="mt-2 flex flex-wrap items-center gap-1.5 empty:hidden xl:mt-4 xl:border-t xl:pt-3"
+        aria-label="Estados"
+      >
         {states.map((field) => {
           if (field.type === 'boolean') {
             const on = (values[field.id] ?? defaultValue(field)) === true;
