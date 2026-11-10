@@ -70,7 +70,7 @@ Em **Sistemas → Criar sistema**, comece de um modelo pronto (d20 ou 2d6), em b
 
 ![O criador de sistemas](imagens/criador.png)
 
-- **Campos:** números, textos, recursos (como PV), listas (ataques, inventário), escolhas e campos calculados por [fórmulas](formulas.md). O campo de fórmula traz exemplos prontos. Para uma regra opcional, use **Aparece na ficha**: o campo só aparece com um sim/não marcado (ou desmarcado), como a Determinação no lugar de PE e Sanidade.
+- **Campos:** números, textos, recursos (como PV), listas (ataques, inventário), escolhas e campos calculados por [fórmulas](formulas.md). O campo de fórmula traz exemplos prontos. Num campo calculado de teste, **Dados do teste** faz rolar tantos dados quanto outro campo (ex.: o atributo), ficando com o maior. Para uma regra opcional, use **Aparece na ficha**: o campo só aparece com um sim/não marcado (ou desmarcado), como a Determinação no lugar de PE e Sanidade.
 - **Seções lado a lado:** marque **Meia página** numa seção para ela ficar ao lado da seguinte em telas largas, como os blocos de uma ficha de papel.
 - **Dados do sistema:** dados com faces próprias, como o dado Fate (`4dF`) ou Esperança e Medo.
 - **Ícone:** uma imagem pequena que aparece nas listas.

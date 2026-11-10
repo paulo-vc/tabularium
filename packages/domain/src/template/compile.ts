@@ -215,6 +215,25 @@ export function compileTemplate(template: SystemTemplate): Result<CompiledTempla
   const fieldsById = new Map(fields.map((field) => [field.id, field]));
   const fieldsByKey = new Map(fields.map((field) => [field.key, field]));
 
+  // Dados do teste pelo valor de outro campo: um número ou calculado da ficha.
+  fields.forEach((field, index) => {
+    if (field.type !== 'computed' || field.checkDiceFrom === undefined) return;
+    const source = fieldsById.get(field.checkDiceFrom);
+    if (
+      !source ||
+      source.id === field.id ||
+      (source.type !== 'number' && source.type !== 'computed')
+    ) {
+      issues.push(
+        issue(
+          'dados-invalidos',
+          ['fields', index, 'checkDiceFrom'],
+          'Os dados do teste precisam vir de outro campo de número ou calculado',
+        ),
+      );
+    }
+  });
+
   // "Só aparece quando": o campo de referência é um sim/não da ficha, e não o próprio.
   fields.forEach((field, index) => {
     const when = field.visibleWhen;

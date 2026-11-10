@@ -29,6 +29,9 @@ import {
 import { parseNumber } from '@/components/sheet/format';
 import { FormulaInput } from './FormulaInput';
 
+/** Teste com um dado só (sem `checkDiceFrom`). */
+const ONE_DIE = '__um__';
+
 type AnyField = FieldDef | ListItemFieldDef;
 
 /** Número opcional: vazio significa "sem valor". Aceita vírgula decimal. */
@@ -645,6 +648,34 @@ export function FieldProperties({
           >
             Mostrar sinal em positivos (ex.: +3), como em modificadores
           </CheckRow>
+          {field.signed && (
+            <Field label="Dados do teste" htmlFor={`${base}-dados`}>
+              <Select
+                value={field.checkDiceFrom ?? ONE_DIE}
+                onValueChange={(value) =>
+                  onChange(set(field, 'checkDiceFrom', value === ONE_DIE ? undefined : value))
+                }
+              >
+                <SelectTrigger id={`${base}-dados`} className="w-full">
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value={ONE_DIE}>Um dado (o normal)</SelectItem>
+                  {fields
+                    .filter(
+                      (other) =>
+                        other.id !== field.id &&
+                        (other.type === 'number' || other.type === 'computed'),
+                    )
+                    .map((other) => (
+                      <SelectItem key={other.id} value={other.id}>
+                        Tantos quanto “{other.label || other.key}”, fica o maior
+                      </SelectItem>
+                    ))}
+                </SelectContent>
+              </Select>
+            </Field>
+          )}
         </div>
       );
     case 'list':

@@ -34,6 +34,8 @@ export interface Roller {
   /** Como sai o próximo teste ou ataque; volta a "normal" depois dele. */
   mode: RollMode;
   setMode: (mode: RollMode) => void;
+  /** Quantos dados o teste do campo rola (ex.: o atributo); sem isso, um. */
+  checkCount?: ((fieldId: string) => number | undefined) | undefined;
   /** Dados do sistema (`4dF`), aceitos nas expressões. */
   dice?: readonly CustomDie[] | undefined;
 }
@@ -61,10 +63,20 @@ export function RollButton({ label, expression }: { label: string; expression: s
 }
 
 /** Botão de teste: o dado do sistema mais o modificador (ex.: 1d20+5), com vantagem se escolhida. */
-export function CheckButton({ label, modifier }: { label: string; modifier: number }) {
+export function CheckButton({
+  label,
+  modifier,
+  fieldId,
+}: {
+  label: string;
+  modifier: number;
+  /** O campo do teste: o sistema pode rolar vários dados por ele (`checkDiceFrom`). */
+  fieldId?: string | undefined;
+}) {
   const roller = useContext(RollContext);
   if (!roller) return null;
-  const expression = checkExpression(roller.checkDice, modifier, roller.mode);
+  const count = fieldId === undefined ? undefined : roller.checkCount?.(fieldId);
+  const expression = checkExpression(roller.checkDice, modifier, roller.mode, count);
   if (!parseDice(expression, roller.dice).ok) return null;
   return (
     <Button

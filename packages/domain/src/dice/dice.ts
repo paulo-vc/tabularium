@@ -243,18 +243,33 @@ export function supportsRollMode(checkDice: string): boolean {
   return singleCheckDie(checkDice) !== null;
 }
 
+/** Máximo de dados num teste rolado pelo valor de um campo (ex.: atributo 5 → 5d20). */
+export const CHECK_DICE_MAX = 20;
+
 /**
  * Rolagem de um teste: o dado do sistema (ex.: 1d20) mais o modificador. Com vantagem ou
  * desvantagem, dois dados ficando com o maior ou o menor ("2d20kh1+5"), se o dado dos testes
  * for um só; senão, a rolagem fica normal.
+ *
+ * `count`: quantos dados rolar (o atributo, na Ordem Paranormal), ficando com o maior; com 0
+ * ou menos, rola dois (três com -1…) e fica com o menor. Vantagem soma um dado e
+ * desvantagem tira um.
  */
 export function checkExpression(
   checkDice: string,
   modifier: number,
   mode: RollMode = 'normal',
+  count?: number,
 ): string {
-  const single = mode === 'normal' ? null : singleCheckDie(checkDice);
-  const base = single ? `2d${single.sides}${mode === 'vantagem' ? 'kh1' : 'kl1'}` : checkDice;
+  const single = mode === 'normal' && count === undefined ? null : singleCheckDie(checkDice);
+  let base = checkDice;
+  if (single && count !== undefined && Number.isFinite(count)) {
+    const n = Math.trunc(count) + (mode === 'vantagem' ? 1 : mode === 'desvantagem' ? -1 : 0);
+    const dice = Math.min(CHECK_DICE_MAX, n >= 1 ? n : 2 - n);
+    base = n === 1 ? `1d${single.sides}` : `${dice}d${single.sides}${n >= 1 ? 'kh1' : 'kl1'}`;
+  } else if (single && mode !== 'normal') {
+    base = `2d${single.sides}${mode === 'vantagem' ? 'kh1' : 'kl1'}`;
+  }
   if (modifier === 0) return base;
   return `${base}${modifier > 0 ? '+' : '-'}${Math.abs(modifier)}`;
 }
