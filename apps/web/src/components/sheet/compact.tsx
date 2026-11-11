@@ -292,7 +292,8 @@ function Toggle({ field, value, onChange }: CompactFieldProps) {
       aria-label={field.label}
       title={field.label}
       className={cn(
-        'shrink-0 rounded-full p-0.5',
+        // Em telas de toque, a área de toque cresce para 44 px sem mudar o desenho.
+        'relative shrink-0 rounded-full p-0.5 pointer-coarse:after:absolute pointer-coarse:after:-inset-3',
         on ? 'text-primary' : 'text-muted-foreground/60 hover:text-muted-foreground',
       )}
       onClick={() => onChange(!on)}

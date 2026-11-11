@@ -12,6 +12,7 @@ import {
 } from '@tabula/domain';
 import { EyeOffIcon } from 'lucide-react';
 import { useId, useState } from 'react';
+import { useMediaQuery } from '@/components/use-media-query';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -126,6 +127,7 @@ export function SheetLayout({
 }: SheetLayoutProps) {
   const base = useId();
   const [selected, setSelected] = useState(0);
+  const roomy = useMediaQuery('(min-width: 40rem)');
   /** Seções em linhas (perícias) mostrando só as treinadas, pelo título. */
   const [onlyTrained, setOnlyTrained] = useState<ReadonlySet<string>>(new Set());
   const trained = (cells: readonly CompactFieldProps[]) => isTrainedRow(cells) !== false;
@@ -217,6 +219,8 @@ export function SheetLayout({
       return [{ main: propsOf(field), secondary: secondary ? propsOf(secondary) : undefined }];
     });
     if (tiles.length < 3 || tiles.length > 8) return renderTiles(section);
+    // Em tela estreita, valores embaixo de cada bloco (o 16 sob o +3) não cabem no círculo.
+    if (!roomy && tiles.some((tile) => tile.secondary)) return renderTiles(section);
     return <CircleSection title={section.title} tiles={tiles} />;
   };
 

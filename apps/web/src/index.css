@@ -276,3 +276,17 @@ body {
 .ficha [data-slot='card-title'] {
   color: var(--primary);
 }
+
+/*
+ * O foco do teclado não fica escondido atrás do que é fixo: o cabeçalho (e, de 768 px a
+ * 1280 px, o painel da ficha no topo) e, no celular, a barra do polegar.
+ */
+html {
+  scroll-padding-top: 4.5rem;
+  scroll-padding-bottom: calc(var(--barra-polegar, 0px) + 1rem);
+}
+@media (min-width: 48rem) and (max-width: 79.99rem) {
+  html:has([aria-label='Resumo do personagem']) {
+    scroll-padding-top: 15rem;
+  }
+}

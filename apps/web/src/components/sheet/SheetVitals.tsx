@@ -203,7 +203,7 @@ function BarButton({
       aria-label={label}
       title={label}
       onClick={onClick}
-      className="relative h-full w-8 shrink-0 text-base text-white/80 [text-shadow:0_1px_2px_rgb(0_0_0/0.6)] hover:bg-black/20 hover:text-white pointer-coarse:w-10"
+      className="relative h-full w-8 shrink-0 text-base text-white/80 [text-shadow:0_1px_2px_rgb(0_0_0/0.6)] hover:bg-black/20 hover:text-white active:bg-black/30 pointer-coarse:w-11"
     >
       {children}
     </button>
@@ -246,7 +246,7 @@ function ResourceVital({
         ) : null}
       </div>
       {/* A barra é o controle: « −5, ‹ −1, o valor (abre o ajuste exato), › +1, » +5. */}
-      <div className="bg-muted relative flex h-8 items-center overflow-hidden rounded-md border pointer-coarse:h-10">
+      <div className="bg-muted relative flex h-8 items-center overflow-hidden rounded-md border pointer-coarse:h-11">
         {/* O medidor fica só no preenchimento: dentro de um meter, os botões sumiriam do leitor de tela. */}
         <div
           role="meter"
