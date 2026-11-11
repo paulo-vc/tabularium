@@ -555,6 +555,12 @@
       "type": "text"
     },
     {
+      "id": "jogador",
+      "key": "jogador",
+      "label": "Jogador",
+      "type": "text"
+    },
+    {
       "id": "edicao",
       "key": "edicao",
       "label": "Regras",
@@ -661,6 +667,42 @@
       "default": 0,
       "min": 0,
       "integer": true
+    },
+    {
+      "id": "idade",
+      "key": "idade",
+      "label": "Idade",
+      "type": "text"
+    },
+    {
+      "id": "altura",
+      "key": "altura",
+      "label": "Altura",
+      "type": "text"
+    },
+    {
+      "id": "peso",
+      "key": "peso",
+      "label": "Peso",
+      "type": "text"
+    },
+    {
+      "id": "olhos",
+      "key": "olhos",
+      "label": "Olhos",
+      "type": "text"
+    },
+    {
+      "id": "pele",
+      "key": "pele",
+      "label": "Pele",
+      "type": "text"
+    },
+    {
+      "id": "cabelos",
+      "key": "cabelos",
+      "label": "Cabelos",
+      "type": "text"
     },
     {
       "id": "for",
@@ -1920,6 +1962,30 @@
       "type": "longtext"
     },
     {
+      "id": "aparencia",
+      "key": "aparencia",
+      "label": "Aparência",
+      "type": "longtext"
+    },
+    {
+      "id": "historia_personagem",
+      "key": "historia_personagem",
+      "label": "História do personagem",
+      "type": "longtext"
+    },
+    {
+      "id": "aliados",
+      "key": "aliados",
+      "label": "Aliados e organizações",
+      "type": "longtext"
+    },
+    {
+      "id": "tesouro",
+      "key": "tesouro",
+      "label": "Tesouro",
+      "type": "longtext"
+    },
+    {
       "id": "caracteristicas",
       "key": "caracteristicas",
       "label": "Características e talentos",
@@ -2535,6 +2601,10 @@
           },
           {
             "kind": "field",
+            "fieldId": "jogador"
+          },
+          {
+            "kind": "field",
             "fieldId": "edicao"
           },
           {
@@ -2564,6 +2634,30 @@
           {
             "kind": "field",
             "fieldId": "xp"
+          },
+          {
+            "kind": "field",
+            "fieldId": "idade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "altura"
+          },
+          {
+            "kind": "field",
+            "fieldId": "peso"
+          },
+          {
+            "kind": "field",
+            "fieldId": "olhos"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pele"
+          },
+          {
+            "kind": "field",
+            "fieldId": "cabelos"
           }
         ],
         "tab": "Personagem"
@@ -2599,6 +2693,29 @@
           {
             "kind": "field",
             "fieldId": "defeitos"
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "title": "História e aparência",
+        "columns": 2,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "aparencia"
+          },
+          {
+            "kind": "field",
+            "fieldId": "historia_personagem"
+          },
+          {
+            "kind": "field",
+            "fieldId": "aliados"
+          },
+          {
+            "kind": "field",
+            "fieldId": "tesouro"
           }
         ]
       },

@@ -4,6 +4,7 @@ As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos
 
 ## Próxima versão
 
+- **D&D 5e completo como a ficha oficial:** a ficha (1.10.0) ganha o que faltava em relação à ficha em PDF: jogador, idade, altura, peso, olhos, pele e cabelos, e a seção História e aparência (aparência, história do personagem, aliados e organizações, tesouro).
 - **Bônus e perícias à vista:** os bônus ativos (itens, maldições, bênçãos) aparecem no painel da ficha junto das condições, com o campo e o total, verdes quando ajudam e vermelhos quando atrapalham. Nas perícias, "Só treinadas" esconde as que não têm treino, e os testes que rolam vários dados mostram quantos no botão ("3d20").
 - **Menor é melhor:** o sistema pode dizer que, nos testes, o menor resultado é o melhor (rolar abaixo do valor). Aí a vantagem fica com o menor dado e o crítico é o 1. Corrige a vantagem do Chamado de Cthulhu, que ficava com o maior.
 - **Cor de cada sistema:** o sistema pode ter uma cor de destaque (cobalto, violeta, magenta, vermelho, laranja, âmbar, verde ou ciano, em "Cor de destaque" no criador de sistemas). Com a ficha ou a campanha desse sistema aberta, botões, abas e destaques do app ficam nessa cor, nos dois temas; fora dela, volta o cobalto. O D&D 5e (1.10.0) fica violeta.
