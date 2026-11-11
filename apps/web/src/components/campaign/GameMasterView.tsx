@@ -20,7 +20,8 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { encodeInvite } from '@/app/invite-link';
 import { useServices } from '@/app/services-context';
-import { useSystemAccent } from '@/components/use-system-accent';
+import { useMediaQuery } from '@/components/use-media-query';
+import { systemTheme } from '@/components/use-system-accent';
 import { CampaignBestiary } from '@/components/bestiary/CampaignBestiary';
 import { CampaignCoverEditor } from '@/components/campaign/CampaignCover';
 import { CodexReader } from '@/components/codex/CodexReader';
@@ -69,8 +70,9 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
     () => catalog.get(campaign.templateRef.id),
     [catalog, campaign.templateRef.id],
   );
-  useSystemAccent(template?.accent);
   const [tab, setTab] = useState<Tab>('jogadores');
+  // Telas largas: os jogadores ficam numa coluna à direita, fora da aba Jogadores.
+  const wide = useMediaQuery('(min-width: 80rem)');
   const active = live.kind === 'mestre' && live.campaignId === campaign.id;
   const online = active ? live.players.filter((p) => p.online).length : 0;
   const inCombat = active && live.initiative !== null;
@@ -161,11 +163,18 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
   ];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-4" {...systemTheme(template)}>
       <GameMasterSessionBar campaign={campaign} />
       <TabBar label="Partes da campanha" tabs={tabs} active={tab} onChange={setTab} />
-      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_24rem]">
-        <div role="tabpanel" className={cn('min-w-0 space-y-4', side && 'max-lg:hidden')}>
+      {/*
+        Telas largas: combate e rolagens à esquerda, a mesa (abas) no centro e os jogadores à
+        direita, tudo à vista. Telas médias: mesa e, ao lado, combate e rolagens. Celular: abas.
+      */}
+      <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_24rem] xl:grid-cols-[22rem_minmax(0,1fr)_19rem]">
+        <div
+          role="tabpanel"
+          className={cn('min-w-0 space-y-4 xl:col-start-2 xl:row-start-1', side && 'max-lg:hidden')}
+        >
           {main === 'jogadores' && (
             <>
               <Tip id="mestre-sessao" title="Como funciona a mesa">
@@ -183,7 +192,7 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
                 </p>
               </Tip>
               <InviteCard campaign={campaign} compact={online > 0} />
-              <GameMasterPlayers campaign={campaign} />
+              {!wide && <GameMasterPlayers campaign={campaign} />}
             </>
           )}
           {main === 'bestiario' && <CampaignBestiary campaign={campaign} template={template} />}
@@ -222,7 +231,7 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
         <aside
           aria-label="Combate e rolagens"
           className={cn(
-            'space-y-4 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto',
+            'space-y-4 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto xl:col-start-1 xl:row-start-1',
             !side && 'max-lg:hidden',
           )}
         >
@@ -250,6 +259,19 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
             <RollLog campaignId={campaign.id} isGameMaster />
           </div>
         </aside>
+
+        {wide && (
+          <aside
+            aria-label="Jogadores da mesa"
+            className="space-y-4 xl:sticky xl:top-20 xl:col-start-3 xl:row-start-1 xl:max-h-[calc(100dvh-6rem)] xl:overflow-y-auto"
+          >
+            <h2 className="font-heading text-primary flex items-center gap-2 text-lg tracking-wide uppercase">
+              <UsersIcon className="size-5" /> Jogadores
+              {online > 0 && <Badge variant="secondary">{online}</Badge>}
+            </h2>
+            <GameMasterPlayers campaign={campaign} />
+          </aside>
+        )}
       </div>
     </div>
   );

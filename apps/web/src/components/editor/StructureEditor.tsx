@@ -124,6 +124,7 @@ const DISPLAY_LABELS: Record<SectionDisplay, string> = {
   padrao: 'Padrão',
   compacto: 'Blocos (atributos)',
   linhas: 'Linhas (perícias)',
+  circulo: 'Em círculo (atributos)',
 };
 
 /** Abas já usadas no sistema, para sugerir ao nomear a aba de uma seção. */

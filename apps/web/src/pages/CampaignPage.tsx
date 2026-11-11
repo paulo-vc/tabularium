@@ -20,7 +20,7 @@ import { useMemo, useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
 import { Link } from 'wouter';
 import { useServices } from '@/app/services-context';
-import { useSystemAccent } from '@/components/use-system-accent';
+import { systemTheme } from '@/components/use-system-accent';
 import { useDeviceId } from '@/components/use-device';
 import { CampaignCover } from '@/components/campaign/CampaignCover';
 import { PlayerJournal } from '@/components/campaign/JournalPanel';
@@ -112,11 +112,10 @@ function PlayerView({ campaign, userId }: { campaign: Campaign; userId: string }
     async () => Boolean(await catalog.get(campaign.templateRef.id)),
     [catalog, campaign.templateRef.id],
   );
-  const accent = useLiveQuery(
-    async () => (await catalog.get(campaign.templateRef.id))?.accent,
+  const theme = useLiveQuery(
+    async () => systemTheme(await catalog.get(campaign.templateRef.id)),
     [catalog, campaign.templateRef.id],
   );
-  useSystemAccent(accent);
   // Páginas do códice que o jogador lê: as condições do combate abrem a página delas.
   const codex = useLiveQuery(
     async () => (await catalog.get(campaign.templateRef.id))?.codex?.filter((page) => !page.gmOnly),
@@ -143,7 +142,7 @@ function PlayerView({ campaign, userId }: { campaign: Campaign; userId: string }
   const showChooser = choosing || linked === null;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2">
+    <div className="grid gap-4 lg:grid-cols-2" {...theme}>
       <div className="lg:col-span-2">
         <Tip id="jogador-sessao" title="Como entrar na mesa">
           <p>

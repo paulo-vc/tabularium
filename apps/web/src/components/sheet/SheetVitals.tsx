@@ -7,6 +7,7 @@ import {
   type FieldDef,
   type FieldOf,
   type FieldValue,
+  type BarColor,
   type ResourceValue,
   type RollMode,
   type SheetValues,
@@ -30,6 +31,7 @@ import { Label } from '@/components/ui/label';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { NumberInput, PrimitiveInput } from './fields';
 import { formatNumber, parseNumber } from './format';
+import { Shield } from './compact';
 import { markCount, Marks } from './Marks';
 import { BonusContext } from './Bonuses';
 import { CheckButton, RollContext, RollModeBar } from './roll-context';
@@ -164,6 +166,50 @@ function ResourceEditor({
   );
 }
 
+/** Matiz de cada cor de barra (o mesmo das cores de destaque). */
+const BAR_HUE: Record<BarColor, number> = {
+  vermelho: 25,
+  laranja: 50,
+  ambar: 78,
+  verde: 152,
+  ciano: 205,
+  cobalto: 262,
+  violeta: 300,
+  magenta: 340,
+};
+
+/**
+ * Cor da barra: a do recurso (Vida vermelha, Sanidade violeta…) ou, sem cor, de verde a
+ * vermelho conforme esvazia. Escura o bastante para o número branco em cima.
+ */
+function barColor(color: BarColor | undefined, percent: number): string {
+  const hue = color ? BAR_HUE[color] : percent > 50 ? 152 : percent > 25 ? 70 : 25;
+  return `oklch(0.5 0.15 ${hue})`;
+}
+
+/** Botão dentro da barra (« ‹ › »): grande para o dedo, discreto no meio do combate. */
+function BarButton({
+  label,
+  onClick,
+  children,
+}: {
+  label: string;
+  onClick: () => void;
+  children: ReactNode;
+}) {
+  return (
+    <button
+      type="button"
+      aria-label={label}
+      title={label}
+      onClick={onClick}
+      className="relative h-full w-8 shrink-0 text-base text-white/80 [text-shadow:0_1px_2px_rgb(0_0_0/0.6)] hover:bg-black/20 hover:text-white pointer-coarse:w-10"
+    >
+      {children}
+    </button>
+  );
+}
+
 function ResourceVital({
   field,
   value,
@@ -189,66 +235,71 @@ function ResourceVital({
 
   return (
     <div className={cn('min-w-56 flex-1 space-y-1 xl:min-w-0 xl:flex-none', className)}>
-      <div className="flex items-baseline justify-between gap-2 text-sm">
-        <span className="text-muted-foreground">{field.label}</span>
-        {/* Um ponto a menos ou a mais, sem digitar: o mais comum no meio do combate. */}
-        <span className="ml-auto flex items-baseline gap-0.5">
-          <button
-            type="button"
-            className="text-muted-foreground hover:bg-muted hover:text-foreground rounded px-1.5 tabular-nums pointer-coarse:px-2.5"
-            aria-label={`Tirar 1 de ${field.label}`}
-            title="−1"
-            onClick={() => onChange(applyToResource(value, 1, 'dano', max))}
-          >
-            −1
-          </button>
-          <Popover>
-            <PopoverTrigger asChild>
-              <button
-                type="button"
-                aria-label={`Ajustar ${field.label}`}
-                title="Ajustar valores"
-                className="hover:bg-muted focus-visible:ring-ring/50 relative -mx-1 rounded px-1 font-semibold tabular-nums outline-none focus-visible:ring-[3px] pointer-coarse:after:absolute pointer-coarse:after:-inset-x-2 pointer-coarse:after:-inset-y-3"
-              >
-                {formatNumber(value.current)}
-                {max !== undefined && (
-                  <span className="text-muted-foreground font-normal"> / {formatNumber(max)}</span>
-                )}
-                {value.temp ? (
-                  <span className="text-sky-500"> +{formatNumber(value.temp)}</span>
-                ) : null}
-              </button>
-            </PopoverTrigger>
-            <PopoverContent align="end" aria-label={`Ajustar ${field.label}`}>
-              <ResourceEditor field={field} value={value} max={max} onChange={onChange} />
-            </PopoverContent>
-          </Popover>
-          <button
-            type="button"
-            className="text-muted-foreground hover:bg-muted hover:text-foreground rounded px-1.5 tabular-nums pointer-coarse:px-2.5"
-            aria-label={`Somar 1 a ${field.label}`}
-            title="+1"
-            onClick={() => onChange(applyToResource(value, 1, 'cura', max))}
-          >
-            +1
-          </button>
+      <div className="flex items-baseline justify-between gap-2">
+        <span className="text-muted-foreground text-xs font-medium tracking-wide uppercase">
+          {field.label}
         </span>
+        {value.temp ? (
+          <span className="text-xs text-sky-400 tabular-nums">
+            +{formatNumber(value.temp)} temp.
+          </span>
+        ) : null}
       </div>
+      {/* A barra é o controle: « −5, ‹ −1, o valor (abre o ajuste exato), › +1, » +5. */}
       <div
         role="meter"
         aria-label={`${field.label}: ${formatNumber(value.current)}${max !== undefined ? ` de ${formatNumber(max)}` : ''}`}
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(percent)}
-        className="bg-muted h-2 overflow-hidden rounded-full"
+        className="bg-muted relative flex h-8 items-center overflow-hidden rounded-md border pointer-coarse:h-10"
       >
         <div
-          className={cn(
-            'h-full transition-[width]',
-            percent > 50 ? 'bg-emerald-500' : percent > 25 ? 'bg-amber-500' : 'bg-red-500',
-          )}
-          style={{ width: `${percent}%` }}
+          className="absolute inset-y-0 left-0 transition-[width]"
+          style={{ width: `${percent}%`, background: barColor(field.color, percent) }}
         />
+        <BarButton
+          label={`Tirar 5 de ${field.label}`}
+          onClick={() => onChange(applyToResource(value, 5, 'dano', max))}
+        >
+          «
+        </BarButton>
+        <BarButton
+          label={`Tirar 1 de ${field.label}`}
+          onClick={() => onChange(applyToResource(value, 1, 'dano', max))}
+        >
+          ‹
+        </BarButton>
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              aria-label={`Ajustar ${field.label}`}
+              title="Ajustar valores"
+              className="relative flex-1 self-stretch font-mono text-sm font-semibold text-white tabular-nums [text-shadow:0_1px_2px_rgb(0_0_0/0.6)] outline-none focus-visible:ring-2 focus-visible:ring-white/70"
+            >
+              {formatNumber(value.current)}
+              {max !== undefined && (
+                <span className="font-normal opacity-80"> / {formatNumber(max)}</span>
+              )}
+            </button>
+          </PopoverTrigger>
+          <PopoverContent align="center" aria-label={`Ajustar ${field.label}`}>
+            <ResourceEditor field={field} value={value} max={max} onChange={onChange} />
+          </PopoverContent>
+        </Popover>
+        <BarButton
+          label={`Somar 1 a ${field.label}`}
+          onClick={() => onChange(applyToResource(value, 1, 'cura', max))}
+        >
+          ›
+        </BarButton>
+        <BarButton
+          label={`Somar 5 a ${field.label}`}
+          onClick={() => onChange(applyToResource(value, 5, 'cura', max))}
+        >
+          »
+        </BarButton>
       </div>
       <form
         className="flex items-center gap-1"
@@ -283,7 +334,26 @@ function ResourceVital({
 }
 
 /** Bloco pequeno do painel: rótulo em cima, valor (ou controle) embaixo. */
-function Tile({ label, children }: { label: string; children: ReactNode }) {
+function Tile({
+  label,
+  emblem,
+  children,
+}: {
+  label: string;
+  emblem?: 'escudo' | undefined;
+  children: ReactNode;
+}) {
+  if (emblem === 'escudo') {
+    return (
+      <div className="relative flex min-w-20 shrink-0 flex-col items-center gap-0.5 px-3 pt-1 pb-3">
+        <Shield />
+        <span className="text-muted-foreground relative line-clamp-2 max-w-24 text-center text-[11px] leading-tight">
+          {label}
+        </span>
+        <div className="relative">{children}</div>
+      </div>
+    );
+  }
   return (
     <div className="flex min-w-16 shrink-0 flex-col items-center gap-0.5 rounded-md border px-2.5 py-1">
       <span
@@ -484,7 +554,7 @@ export function SheetVitals({
             não pode tomar a tela. */}
           <div className="-mx-1 flex max-w-full gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0 xl:mx-0 xl:grid xl:grid-cols-2 xl:px-0 xl:[&>*]:min-w-0">
             {tiles.map((field) => (
-              <Tile key={field.id} label={field.label}>
+              <Tile key={field.id} label={field.label} emblem={field.emblem}>
                 {tile(field)}
               </Tile>
             ))}

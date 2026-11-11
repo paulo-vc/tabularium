@@ -329,6 +329,21 @@ function FieldForm({
             Visível só para o Mestre durante a sessão
           </Label>
         </div>
+        {field.type !== 'list' && field.type !== 'longtext' && (
+          <div className="flex items-center gap-2">
+            <Checkbox
+              id={`${base}-escudo`}
+              checked={field.emblem === 'escudo'}
+              onCheckedChange={(checked) => {
+                const { emblem: _, ...rest } = field;
+                changeField(checked === true ? { ...field, emblem: 'escudo' } : (rest as FieldDef));
+              }}
+            />
+            <Label htmlFor={`${base}-escudo`} className="font-normal">
+              Mostrar dentro de um escudo (ex.: Defesa, Classe de Armadura)
+            </Label>
+          </div>
+        )}
         <div className="flex items-center gap-2">
           <Checkbox
             id={`${base}-resumo`}

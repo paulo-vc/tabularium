@@ -15,7 +15,15 @@ import { useId, useState } from 'react';
 import { cn } from '@/lib/utils';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { FieldLine, SecondaryValue, StatTile, type CompactFieldProps } from './compact';
+import {
+  CircleSection,
+  FieldLine,
+  FieldLineHeader,
+  isTrainedRow,
+  SecondaryValue,
+  StatTile,
+  type CompactFieldProps,
+} from './compact';
 import { BonusSection } from './Bonuses';
 import { AddItemButton, FieldControl } from './fields';
 import { RollModeBar } from './roll-context';
@@ -120,20 +128,7 @@ export function SheetLayout({
   const [selected, setSelected] = useState(0);
   /** Seções em linhas (perícias) mostrando só as treinadas, pelo título. */
   const [onlyTrained, setOnlyTrained] = useState<ReadonlySet<string>>(new Set());
-  /** A linha tem treino: um sim/não marcado, ou uma escolha além da primeira (o "destreinado"). */
-  const trained = (cells: readonly CompactFieldProps[]) => {
-    const marks = cells.filter(
-      (cell) =>
-        cell.field.type === 'boolean' || (cell.field.type === 'select' && !cell.field.multiple),
-    );
-    if (marks.length === 0) return true;
-    return marks.some(({ field, value }) => {
-      const current = value ?? defaultValue(field);
-      if (field.type === 'boolean') return current === true;
-      if (field.type !== 'select') return false;
-      return typeof current === 'string' && current !== '' && current !== field.options[0]?.value;
-    });
-  };
+  const trained = (cells: readonly CompactFieldProps[]) => isTrainedRow(cells) !== false;
   const linesHaveTraining = (section: SectionNode) =>
     section.children.some((node) => {
       if (node.kind !== 'field') return false;
@@ -212,6 +207,19 @@ export function SheetLayout({
     </div>
   );
 
+  /** Seção em círculo (atributos): de 3 a 8 blocos em volta do título; senão, blocos. */
+  const renderCircle = (section: SectionNode) => {
+    const tiles = section.children.flatMap((node) => {
+      if (node.kind !== 'field') return [];
+      const field = visible(node.fieldId);
+      if (!field) return [];
+      const secondary = visible(node.secondary);
+      return [{ main: propsOf(field), secondary: secondary ? propsOf(secondary) : undefined }];
+    });
+    if (tiles.length < 3 || tiles.length > 8) return renderTiles(section);
+    return <CircleSection title={section.title} tiles={tiles} />;
+  };
+
   /** Seção em linhas: cada `columns` campos formam uma linha (ex.: uma perícia). */
   const renderLines = (section: SectionNode) => {
     const rows: CompactFieldProps[][] = [];
@@ -235,9 +243,26 @@ export function SheetLayout({
     }
     if (row.length > 0) rows.push(row);
     const shownRows = onlyTrained.has(section.title) ? rows.filter(trained) : rows;
+    // Linhas com uma escolha (o grau da perícia) não cabem em duas colunas: uma só, larga.
+    const wide = rows[0]?.some((cell) => cell.field.type === 'select') ?? false;
+    // Em meia página também não cabem duas colunas: uma só, ocupando a seção.
+    const single = wide || section.width === 'metade';
     return (
       <div className="space-y-3">
-        <div className="sm:columns-2 sm:gap-6">
+        {rows[0] &&
+          (single ? (
+            <div className={cn(wide && 'max-w-2xl')}>
+              <FieldLineHeader cells={rows[0]} />
+            </div>
+          ) : (
+            <div className="sm:grid sm:grid-cols-2 sm:gap-6">
+              <FieldLineHeader cells={rows[0]} />
+              <div className="max-sm:hidden">
+                <FieldLineHeader cells={rows[0]} />
+              </div>
+            </div>
+          ))}
+        <div className={cn(single ? wide && 'max-w-2xl' : 'sm:columns-2 sm:gap-6')}>
           {shownRows.length === 0 && (
             <p className="text-muted-foreground text-sm">Nenhuma treinada ainda.</p>
           )}
@@ -338,9 +363,11 @@ export function SheetLayout({
     const content =
       section.display === 'compacto'
         ? renderTiles(section)
-        : section.display === 'linhas'
-          ? renderLines(section)
-          : renderGrid(section.children, section.columns, depth);
+        : section.display === 'circulo'
+          ? renderCircle(section)
+          : section.display === 'linhas'
+            ? renderLines(section)
+            : renderGrid(section.children, section.columns, depth);
     // Perícias e afins: dá para ver só as treinadas (marcadas, ou com um grau escolhido).
     const filterable = section.display === 'linhas' && linesHaveTraining(section);
     const filtering = onlyTrained.has(section.title);
@@ -433,7 +460,7 @@ export function SheetLayout({
 
   if (tabs.length === 1) {
     return (
-      <div className="grid items-start gap-4 lg:grid-cols-2">
+      <div className="ficha grid items-start gap-4 lg:grid-cols-2">
         {rollModeHere && <RollModeBar className="justify-self-end lg:col-span-2" />}
         {renderTop(tabs[0]?.nodes ?? [])}
         {withBonuses(tabs[0]?.name)}
@@ -442,7 +469,7 @@ export function SheetLayout({
   }
 
   return (
-    <div className="space-y-4">
+    <div className="ficha space-y-4">
       <div className="flex flex-wrap-reverse items-end gap-x-2 gap-y-1 border-b">
         <div
           role="tablist"

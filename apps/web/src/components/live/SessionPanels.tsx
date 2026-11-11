@@ -130,7 +130,7 @@ export function GameMasterPlayers({ campaign }: { campaign: Campaign }) {
     );
   }
   return (
-    <ul className="grid gap-3 sm:grid-cols-2">
+    <ul className="grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
       {players.map((player) => (
         <li key={player.sheetId}>
           <PlayerCard

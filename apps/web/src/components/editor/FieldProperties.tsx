@@ -12,6 +12,9 @@ import {
   type ItemFieldType,
   type ListItemFieldDef,
   type RestRecovery,
+  ACCENT_LABELS,
+  BAR_COLORS,
+  type BarColor,
 } from '@tabula/domain';
 import { ArrowDownIcon, ArrowUpIcon, PlusIcon, Trash2Icon } from 'lucide-react';
 import { useId, useState } from 'react';
@@ -28,6 +31,9 @@ import {
 } from '@/components/ui/select';
 import { parseNumber } from '@/components/sheet/format';
 import { FormulaInput } from './FormulaInput';
+
+/** Barra sem cor fixa: de verde a vermelho conforme esvazia. */
+const AUTO_COLOR = '__auto__';
 
 /** Teste com um dado só (sem `checkDiceFrom`). */
 const ONE_DIE = '__um__';
@@ -568,6 +574,16 @@ export function FieldProperties({
           >
             Mostrar como marcadores (bolinhas), de 0 até o máximo (no máximo {MAX_MARKS})
           </CheckRow>
+          {!inList && (
+            <CheckRow
+              id={`${base}-dados`}
+              checked={field.rollsDice === true}
+              onChange={(rolls) => onChange(set(field, 'rollsDice', rolls || undefined))}
+            >
+              O valor é quantos dados o teste rola, ficando com o maior (ex.: atributos da Ordem
+              Paranormal)
+            </CheckRow>
+          )}
           {!inList && <RecoverEditor field={field} onChange={onChange} />}
         </div>
       );
@@ -613,6 +629,28 @@ export function FieldProperties({
           >
             Mostrar como marcadores (bolinhas) quando o máximo for até {MAX_MARKS}
           </CheckRow>
+          <Field label="Cor da barra" htmlFor={`${base}-cor`}>
+            <Select
+              value={field.color ?? AUTO_COLOR}
+              onValueChange={(value) =>
+                onChange(
+                  set(field, 'color', value === AUTO_COLOR ? undefined : (value as BarColor)),
+                )
+              }
+            >
+              <SelectTrigger id={`${base}-cor`} className="w-full sm:w-64">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value={AUTO_COLOR}>Muda conforme esvazia</SelectItem>
+                {BAR_COLORS.map((color) => (
+                  <SelectItem key={color} value={color}>
+                    {ACCENT_LABELS[color]}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </Field>
           {field.max !== undefined && (
             <Field label="Fórmula do máximo" htmlFor={`${base}-max`}>
               <FormulaInput
