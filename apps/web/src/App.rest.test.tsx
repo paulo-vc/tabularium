@@ -111,4 +111,23 @@ describe('painel da ficha', () => {
       }),
     );
   });
+
+  it('a barra do celular rola um dado e ajusta o recurso', async () => {
+    const { user, id } = await openSheet();
+    const bar = await screen.findByRole('toolbar', { name: 'Ações rápidas' });
+    await user.click(within(bar).getByRole('button', { name: 'Rolar dados' }));
+    await user.click(await screen.findByRole('button', { name: 'd20' }));
+    await waitFor(() =>
+      expect(screen.getByRole('list', { name: 'Últimas rolagens' })).toHaveTextContent('d20'),
+    );
+    await user.click(within(bar).getByRole('button', { name: 'PV: ajustar' }));
+    const panel = await screen.findByRole('dialog');
+    await user.click(within(panel).getByRole('button', { name: 'Somar 1 a PV' }));
+    await waitFor(async () =>
+      expect((await services.sheetRepository.get(id))?.values['pv']).toEqual({
+        current: 6,
+        max: 20,
+      }),
+    );
+  });
 });

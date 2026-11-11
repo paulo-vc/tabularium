@@ -203,3 +203,8 @@
   :is([data-slot='input'], [data-slot='select-trigger']):not(li *)[aria-invalid='true'] {
   border-bottom-color: var(--color-destructive);
 }
+
+/* Barra do polegar (ficha no celular): o fim da página não fica escondido atrás dela. */
+body {
+  padding-bottom: var(--barra-polegar, 0px);
+}

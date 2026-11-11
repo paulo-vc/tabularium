@@ -8,10 +8,19 @@ import {
   type FieldOf,
   type FieldValue,
   type ResourceValue,
+  type RollMode,
   type SheetValues,
+  supportsRollMode,
 } from '@tabula/domain';
-import { HeartIcon, PencilIcon, SwordIcon } from 'lucide-react';
-import { useId, useMemo, useState, type ReactNode } from 'react';
+import {
+  ChevronsUpDownIcon,
+  DicesIcon,
+  HeartIcon,
+  PencilIcon,
+  SwordIcon,
+  TagIcon,
+} from 'lucide-react';
+import { useContext, useEffect, useId, useMemo, useRef, useState, type ReactNode } from 'react';
 import { cn } from '@/lib/utils';
 import { ConditionTags } from '@/components/codex/CodexPageDialog';
 import { Badge } from '@/components/ui/badge';
@@ -22,7 +31,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { NumberInput, PrimitiveInput } from './fields';
 import { formatNumber, parseNumber } from './format';
 import { markCount, Marks } from './Marks';
-import { CheckButton, RollModeBar } from './roll-context';
+import { CheckButton, RollContext, RollModeBar } from './roll-context';
 
 /** Campos em destaque: os do card do Mestre (`gmSummary`) ou, sem ele, os recursos. */
 export function vitalFields(compiled: CompiledTemplate, hidden?: ReadonlySet<string>): FieldDef[] {
@@ -159,7 +168,9 @@ function ResourceVital({
   value,
   max,
   onChange,
+  className,
 }: {
+  className?: string | undefined;
   field: FieldOf<'resource'>;
   value: ResourceValue;
   max: number | undefined;
@@ -176,7 +187,7 @@ function ResourceVital({
   };
 
   return (
-    <div className="min-w-56 flex-1 space-y-1 xl:min-w-0 xl:flex-none">
+    <div className={cn('min-w-56 flex-1 space-y-1 xl:min-w-0 xl:flex-none', className)}>
       <div className="flex items-baseline justify-between gap-2 text-sm">
         <span className="text-muted-foreground">{field.label}</span>
         {/* Um ponto a menos ou a mais, sem digitar: o mais comum no meio do combate. */}
@@ -443,73 +454,257 @@ export function SheetVitals({
     }
   };
 
+  // A seleção múltipla do painel (ex.: Condições) também vai para a barra do celular.
+  const conditions = states.find(
+    (f): f is FieldOf<'select'> => f.type === 'select' && f.multiple === true,
+  );
+
   return (
-    <section
-      aria-label="Resumo do personagem"
-      className="bg-background/95 sticky top-14 z-[5] -mx-4 border-b px-4 py-3 backdrop-blur xl:top-20 xl:mx-0 xl:max-h-[calc(100dvh-6rem)] xl:overflow-y-auto xl:rounded-xl xl:border xl:p-4"
-    >
-      <div className="flex flex-wrap items-center gap-x-4 gap-y-3 xl:flex-col xl:items-stretch">
-        {bars.map((field) => {
-          const value = resourceValue(field);
-          return (
-            <ResourceVital
-              key={field.id}
-              field={field}
-              value={value}
-              max={resourceMax(field, value)}
-              onChange={(next) => onChange(field.id, next)}
-            />
-          );
-        })}
-        {/* No celular, os números ficam numa linha só, com rolagem lateral: o painel fixo
-            não pode tomar a tela. */}
-        <div className="-mx-1 flex max-w-full gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0 xl:mx-0 xl:grid xl:grid-cols-2 xl:px-0 xl:[&>*]:min-w-0">
-          {tiles.map((field) => (
-            <Tile key={field.id} label={field.label}>
-              {tile(field)}
-            </Tile>
-          ))}
-        </div>
-      </div>
-      {/* Sem estados nem vantagem (sistema sem d20), a linha some. */}
-      <div
-        className="mt-2 flex flex-wrap items-center gap-1.5 empty:hidden xl:mt-4 xl:border-t xl:pt-3"
-        aria-label="Estados"
+    <>
+      <section
+        aria-label="Resumo do personagem"
+        className="bg-background/95 z-[5] -mx-4 border-b px-4 py-3 backdrop-blur md:sticky md:top-14 xl:top-20 xl:mx-0 xl:max-h-[calc(100dvh-6rem)] xl:overflow-y-auto xl:rounded-xl xl:border xl:p-4"
       >
-        {states.map((field) => {
-          if (field.type === 'boolean') {
-            const on = (values[field.id] ?? defaultValue(field)) === true;
+        <div className="flex flex-wrap items-center gap-x-4 gap-y-3 xl:flex-col xl:items-stretch">
+          {bars.map((field, index) => {
+            const value = resourceValue(field);
             return (
-              <Badge key={field.id} asChild variant={on ? 'default' : 'outline'}>
-                <button type="button" aria-pressed={on} onClick={() => onChange(field.id, !on)}>
-                  {field.label}
-                </button>
-              </Badge>
-            );
-          }
-          if (field.type !== 'select') return null;
-          if (field.multiple) {
-            return (
-              <MultiSelectVital
+              <ResourceVital
+                className={index < 2 ? 'max-md:hidden' : undefined}
                 key={field.id}
                 field={field}
-                value={values[field.id]}
-                pages={codexPages}
+                value={value}
+                max={resourceMax(field, value)}
                 onChange={(next) => onChange(field.id, next)}
               />
             );
-          }
-          const labels = field.options
-            .filter((o) => selected(field, values[field.id]).includes(o.value))
-            .map((o) => o.label);
-          return labels.map((label) => (
-            <Badge key={`${field.id}-${label}`} variant="secondary">
-              {label}
-            </Badge>
-          ));
-        })}
-        <RollModeBar className="ml-auto" />
-      </div>
-    </section>
+          })}
+          {/* No celular, os números ficam numa linha só, com rolagem lateral: o painel fixo
+            não pode tomar a tela. */}
+          <div className="-mx-1 flex max-w-full gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0 xl:mx-0 xl:grid xl:grid-cols-2 xl:px-0 xl:[&>*]:min-w-0">
+            {tiles.map((field) => (
+              <Tile key={field.id} label={field.label}>
+                {tile(field)}
+              </Tile>
+            ))}
+          </div>
+        </div>
+        {/* Sem estados nem vantagem (sistema sem d20), a linha some. */}
+        <div
+          className="mt-2 flex flex-wrap items-center gap-1.5 empty:hidden xl:mt-4 xl:border-t xl:pt-3"
+          aria-label="Estados"
+        >
+          {states.map((field) => {
+            if (field.type === 'boolean') {
+              const on = (values[field.id] ?? defaultValue(field)) === true;
+              return (
+                <Badge key={field.id} asChild variant={on ? 'default' : 'outline'}>
+                  <button type="button" aria-pressed={on} onClick={() => onChange(field.id, !on)}>
+                    {field.label}
+                  </button>
+                </Badge>
+              );
+            }
+            if (field.type !== 'select') return null;
+            if (field.multiple) {
+              return (
+                <MultiSelectVital
+                  key={field.id}
+                  field={field}
+                  value={values[field.id]}
+                  pages={codexPages}
+                  onChange={(next) => onChange(field.id, next)}
+                />
+              );
+            }
+            const labels = field.options
+              .filter((o) => selected(field, values[field.id]).includes(o.value))
+              .map((o) => o.label);
+            return labels.map((label) => (
+              <Badge key={`${field.id}-${label}`} variant="secondary">
+                {label}
+              </Badge>
+            ));
+          })}
+          <RollModeBar className="ml-auto max-md:hidden" />
+        </div>
+      </section>
+      {/* Fora da seção: o desfoque dela prenderia a barra fixa dentro do painel. */}
+      <ThumbBar
+        bars={bars}
+        conditions={conditions}
+        resourceValue={resourceValue}
+        resourceMax={resourceMax}
+        values={values}
+        pages={codexPages}
+        onChange={onChange}
+      />
+    </>
+  );
+}
+
+/** Dados da rolagem rápida da barra do celular. */
+const QUICK_DICE = ['1d20', '1d12', '1d10', '1d8', '1d6', '1d4'] as const;
+const NEXT_MODE: Record<RollMode, RollMode> = {
+  normal: 'vantagem',
+  vantagem: 'desvantagem',
+  desvantagem: 'normal',
+};
+const MODE_SHORT: Record<RollMode, string> = {
+  normal: 'Normal',
+  vantagem: 'Vant.',
+  desvantagem: 'Desv.',
+};
+
+/**
+ * No celular, o que mais se usa no jogo fica embaixo, ao alcance do polegar: os primeiros
+ * recursos (dano e cura), as condições, uma rolagem rápida e a vantagem. Reserva a altura
+ * em `--barra-polegar`, para o chat e a música subirem acima dela.
+ */
+function ThumbBar({
+  bars,
+  conditions,
+  resourceValue,
+  resourceMax,
+  values,
+  pages,
+  onChange,
+}: {
+  bars: readonly FieldOf<'resource'>[];
+  conditions: FieldOf<'select'> | undefined;
+  resourceValue: (field: FieldOf<'resource'>) => ResourceValue;
+  resourceMax: (field: FieldOf<'resource'>, value: ResourceValue) => number | undefined;
+  values: SheetValues;
+  pages: readonly CodexPage[];
+  onChange: (fieldId: string, value: FieldValue) => void;
+}) {
+  const roller = useContext(RollContext);
+  const ref = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const root = document.documentElement;
+    const element = ref.current;
+    if (!element) return;
+    const update = () => root.style.setProperty('--barra-polegar', `${element.offsetHeight}px`);
+    const observer = new ResizeObserver(update);
+    observer.observe(element);
+    update();
+    return () => {
+      observer.disconnect();
+      root.style.removeProperty('--barra-polegar');
+    };
+  }, []);
+  const shown = bars.slice(0, 2);
+  const active = conditions ? selected(conditions, values[conditions.id]) : [];
+  const modes = roller && supportsRollMode(roller.checkDice);
+  const slot =
+    'flex h-12 min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-md px-1 text-[11px] leading-tight hover:bg-muted';
+  return (
+    <div
+      ref={ref}
+      role="toolbar"
+      aria-label="Ações rápidas"
+      className="bg-background/95 fixed inset-x-0 bottom-0 z-30 flex gap-1 border-t px-2 pt-1 pb-[max(0.25rem,env(safe-area-inset-bottom))] backdrop-blur md:hidden print:hidden"
+    >
+      {shown.map((field) => {
+        const value = resourceValue(field);
+        const max = resourceMax(field, value);
+        const percent = max && max > 0 ? (value.current / max) * 100 : 100;
+        return (
+          <Popover key={field.id}>
+            <PopoverTrigger asChild>
+              <button type="button" className={slot} aria-label={`${field.label}: ajustar`}>
+                <span className="text-muted-foreground max-w-full truncate">{field.label}</span>
+                <span
+                  className={cn(
+                    'text-sm font-semibold tabular-nums',
+                    percent <= 25 ? 'text-red-500' : percent <= 50 && 'text-amber-500',
+                  )}
+                >
+                  {formatNumber(value.current)}
+                  {max !== undefined && (
+                    <span className="text-muted-foreground font-normal">/{formatNumber(max)}</span>
+                  )}
+                </span>
+              </button>
+            </PopoverTrigger>
+            <PopoverContent side="top" align="start" className="w-[min(22rem,calc(100vw-1rem))]">
+              <ResourceVital
+                field={field}
+                value={value}
+                max={max}
+                onChange={(next) => onChange(field.id, next)}
+              />
+            </PopoverContent>
+          </Popover>
+        );
+      })}
+      {conditions && (
+        <Popover>
+          <PopoverTrigger asChild>
+            <button
+              type="button"
+              className={slot}
+              aria-label={`${conditions.label}: ${active.length}`}
+            >
+              <TagIcon className="size-4" />
+              <span className="max-w-full truncate">
+                {conditions.label}
+                {active.length > 0 && <span className="text-primary"> {active.length}</span>}
+              </span>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent side="top" className="w-[min(22rem,calc(100vw-1rem))] space-y-2">
+            <MultiSelectVital
+              field={conditions}
+              value={values[conditions.id]}
+              pages={pages}
+              onChange={(next) => onChange(conditions.id, next)}
+            />
+            <PrimitiveInput
+              field={conditions}
+              label={conditions.label}
+              value={active}
+              onChange={(next) => onChange(conditions.id, next as FieldValue)}
+            />
+          </PopoverContent>
+        </Popover>
+      )}
+      {roller && (
+        <Popover>
+          <PopoverTrigger asChild>
+            <button type="button" className={slot} aria-label="Rolar dados">
+              <DicesIcon className="size-4" />
+              <span>Rolar</span>
+            </button>
+          </PopoverTrigger>
+          <PopoverContent side="top" align="end" className="w-auto">
+            <div className="grid grid-cols-3 gap-1" role="group" aria-label="Rolagem rápida">
+              {QUICK_DICE.map((dice) => (
+                <Button
+                  key={dice}
+                  type="button"
+                  variant="outline"
+                  className="h-11 font-mono"
+                  onClick={() => roller.roll(dice.slice(1), dice)}
+                >
+                  {dice.slice(1)}
+                </Button>
+              ))}
+            </div>
+          </PopoverContent>
+        </Popover>
+      )}
+      {modes && (
+        <button
+          type="button"
+          className={cn(slot, roller.mode !== 'normal' && 'text-primary')}
+          aria-label={`Próximo teste: ${roller.mode}. Trocar`}
+          onClick={() => roller.setMode(NEXT_MODE[roller.mode])}
+        >
+          <ChevronsUpDownIcon className="size-4" />
+          <span>{MODE_SHORT[roller.mode]}</span>
+        </button>
+      )}
+    </div>
   );
 }

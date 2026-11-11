@@ -92,7 +92,7 @@ function Dock({ live }: { live: Exclude<LiveSession, { kind: 'nenhuma' }> }) {
   if (!open) {
     return (
       <Button
-        className="fixed right-4 bottom-4 z-40 shadow-lg"
+        className="fixed right-4 bottom-[calc(1rem+var(--barra-polegar,0px))] z-40 shadow-lg"
         aria-label={unread > 0 ? `Abrir chat (${unread} novas)` : 'Abrir chat'}
         onClick={() => {
           setOpen(true);
@@ -206,7 +206,7 @@ function ChatPanel({
   return (
     <section
       aria-label="Chat da sessão"
-      className="bg-background fixed right-4 bottom-4 z-40 flex h-[min(34rem,calc(100dvh-6rem))] w-[min(26rem,calc(100vw-2rem))] flex-col rounded-xl border shadow-xl"
+      className="bg-background fixed right-4 bottom-[calc(1rem+var(--barra-polegar,0px))] z-40 flex h-[min(34rem,calc(100dvh-6rem))] w-[min(26rem,calc(100vw-2rem))] flex-col rounded-xl border shadow-xl"
     >
       <header className="flex items-center gap-2 border-b px-3 py-2">
         <h2 className="sr-only">Chat da sessão</h2>
