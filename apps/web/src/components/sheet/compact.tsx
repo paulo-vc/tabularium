@@ -187,7 +187,10 @@ export function CircleSection({
           strokeWidth="0.8"
         />
       </svg>
-      <span className="font-heading text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-sm tracking-widest uppercase">
+      <span
+        aria-hidden
+        className="font-heading text-primary absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center text-sm tracking-widest uppercase"
+      >
         {title}
       </span>
       {tiles.map(({ main, secondary }, index) => {

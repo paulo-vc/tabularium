@@ -54,6 +54,7 @@
 }
 
 :root {
+  color-scheme: light;
   /* Claro: papel quente e o dourado envelhecido mais escuro, para contraste. */
   --background: oklch(0.965 0.006 85);
   --foreground: oklch(0.22 0.012 260);
@@ -91,6 +92,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   /*
    * Escuro (o padrão): grafite, como uma mesa de jogo à noite, e um único destaque, o dourado
    * envelhecido (#d4af37), no que é interativo e importante. Superfícies em #1a1d24, bordas

@@ -246,17 +246,19 @@ function ResourceVital({
         ) : null}
       </div>
       {/* A barra é o controle: « −5, ‹ −1, o valor (abre o ajuste exato), › +1, » +5. */}
-      <div
-        role="meter"
-        aria-label={`${field.label}: ${formatNumber(value.current)}${max !== undefined ? ` de ${formatNumber(max)}` : ''}`}
-        aria-valuemin={0}
-        aria-valuemax={100}
-        aria-valuenow={Math.round(percent)}
-        className="bg-muted relative flex h-8 items-center overflow-hidden rounded-md border pointer-coarse:h-10"
-      >
+      <div className="bg-muted relative flex h-8 items-center overflow-hidden rounded-md border pointer-coarse:h-10">
+        {/* O medidor fica só no preenchimento: dentro de um meter, os botões sumiriam do leitor de tela. */}
         <div
-          className="absolute inset-y-0 left-0 transition-[width]"
-          style={{ width: `${percent}%`, background: barColor(field.color, percent) }}
+          role="meter"
+          aria-label={`${field.label}: ${formatNumber(value.current)}${max !== undefined ? ` de ${formatNumber(max)}` : ''}`}
+          aria-valuemin={0}
+          aria-valuemax={100}
+          aria-valuenow={Math.round(percent)}
+          className="absolute inset-0 origin-left transition-transform motion-reduce:transition-none"
+          style={{
+            transform: `scaleX(${percent / 100})`,
+            background: barColor(field.color, percent),
+          }}
         />
         <BarButton
           label={`Tirar 5 de ${field.label}`}
