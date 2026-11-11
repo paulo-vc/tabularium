@@ -31,6 +31,8 @@ export interface Roller {
   rollAll: (title: string, rolls: readonly GroupRoll[]) => void;
   /** Dado dos testes do sistema ("1d20", "2d12"…). */
   checkDice: string;
+  /** O menor resultado é o melhor (`lowerIsBetter` do sistema). */
+  lowerIsBetter?: boolean | undefined;
   /** Como sai o próximo teste ou ataque; volta a "normal" depois dele. */
   mode: RollMode;
   setMode: (mode: RollMode) => void;
@@ -76,14 +78,26 @@ export function CheckButton({
   const roller = useContext(RollContext);
   if (!roller) return null;
   const count = fieldId === undefined ? undefined : roller.checkCount?.(fieldId);
-  const expression = checkExpression(roller.checkDice, modifier, roller.mode, count);
+  const expression = checkExpression(
+    roller.checkDice,
+    modifier,
+    roller.mode,
+    count,
+    roller.lowerIsBetter,
+  );
   if (!parseDice(expression, roller.dice).ok) return null;
+  // Teste com vários dados (o atributo): os dados ficam à vista no botão ("3d20").
+  const dice = count === undefined ? null : /^\d+d\d+/.exec(expression)?.[0];
   return (
     <Button
       type="button"
       variant="ghost"
-      size="icon"
-      className={cn('shrink-0', roller.mode !== 'normal' && 'text-primary')}
+      size={dice ? 'sm' : 'icon'}
+      className={cn(
+        'shrink-0',
+        dice && 'h-8 gap-1 px-1.5 font-mono text-xs',
+        roller.mode !== 'normal' && 'text-primary',
+      )}
       aria-label={`Rolar ${label}`}
       title={`Rolar ${expression}`}
       onClick={() => {
@@ -92,6 +106,7 @@ export function CheckButton({
       }}
     >
       <DicesIcon />
+      {dice}
     </Button>
   );
 }
@@ -156,7 +171,13 @@ export function AttackButtons({
   const bonusField = field.itemFields.find((f) => f.id === attack.bonus);
   const damageField = field.itemFields.find((f) => f.id === attack.damage);
   const bonus = bonusField ? Number(listItemValue(bonusField, item)) || 0 : 0;
-  const hit = checkExpression(roller.checkDice, bonus, roller.mode);
+  const hit = checkExpression(
+    roller.checkDice,
+    bonus,
+    roller.mode,
+    undefined,
+    roller.lowerIsBetter,
+  );
   const damage = damageField ? String(listItemValue(damageField, item) ?? '') : '';
   const hasDamage = damage.trim() !== '' && parseDice(damage, roller.dice).ok;
   return (

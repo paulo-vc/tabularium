@@ -21,6 +21,7 @@ import { useSheetEditing } from '@/components/sheet/use-sheet-editing';
 import { RestButton } from '@/components/sheet/RestButton';
 import { RollContext, type GroupRoll } from '@/components/sheet/roll-context';
 import { useRoller } from '@/components/live/use-roller';
+import { useSystemAccent } from '@/components/use-system-accent';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 
@@ -135,6 +136,7 @@ function PlayerSheet({
     newId: () => crypto.randomUUID(),
   };
   const roller = useRoller(compiled, { values, derived });
+  useSystemAccent(compiled.template.accent);
   // O Mestre rolando pela ficha do jogador: o registro mostra de quem é o teste.
   const playerRoller = useMemo(
     () => ({

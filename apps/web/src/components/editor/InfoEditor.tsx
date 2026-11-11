@@ -1,10 +1,18 @@
-import { bumpVersion, type SystemTemplate, type VersionBump } from '@tabula/domain';
+import {
+  ACCENT_LABELS,
+  bumpVersion,
+  SYSTEM_ACCENTS,
+  type SystemAccent,
+  type SystemTemplate,
+  type VersionBump,
+} from '@tabula/domain';
 import { ImageIcon } from 'lucide-react';
 import { useId, useRef } from 'react';
 import { toast } from 'sonner';
 import { useServices } from '@/app/services-context';
 import { SystemIcon } from '@/components/SystemIcon';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -31,6 +39,18 @@ function setOptional<
   const { [key]: _, ...rest } = template;
   return (value ? { ...rest, [key]: value } : rest) as SystemTemplate;
 }
+
+/** Matiz de cada cor de destaque (o mesmo de `[data-destaque]` no index.css), para a amostra. */
+const ACCENT_HUE: Record<SystemAccent, number> = {
+  cobalto: 262,
+  violeta: 300,
+  magenta: 340,
+  vermelho: 25,
+  laranja: 50,
+  ambar: 78,
+  verde: 152,
+  ciano: 205,
+};
 
 /** Ícone do sistema: escolher uma imagem (reduzida a 128 px) ou tirar. */
 function IconPicker({ template, apply }: { template: SystemTemplate; apply: Apply }) {
@@ -107,6 +127,56 @@ export function InfoEditor({
   return (
     <div className="space-y-4">
       <IconPicker template={template} apply={apply} />
+      <div className="space-y-1.5">
+        <Label htmlFor={`${base}-cor`}>Cor de destaque</Label>
+        <Select
+          value={template.accent ?? 'cobalto'}
+          onValueChange={(value) =>
+            apply((t) => {
+              const { accent: _accent, ...rest } = t;
+              return value === 'cobalto' ? rest : { ...rest, accent: value as SystemAccent };
+            }, 'cor')
+          }
+        >
+          <SelectTrigger id={`${base}-cor`} className="w-full sm:w-64">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {SYSTEM_ACCENTS.map((accent) => (
+              <SelectItem key={accent} value={accent}>
+                <span
+                  className="size-3 rounded-full"
+                  style={{ background: `oklch(0.65 0.17 ${ACCENT_HUE[accent]})` }}
+                  aria-hidden
+                />
+                {ACCENT_LABELS[accent]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-muted-foreground text-xs">
+          Botões, abas e destaques da ficha e da campanha deste sistema.
+        </p>
+      </div>
+      <label className="flex items-start gap-2 text-sm">
+        <Checkbox
+          className="mt-0.5"
+          checked={template.lowerIsBetter === true}
+          onCheckedChange={(checked) =>
+            apply((t) => {
+              const { lowerIsBetter: _lower, ...rest } = t;
+              return checked === true ? { ...rest, lowerIsBetter: true } : rest;
+            }, 'menor')
+          }
+        />
+        <span>
+          Nos testes, o menor resultado é o melhor
+          <span className="text-muted-foreground block text-xs">
+            Para rolar abaixo do valor (ex.: 1d100): a vantagem fica com o menor dado e o crítico é
+            o 1.
+          </span>
+        </span>
+      </label>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor={`${base}-nome`}>Nome do sistema</Label>

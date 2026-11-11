@@ -26,11 +26,13 @@ export function useRoller(
   // Com os dados 3D, o resultado aparece na bandeja, à direita: sem aviso repetido.
   const { enabled: tray } = useDiceTray();
   const checkDice = compiled.template.checkDice ?? '1d20';
+  const lowerIsBetter = compiled.template.lowerIsBetter === true;
   const dice = compiled.template.dice;
   const [mode, setMode] = useState<RollMode>('normal');
   return useMemo(
     () => ({
       checkDice,
+      lowerIsBetter,
       dice,
       mode,
       setMode,
@@ -65,7 +67,7 @@ export function useRoller(
               toast.error('Não foi possível rolar', { description: result.error.message });
               return;
             }
-            if (index === 0) critical = isCriticalRoll(result.value.result);
+            if (index === 0) critical = isCriticalRoll(result.value.result, lowerIsBetter);
             results.push({ name, entry: result.value });
           }
           if (tray) return;
@@ -79,6 +81,6 @@ export function useRoller(
         })();
       },
     }),
-    [session, checkDice, dice, tray, mode, compiled, sheet],
+    [session, checkDice, lowerIsBetter, dice, tray, mode, compiled, sheet],
   );
 }

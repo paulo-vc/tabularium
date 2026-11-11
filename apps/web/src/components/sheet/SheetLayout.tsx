@@ -13,6 +13,7 @@ import {
 import { EyeOffIcon } from 'lucide-react';
 import { useId, useState } from 'react';
 import { cn } from '@/lib/utils';
+import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { FieldLine, SecondaryValue, StatTile, type CompactFieldProps } from './compact';
 import { BonusSection } from './Bonuses';
@@ -117,6 +118,28 @@ export function SheetLayout({
 }: SheetLayoutProps) {
   const base = useId();
   const [selected, setSelected] = useState(0);
+  /** Seções em linhas (perícias) mostrando só as treinadas, pelo título. */
+  const [onlyTrained, setOnlyTrained] = useState<ReadonlySet<string>>(new Set());
+  /** A linha tem treino: um sim/não marcado, ou uma escolha além da primeira (o "destreinado"). */
+  const trained = (cells: readonly CompactFieldProps[]) => {
+    const marks = cells.filter(
+      (cell) =>
+        cell.field.type === 'boolean' || (cell.field.type === 'select' && !cell.field.multiple),
+    );
+    if (marks.length === 0) return true;
+    return marks.some(({ field, value }) => {
+      const current = value ?? defaultValue(field);
+      if (field.type === 'boolean') return current === true;
+      if (field.type !== 'select') return false;
+      return typeof current === 'string' && current !== '' && current !== field.options[0]?.value;
+    });
+  };
+  const linesHaveTraining = (section: SectionNode) =>
+    section.children.some((node) => {
+      if (node.kind !== 'field') return false;
+      const field = compiled.fieldsById.get(node.fieldId);
+      return field?.type === 'boolean' || (field?.type === 'select' && !field.multiple);
+    });
 
   // Regra opcional (ex.: Determinação no lugar de PE e Sanidade): some o que ela troca.
   const byCondition = conditionallyHidden(compiled, values);
@@ -211,10 +234,14 @@ export function SheetLayout({
       }
     }
     if (row.length > 0) rows.push(row);
+    const shownRows = onlyTrained.has(section.title) ? rows.filter(trained) : rows;
     return (
       <div className="space-y-3">
         <div className="sm:columns-2 sm:gap-6">
-          {rows.map((cells) => (
+          {shownRows.length === 0 && (
+            <p className="text-muted-foreground text-sm">Nenhuma treinada ainda.</p>
+          )}
+          {shownRows.map((cells) => (
             <div key={cells.map((c) => c.field.id).join('-')} className="break-inside-avoid">
               <FieldLine cells={cells} />
             </div>
@@ -314,13 +341,35 @@ export function SheetLayout({
         : section.display === 'linhas'
           ? renderLines(section)
           : renderGrid(section.children, section.columns, depth);
+    // Perícias e afins: dá para ver só as treinadas (marcadas, ou com um grau escolhido).
+    const filterable = section.display === 'linhas' && linesHaveTraining(section);
+    const filtering = onlyTrained.has(section.title);
     if (depth === 0) {
       return (
         <Card>
-          <CardHeader>
+          <CardHeader className="flex items-center justify-between gap-2">
             <CardTitle>
               <h2>{section.title}</h2>
             </CardTitle>
+            {filterable && (
+              <Button
+                type="button"
+                size="sm"
+                variant={filtering ? 'secondary' : 'ghost'}
+                aria-pressed={filtering}
+                className="h-7 text-xs"
+                onClick={() =>
+                  setOnlyTrained((current) => {
+                    const next = new Set(current);
+                    if (next.has(section.title)) next.delete(section.title);
+                    else next.add(section.title);
+                    return next;
+                  })
+                }
+              >
+                Só treinadas
+              </Button>
+            )}
           </CardHeader>
           <CardContent>{content}</CardContent>
         </Card>
