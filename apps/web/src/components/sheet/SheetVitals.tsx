@@ -182,7 +182,7 @@ const BAR_HUE: Record<BarColor, number> = {
  * Cor da barra: a do recurso (Vida vermelha, Sanidade violeta…) ou, sem cor, de verde a
  * vermelho conforme esvazia. Escura o bastante para o número branco em cima.
  */
-function barColor(color: BarColor | undefined, percent: number): string {
+export function barColor(color: BarColor | undefined, percent: number): string {
   const hue = color ? BAR_HUE[color] : percent > 50 ? 152 : percent > 25 ? 70 : 25;
   return `oklch(0.5 0.15 ${hue})`;
 }

@@ -28,6 +28,7 @@ import { PlayerInitiative } from '@/components/live/InitiativePanel';
 import { RollLog } from '@/components/live/RollLog';
 import { PlayerSession } from '@/components/live/SessionPanels';
 import { DangerZone } from '@/components/campaign/DangerZone';
+import { CharacterSummary } from '@/components/campaign/CharacterSummary';
 import { GameMasterView } from '@/components/campaign/GameMasterView';
 import { useImport } from '@/components/use-import';
 import { Badge } from '@/components/ui/badge';
@@ -128,22 +129,28 @@ function PlayerView({ campaign, userId }: { campaign: Campaign; userId: string }
     async () => (linked ? await catalog.get(linked.templateRef.id) : undefined),
     [catalog, linked?.templateRef.id],
   );
-  const initiativeRoll = useMemo(() => {
+  // A ficha vinculada calculada: o resumo do personagem e a rolagem de iniciativa saem dela.
+  const linkedSheet = useMemo(() => {
     if (!linked || !linkedTemplate) return null;
     const compiled = catalog.compile(linkedTemplate);
-    return initiativeExpression(
-      compiled,
-      linked.values,
-      computeDerived(compiled, linked.values, linked.bonuses),
-    );
+    return { compiled, derived: computeDerived(compiled, linked.values, linked.bonuses) };
   }, [catalog, linked, linkedTemplate]);
+  const initiativeRoll =
+    linked && linkedSheet
+      ? initiativeExpression(linkedSheet.compiled, linked.values, linkedSheet.derived)
+      : null;
 
   // `null`: sem ficha vinculada (ou a vinculada foi apagada). `undefined`: carregando.
   const showChooser = choosing || linked === null;
 
   return (
-    <div className="grid gap-4 lg:grid-cols-2" {...theme}>
-      <div className="lg:col-span-2">
+    // Como na tela do Mestre: combate e rolagens numa coluna fixa ao lado (à esquerda em telas
+    // largas); no centro, a sessão, o personagem em destaque e o diário.
+    <div
+      className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_24rem] xl:grid-cols-[22rem_minmax(0,1fr)]"
+      {...theme}
+    >
+      <div className="min-w-0 space-y-4 xl:col-start-2 xl:row-start-1">
         <Tip id="jogador-sessao" title="Como entrar na mesa">
           <p>
             Escolha (ou crie) a sua ficha aqui. Quando o Mestre iniciar a sessão, toque em{' '}
@@ -151,60 +158,77 @@ function PlayerView({ campaign, userId }: { campaign: Campaign; userId: string }
             para o Mestre na hora.
           </p>
         </Tip>
-      </div>
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <h2>Sua ficha</h2>
-          </CardTitle>
-          <CardDescription>
-            O Mestre acompanhará esta ficha durante a sessão. Ela precisa ser do sistema{' '}
-            <strong>{campaign.templateName}</strong>.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {linked && !choosing && (
-            <div className="flex flex-wrap items-center gap-2">
-              <ScrollTextIcon className="text-muted-foreground size-5" />
-              <span className="font-medium">{linked.name}</span>
-              <Button size="sm" asChild>
-                <Link href={`/fichas/${linked.id}`}>Abrir ficha</Link>
-              </Button>
-              <Button size="sm" variant="outline" onClick={() => setChoosing(true)}>
-                Trocar
-              </Button>
+        <PlayerSession campaign={campaign} hasSheet={Boolean(linked)} />
+        <Card>
+          <CardHeader className="flex flex-wrap items-start justify-between gap-2">
+            <div className="space-y-1.5">
+              <CardTitle>
+                <h2>Seu personagem</h2>
+              </CardTitle>
+              <CardDescription>
+                O Mestre acompanha esta ficha durante a sessão. Ela precisa ser do sistema{' '}
+                <strong>{campaign.templateName}</strong>.
+              </CardDescription>
             </div>
-          )}
-          {sheetId && linked === null && !choosing && (
-            <p className="text-destructive text-sm">
-              A ficha vinculada não existe mais neste dispositivo. Escolha outra.
-            </p>
-          )}
+            {linked && !choosing && (
+              <div className="flex gap-2">
+                <Button asChild>
+                  <Link href={`/fichas/${linked.id}`}>
+                    <ScrollTextIcon /> Abrir ficha
+                  </Link>
+                </Button>
+                <Button variant="outline" onClick={() => setChoosing(true)}>
+                  Trocar
+                </Button>
+              </div>
+            )}
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {linked &&
+              !choosing &&
+              (linkedSheet ? (
+                <CharacterSummary
+                  sheet={linked}
+                  compiled={linkedSheet.compiled}
+                  derived={linkedSheet.derived}
+                />
+              ) : (
+                <p className="font-heading text-2xl tracking-wide uppercase">{linked.name}</p>
+              ))}
+            {sheetId && linked === null && !choosing && (
+              <p className="text-destructive text-sm">
+                A ficha vinculada não existe mais neste dispositivo. Escolha outra.
+              </p>
+            )}
 
-          {showChooser && (
-            <SheetChooser
-              campaign={campaign}
-              compatible={compatible ?? []}
-              hasTemplate={hasTemplate ?? true}
-              onDone={() => setChoosing(false)}
-              onImport={importFile}
-            />
-          )}
-        </CardContent>
-      </Card>
+            {showChooser && (
+              <SheetChooser
+                campaign={campaign}
+                compatible={compatible ?? []}
+                hasTemplate={hasTemplate ?? true}
+                onDone={() => setChoosing(false)}
+                onImport={importFile}
+              />
+            )}
+          </CardContent>
+        </Card>
+        <PlayerJournal campaignId={campaign.id} />
+        <DangerZone
+          campaign={campaign}
+          title="Sair da campanha"
+          description="A campanha sai deste dispositivo. Sua ficha continua em Minhas fichas."
+          action="Sair"
+          icon={<LogOutIcon />}
+        />
+      </div>
 
-      <PlayerSession campaign={campaign} hasSheet={Boolean(linked)} />
-      <PlayerInitiative campaignId={campaign.id} initiativeRoll={initiativeRoll} codex={codex} />
-      <RollLog campaignId={campaign.id} isGameMaster={false} />
-      <PlayerJournal campaignId={campaign.id} />
-
-      <DangerZone
-        campaign={campaign}
-        title="Sair da campanha"
-        description="A campanha sai deste dispositivo. Sua ficha continua em Minhas fichas."
-        action="Sair"
-        icon={<LogOutIcon />}
-      />
+      <aside
+        aria-label="Combate e rolagens"
+        className="space-y-4 lg:sticky lg:top-20 lg:max-h-[calc(100dvh-6rem)] lg:overflow-y-auto xl:col-start-1 xl:row-start-1"
+      >
+        <PlayerInitiative campaignId={campaign.id} initiativeRoll={initiativeRoll} codex={codex} />
+        <RollLog campaignId={campaign.id} isGameMaster={false} />
+      </aside>
     </div>
   );
 }
