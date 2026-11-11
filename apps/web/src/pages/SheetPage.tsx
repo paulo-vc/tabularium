@@ -28,6 +28,7 @@ import {
 } from '@/components/sheet/Bonuses';
 import { RollContext } from '@/components/sheet/roll-context';
 import { useRoller } from '@/components/live/use-roller';
+import { useSystemAccent } from '@/components/use-system-accent';
 import { useDeviceId } from '@/components/use-device';
 import {
   AlertDialog,
@@ -138,6 +139,7 @@ function SheetEditor({ id, compiled }: { id: string; compiled: OpenedReady['comp
   );
   const bonusEffects = useBonusEffects(sheet?.bonuses);
   const roller = useRoller(compiled, { values, derived });
+  useSystemAccent(compiled.template.accent);
   // Ficha de jogador numa campanha: os campos secretos são do Mestre. Escondidos também
   // enquanto a consulta carrega, para não piscarem na tela.
   const deviceId = useDeviceId();

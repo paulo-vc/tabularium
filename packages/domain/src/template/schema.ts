@@ -243,6 +243,32 @@ const LayoutSchema = z.array(LayoutNodeSchema).max(LIMITS.layoutNodes);
 
 // ---------- Template ----------
 
+/**
+ * Cor de destaque da ficha e da campanha do sistema (botões, abas, foco), entre tons que o app
+ * já ajusta para os dois temas. Sem cor, vale o cobalto do app.
+ */
+export const SYSTEM_ACCENTS = [
+  'cobalto',
+  'violeta',
+  'magenta',
+  'vermelho',
+  'laranja',
+  'ambar',
+  'verde',
+  'ciano',
+] as const;
+export type SystemAccent = (typeof SYSTEM_ACCENTS)[number];
+export const ACCENT_LABELS: Record<SystemAccent, string> = {
+  cobalto: 'Cobalto (o do app)',
+  violeta: 'Violeta',
+  magenta: 'Magenta',
+  vermelho: 'Vermelho',
+  laranja: 'Laranja',
+  ambar: 'Âmbar',
+  verde: 'Verde',
+  ciano: 'Ciano',
+};
+
 /** De onde o template veio: embutido no app, repositório da comunidade ou criado localmente. */
 export const TemplateSourceSchema = z.enum(['builtin', 'community', 'local']);
 export type TemplateSource = z.infer<typeof TemplateSourceSchema>;
@@ -282,6 +308,8 @@ export const SystemTemplateSchema = z.object({
   bonusTab: z.string().trim().min(1).max(40).optional(),
   /** Ícone do sistema (imagem pequena, embutida), nas listas de sistemas, fichas e campanhas. */
   icon: SystemIconSchema.optional(),
+  /** Cor de destaque da ficha e da campanha (ex.: laranja na Ordem Paranormal). */
+  accent: z.enum(SYSTEM_ACCENTS).optional(),
   /** Versão mínima do app capaz de abrir este template. */
   minAppVersion: SemVerSchema.optional(),
   /** Códice: páginas de consulta (habilidades, regras, itens…), lidas por toda a mesa. */

@@ -20,6 +20,7 @@ import { toast } from 'sonner';
 import { cn } from '@/lib/utils';
 import { encodeInvite } from '@/app/invite-link';
 import { useServices } from '@/app/services-context';
+import { useSystemAccent } from '@/components/use-system-accent';
 import { CampaignBestiary } from '@/components/bestiary/CampaignBestiary';
 import { CampaignCoverEditor } from '@/components/campaign/CampaignCover';
 import { CodexReader } from '@/components/codex/CodexReader';
@@ -68,6 +69,7 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
     () => catalog.get(campaign.templateRef.id),
     [catalog, campaign.templateRef.id],
   );
+  useSystemAccent(template?.accent);
   const [tab, setTab] = useState<Tab>('jogadores');
   const active = live.kind === 'mestre' && live.campaignId === campaign.id;
   const online = active ? live.players.filter((p) => p.online).length : 0;
