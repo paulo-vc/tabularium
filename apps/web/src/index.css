@@ -54,25 +54,26 @@
 }
 
 :root {
-  /* Claro: cinza-azulado frio, com o mesmo cobalto do escuro (mais fundo, para contraste). */
-  --background: oklch(0.968 0.007 255);
-  --foreground: oklch(0.2 0.03 262);
-  --card: oklch(0.993 0.003 255);
-  --card-foreground: oklch(0.2 0.03 262);
-  --popover: oklch(0.993 0.003 255);
-  --popover-foreground: oklch(0.2 0.03 262);
-  --primary: oklch(0.5 0.19 262);
-  --primary-foreground: oklch(0.98 0.005 255);
-  --secondary: oklch(0.935 0.012 255);
-  --secondary-foreground: oklch(0.26 0.04 262);
-  --muted: oklch(0.935 0.012 255);
-  --muted-foreground: oklch(0.5 0.03 258);
-  --accent: oklch(0.92 0.03 258);
-  --accent-foreground: oklch(0.3 0.09 262);
+  color-scheme: light;
+  /* Claro: papel quente e o dourado envelhecido mais escuro, para contraste. */
+  --background: oklch(0.965 0.006 85);
+  --foreground: oklch(0.22 0.012 260);
+  --card: oklch(0.99 0.004 85);
+  --card-foreground: oklch(0.22 0.012 260);
+  --popover: oklch(0.99 0.004 85);
+  --popover-foreground: oklch(0.22 0.012 260);
+  --primary: oklch(0.52 0.1 80);
+  --primary-foreground: oklch(0.99 0.004 85);
+  --secondary: oklch(0.93 0.008 85);
+  --secondary-foreground: oklch(0.26 0.015 260);
+  --muted: oklch(0.93 0.008 85);
+  --muted-foreground: oklch(0.5 0.012 260);
+  --accent: oklch(0.92 0.03 85);
+  --accent-foreground: oklch(0.3 0.06 80);
   --destructive: oklch(0.56 0.21 25);
-  --border: oklch(0.88 0.014 255);
-  --input: oklch(0.86 0.016 255);
-  --ring: oklch(0.58 0.17 262);
+  --border: oklch(0.87 0.012 85);
+  --input: oklch(0.85 0.014 85);
+  --ring: oklch(0.6 0.11 82);
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
@@ -91,38 +92,43 @@
 }
 
 .dark {
-  /* Escuro (o padrão): azul-tinta quase preto e um único destaque, o cobalto luminoso. */
-  --background: oklch(0.165 0.022 264);
-  --foreground: oklch(0.94 0.012 250);
-  --card: oklch(0.205 0.026 264);
-  --card-foreground: oklch(0.94 0.012 250);
-  --popover: oklch(0.225 0.028 264);
-  --popover-foreground: oklch(0.94 0.012 250);
-  --primary: oklch(0.7 0.16 256);
-  --primary-foreground: oklch(0.16 0.03 264);
-  --secondary: oklch(0.26 0.03 264);
-  --secondary-foreground: oklch(0.94 0.012 250);
-  --muted: oklch(0.26 0.03 264);
-  --muted-foreground: oklch(0.72 0.03 254);
-  --accent: oklch(0.29 0.05 262);
-  --accent-foreground: oklch(0.95 0.012 250);
-  --destructive: oklch(0.68 0.19 22);
-  --border: oklch(0.85 0.04 255 / 11%);
-  --input: oklch(0.85 0.04 255 / 16%);
-  --ring: oklch(0.7 0.16 256);
+  color-scheme: dark;
+  /*
+   * Escuro (o padrão): grafite, como uma mesa de jogo à noite, e um único destaque, o dourado
+   * envelhecido (#d4af37), no que é interativo e importante. Superfícies em #1a1d24, bordas
+   * em #2c323f.
+   */
+  --background: #121419;
+  --foreground: #e8e4d8;
+  --card: #1a1d24;
+  --card-foreground: #e8e4d8;
+  --popover: #20242c;
+  --popover-foreground: #e8e4d8;
+  --primary: #d4af37;
+  --primary-foreground: #1a1d24;
+  --secondary: #22262e;
+  --secondary-foreground: #e8e4d8;
+  --muted: #22262e;
+  --muted-foreground: #959aa5;
+  --accent: #272b34;
+  --accent-foreground: #f1ead2;
+  --destructive: oklch(0.66 0.19 25);
+  --border: #2c323f;
+  --input: #343b4a;
+  --ring: #d4af37;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: oklch(0.205 0 0);
-  --sidebar-foreground: oklch(0.985 0 0);
-  --sidebar-primary: oklch(0.488 0.243 264.376);
-  --sidebar-primary-foreground: oklch(0.985 0 0);
-  --sidebar-accent: oklch(0.269 0 0);
-  --sidebar-accent-foreground: oklch(0.985 0 0);
-  --sidebar-border: oklch(1 0 0 / 10%);
-  --sidebar-ring: oklch(0.556 0 0);
+  --sidebar: #1a1d24;
+  --sidebar-foreground: #e8e4d8;
+  --sidebar-primary: #d4af37;
+  --sidebar-primary-foreground: #1a1d24;
+  --sidebar-accent: #272b34;
+  --sidebar-accent-foreground: #e8e4d8;
+  --sidebar-border: #2c323f;
+  --sidebar-ring: #d4af37;
 }
 
 /* Impressão da ficha: folha A4 e fundo branco, mesmo com o app no tema escuro. */
@@ -164,7 +170,7 @@
   }
 }
 
-/* Escuro: um brilho cobalto bem leve no alto da tela, fixo (não repinta ao rolar). */
+/* Escuro: um brilho dourado bem leve no alto da tela, fixo (não repinta ao rolar). */
 .dark body::before {
   content: '';
   position: fixed;
@@ -172,7 +178,7 @@
   height: 28rem;
   pointer-events: none;
   z-index: -1;
-  background: radial-gradient(60rem 22rem at 50% -6rem, oklch(0.7 0.16 256 / 9%), transparent 70%);
+  background: radial-gradient(60rem 22rem at 50% -6rem, oklch(0.78 0.12 85 / 6%), transparent 70%);
 }
 @media print {
   .dark body::before {
@@ -210,9 +216,13 @@ body {
 }
 
 /*
- * Cor de destaque do sistema (`accent`), posta em <html data-destaque> pela ficha e pela
- * campanha: o mesmo desenho do cobalto (claridade e saturação), trocando só o matiz.
+ * Tema do sistema (`theme` no arquivo do sistema), dentro da ficha e da campanha dele: a cor
+ * de destaque (mesma claridade e saturação para os dois temas, trocando só o matiz) e a fonte
+ * dos títulos. O resto do app continua grafite e dourado.
  */
+[data-destaque='cobalto'] {
+  --matiz: 262;
+}
 [data-destaque='violeta'] {
   --matiz: 300;
 }
@@ -234,16 +244,49 @@ body {
 [data-destaque='ciano'] {
   --matiz: 205;
 }
-:root[data-destaque] {
+[data-destaque] {
   --primary: oklch(0.5 0.19 var(--matiz));
   --accent: oklch(0.92 0.03 var(--matiz));
   --accent-foreground: oklch(0.3 0.09 var(--matiz));
   --ring: oklch(0.58 0.17 var(--matiz));
 }
-:root.dark[data-destaque] {
-  --primary: oklch(0.7 0.16 var(--matiz));
+.dark [data-destaque] {
+  --primary: oklch(0.72 0.15 var(--matiz));
   --primary-foreground: oklch(0.16 0.03 var(--matiz));
   --accent: oklch(0.29 0.05 var(--matiz));
   --accent-foreground: oklch(0.95 0.012 var(--matiz));
-  --ring: oklch(0.7 0.16 var(--matiz));
+  --ring: oklch(0.72 0.15 var(--matiz));
+}
+[data-titulos='serifa'] :is(.font-heading, h1, h2, h3) {
+  font-family: 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  letter-spacing: 0.02em;
+}
+[data-titulos='maquina'] :is(.font-heading, h1, h2, h3) {
+  font-family: 'Courier New', Courier, ui-monospace, monospace;
+  letter-spacing: 0.06em;
+}
+
+/*
+ * Ficha como painéis de uma ficha impressa: cada bloco com o título na cor de destaque (a do
+ * sistema, ou o dourado) e um filete dela no alto.
+ */
+.ficha [data-slot='card'] {
+  border-top: 2px solid color-mix(in oklch, var(--primary) 55%, transparent);
+}
+.ficha [data-slot='card-title'] {
+  color: var(--primary);
+}
+
+/*
+ * O foco do teclado não fica escondido atrás do que é fixo: o cabeçalho (e, de 768 px a
+ * 1280 px, o painel da ficha no topo) e, no celular, a barra do polegar.
+ */
+html {
+  scroll-padding-top: 4.5rem;
+  scroll-padding-bottom: calc(var(--barra-polegar, 0px) + 1rem);
+}
+@media (min-width: 48rem) and (max-width: 79.99rem) {
+  html:has([aria-label='Resumo do personagem']) {
+    scroll-padding-top: 15rem;
+  }
 }

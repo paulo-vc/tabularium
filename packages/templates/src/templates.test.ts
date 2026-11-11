@@ -249,7 +249,7 @@ describe('D&D 5e: nova ficha (1.2.0)', () => {
       'Personagem',
       'Anotações',
     ]);
-    expect(template.layouts.full[0]).toMatchObject({ title: 'Atributos', display: 'compacto' });
+    expect(template.layouts.full[0]).toMatchObject({ title: 'Atributos', display: 'circulo' });
     expect(template.layouts.full[0]).toMatchObject({
       children: expect.arrayContaining([{ kind: 'field', fieldId: 'for_mod', secondary: 'for' }]),
     });

@@ -4,6 +4,12 @@ As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos
 
 ## Próxima versão
 
+- **Visual novo: grafite e dourado.** O app troca o azul-tinta e o cobalto por superfícies em grafite e um único destaque em dourado envelhecido, no que é interativo e importante.
+- **Cada sistema com a sua cara.** Dentro da ficha e da campanha, o sistema usa o tema dele: a cor de destaque, a fonte dos títulos (condensada, serifada de livro antigo ou de máquina de escrever), a cor de cada barra de recurso, os atributos em círculo e a Defesa ou CA num escudo. O D&D 5e (1.11.0) fica violeta e serifado, com a CA no escudo e os atributos em círculo ao lado dos testes de resistência. Quem cria sistemas acha tudo isso no editor.
+- **Barras de recurso grandes.** PV, Sanidade, Esforço e afins viram barras largas, na cor do recurso, com « ‹ valor › » para tirar ou somar 5 e 1 num toque; o valor abre o ajuste exato.
+- **Atributos que rolam.** Um número pode ser a quantidade de dados do teste (ex.: os atributos da Ordem Paranormal: Agilidade 3 rola 3d20 e fica com o maior), com o botão de rolar ao lado.
+- **Perícias como tabela.** As seções em linhas ganham cabeçalho de colunas, as perícias treinadas aparecem na cor de destaque, e as linhas com escolha de grau (ou em meia página) ficam numa coluna só, para o nome caber.
+- **Campanha em três colunas.** Em telas largas, o Mestre vê o combate e as rolagens à esquerda, a mesa (cena, música, diário, códice, bestiário) no centro e os jogadores à direita, tudo à vista.
 - **Bônus e perícias à vista:** os bônus ativos (itens, maldições, bênçãos) aparecem no painel da ficha junto das condições, com o campo e o total, verdes quando ajudam e vermelhos quando atrapalham. Nas perícias, "Só treinadas" esconde as que não têm treino, e os testes que rolam vários dados mostram quantos no botão ("3d20").
 - **Menor é melhor:** o sistema pode dizer que, nos testes, o menor resultado é o melhor (rolar abaixo do valor). Aí a vantagem fica com o menor dado e o crítico é o 1. Corrige a vantagem do Chamado de Cthulhu, que ficava com o maior.
 - **Cor de cada sistema:** o sistema pode ter uma cor de destaque (cobalto, violeta, magenta, vermelho, laranja, âmbar, verde ou ciano, em "Cor de destaque" no criador de sistemas). Com a ficha ou a campanha desse sistema aberta, botões, abas e destaques do app ficam nessa cor, nos dois temas; fora dela, volta o cobalto. O D&D 5e (1.10.0) fica violeta.

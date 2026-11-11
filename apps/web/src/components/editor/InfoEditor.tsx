@@ -1,6 +1,9 @@
 import {
   ACCENT_LABELS,
   bumpVersion,
+  HEADING_FONT_LABELS,
+  HEADING_FONTS,
+  type HeadingFont,
   SYSTEM_ACCENTS,
   type SystemAccent,
   type SystemTemplate,
@@ -156,6 +159,32 @@ export function InfoEditor({
         </Select>
         <p className="text-muted-foreground text-xs">
           Botões, abas e destaques da ficha e da campanha deste sistema.
+        </p>
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor={`${base}-fonte`}>Fonte dos títulos</Label>
+        <Select
+          value={template.headingFont ?? 'condensada'}
+          onValueChange={(value) =>
+            apply((t) => {
+              const { headingFont: _font, ...rest } = t;
+              return value === 'condensada' ? rest : { ...rest, headingFont: value as HeadingFont };
+            }, 'fonte')
+          }
+        >
+          <SelectTrigger id={`${base}-fonte`} className="w-full sm:w-64">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {HEADING_FONTS.map((font) => (
+              <SelectItem key={font} value={font}>
+                {HEADING_FONT_LABELS[font]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-muted-foreground text-xs">
+          Com a cor, dá a cara do sistema à ficha e à campanha, como na ficha impressa dele.
         </p>
       </div>
       <label className="flex items-start gap-2 text-sm">

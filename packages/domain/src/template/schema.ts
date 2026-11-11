@@ -31,7 +31,22 @@ const fieldBase = {
    * Sanidade. O valor continua guardado e nas fórmulas.
    */
   visibleWhen: z.object({ field: IdSchema, value: z.boolean() }).optional(),
+  /** Desenho especial do valor na ficha: `escudo` (ex.: Defesa, Classe de Armadura). */
+  emblem: z.enum(['escudo']).optional(),
 };
+
+/** Cores das barras de recurso (ex.: Vida vermelha, Sanidade violeta, Esforço laranja). */
+export const BAR_COLORS = [
+  'vermelho',
+  'laranja',
+  'ambar',
+  'verde',
+  'ciano',
+  'cobalto',
+  'violeta',
+  'magenta',
+] as const;
+export type BarColor = (typeof BAR_COLORS)[number];
 
 /**
  * Mostra um número (ou o valor atual de um recurso) como marcadores clicáveis, como as
@@ -66,6 +81,11 @@ const NumberFieldSchema = z.object({
   integer: z.boolean().optional(),
   display: z.enum(FIELD_DISPLAYS).optional(),
   /** O que volta num descanso (ex.: os testes contra a morte zeram). */
+  /**
+   * O valor é quantos dados do teste rolar, ficando com o maior (ex.: os atributos da Ordem
+   * Paranormal: Agilidade 3 rola 3d20). Ganha o botão de rolar na ficha.
+   */
+  rollsDice: z.boolean().optional(),
   recover: RestRecoverySchema.optional(),
 });
 
@@ -119,6 +139,8 @@ const ResourceFieldSchema = z.object({
   default: FiniteNumberSchema.optional(),
   display: z.enum(FIELD_DISPLAYS).optional(),
   /** O que volta num descanso (ex.: os PV enchem no descanso longo). */
+  /** Cor da barra (sem ela, a barra muda de verde a vermelho conforme esvazia). */
+  color: z.enum(BAR_COLORS).optional(),
   recover: RestRecoverySchema.optional(),
 });
 
@@ -189,9 +211,11 @@ export const NUMERIC_ITEM_FIELD_TYPES = ['number', 'boolean', 'select'] as const
  * - `padrao`: campos com rótulo em grade;
  * - `compacto`: blocos de valor (ex.: atributos), número grande e rótulo pequeno;
  * - `linhas`: cada grupo de `columns` campos vira uma linha (ex.: perícias: proficiência,
- *   nome e total numa linha só).
+ *   nome e total numa linha só);
+ * - `circulo`: os blocos em volta de um círculo, como o pentágono de atributos da Ordem
+ *   Paranormal (de 3 a 8 campos; com mais, vira `compacto`).
  */
-export const SECTION_DISPLAYS = ['padrao', 'compacto', 'linhas'] as const;
+export const SECTION_DISPLAYS = ['padrao', 'compacto', 'linhas', 'circulo'] as const;
 export type SectionDisplay = (typeof SECTION_DISPLAYS)[number];
 
 export type LayoutNode =
@@ -243,6 +267,15 @@ const LayoutSchema = z.array(LayoutNodeSchema).max(LIMITS.layoutNodes);
 
 // ---------- Template ----------
 
+/** Fonte dos títulos na ficha do sistema: a condensada do app, uma serifada ou de máquina. */
+export const HEADING_FONTS = ['condensada', 'serifa', 'maquina'] as const;
+export type HeadingFont = (typeof HEADING_FONTS)[number];
+export const HEADING_FONT_LABELS: Record<HeadingFont, string> = {
+  condensada: 'Condensada (a do app)',
+  serifa: 'Serifada (livro antigo)',
+  maquina: 'Máquina de escrever (dossiê)',
+};
+
 /**
  * Cor de destaque da ficha e da campanha do sistema (botões, abas, foco), entre tons que o app
  * já ajusta para os dois temas. Sem cor, vale o cobalto do app.
@@ -259,7 +292,7 @@ export const SYSTEM_ACCENTS = [
 ] as const;
 export type SystemAccent = (typeof SYSTEM_ACCENTS)[number];
 export const ACCENT_LABELS: Record<SystemAccent, string> = {
-  cobalto: 'Cobalto (o do app)',
+  cobalto: 'Cobalto',
   violeta: 'Violeta',
   magenta: 'Magenta',
   vermelho: 'Vermelho',
@@ -315,6 +348,8 @@ export const SystemTemplateSchema = z.object({
   lowerIsBetter: z.boolean().optional(),
   /** Cor de destaque da ficha e da campanha (ex.: laranja na Ordem Paranormal). */
   accent: z.enum(SYSTEM_ACCENTS).optional(),
+  /** Fonte dos títulos da ficha e da campanha (ex.: máquina de escrever no Chamado de Cthulhu). */
+  headingFont: z.enum(HEADING_FONTS).optional(),
   /** Versão mínima do app capaz de abrir este template. */
   minAppVersion: SemVerSchema.optional(),
   /** Códice: páginas de consulta (habilidades, regras, itens…), lidas por toda a mesa. */

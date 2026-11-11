@@ -1,17 +1,17 @@
-import type { SystemAccent } from '@tabula/domain';
-import { useEffect } from 'react';
+import type { HeadingFont, SystemAccent } from '@tabula/domain';
 
 /**
- * Enquanto a tela de um sistema está aberta (ficha, campanha), o app usa a cor de destaque
- * dele: botões, abas e foco, também nas janelas e menus. Ao sair, volta ao cobalto.
+ * Tema do sistema na ficha e na campanha dele: a cor de destaque e a fonte dos títulos, como
+ * atributos do contêiner da tela (o index.css lê `data-destaque` e `data-titulos`). O resto do
+ * app (cabeçalho, listas, janelas) continua grafite e dourado.
  */
-export function useSystemAccent(accent: SystemAccent | undefined) {
-  useEffect(() => {
-    if (!accent || accent === 'cobalto') return;
-    const root = document.documentElement;
-    root.dataset.destaque = accent;
-    return () => {
-      if (root.dataset.destaque === accent) delete root.dataset.destaque;
-    };
-  }, [accent]);
+export function systemTheme(
+  template:
+    { accent?: SystemAccent | undefined; headingFont?: HeadingFont | undefined } | undefined,
+): { 'data-destaque'?: SystemAccent; 'data-titulos'?: HeadingFont } {
+  return {
+    ...(template?.accent && { 'data-destaque': template.accent }),
+    ...(template?.headingFont &&
+      template.headingFont !== 'condensada' && { 'data-titulos': template.headingFont }),
+  };
 }

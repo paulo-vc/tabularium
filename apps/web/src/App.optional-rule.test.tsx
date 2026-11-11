@@ -90,16 +90,22 @@ describe('regra opcional na ficha', () => {
   });
 });
 
-describe('cor de destaque do sistema', () => {
-  it('a ficha usa a cor do sistema e, ao sair, o app volta ao cobalto', async () => {
-    await services.files.installTemplate({ ...TEMPLATE, accent: 'laranja' });
+describe('tema do sistema', () => {
+  it('a ficha usa a cor e a fonte do sistema; o resto do app continua dourado', async () => {
+    await services.files.installTemplate({
+      ...TEMPLATE,
+      accent: 'laranja',
+      headingFont: 'maquina',
+    });
     const sheet = await services.sheets.create({ name: 'Arthur', templateId: 'regra-opcional' });
     window.location.hash = `#/fichas/${sheet.id}`;
     render(<App services={services} />);
     await screen.findAllByText('Sanidade');
-    expect(document.documentElement.dataset.destaque).toBe('laranja');
-
-    cleanup();
-    expect(document.documentElement.dataset.destaque).toBeUndefined();
+    const themed = document.querySelector('[data-destaque]');
+    expect(themed).toHaveAttribute('data-destaque', 'laranja');
+    expect(themed).toHaveAttribute('data-titulos', 'maquina');
+    // O cabeçalho do app fica fora do tema do sistema.
+    expect(document.documentElement).not.toHaveAttribute('data-destaque');
+    expect(themed?.contains(screen.getByRole('banner'))).toBe(false);
   });
 });

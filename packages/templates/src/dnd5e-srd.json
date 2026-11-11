@@ -1,10 +1,11 @@
 {
   "id": "dnd5e-srd",
-  "version": "1.10.0",
+  "version": "1.11.0",
   "name": "D&D 5ª Edição (SRD 5.1)",
   "description": "Ficha para personagens de D&D 5ª edição, com opção para as regras de 2024 (5.5): maestria de armas, talento de origem e a Exaustão nova. This work includes material taken from the System Reference Document 5.1 (\"SRD 5.1\") by Wizards of the Coast LLC and available at https://dnd.wizards.com/resources/systems-reference-document. The SRD 5.1 is licensed under the Creative Commons Attribution 4.0 International License available at https://creativecommons.org/licenses/by/4.0/legalcode. Termos traduzidos para o português e organizados como ficha pelo projeto Tabularium. This work includes material from the System Reference Document 5.2 (\"SRD 5.2\") by Wizards of the Coast LLC, available at https://www.dndbeyond.com/srd. The SRD 5.2 is licensed under the Creative Commons Attribution 4.0 International License, available at https://creativecommons.org/licenses/by/4.0/legalcode.",
   "author": "Tabularium",
   "accent": "violeta",
+  "headingFont": "serifa",
   "license": "CC-BY-4.0",
   "language": "pt-BR",
   "tags": ["fantasia", "d20", "dnd"],
@@ -1260,7 +1261,8 @@
       "label": "Classe de Armadura",
       "type": "computed",
       "formula": "@ca + sum(@equipamento.bonus_ca * @equipamento.equipado)",
-      "description": "CA base + bônus dos itens equipados + efeitos ativos."
+      "description": "CA base + bônus dos itens equipados + efeitos ativos.",
+      "emblem": "escudo"
     },
     {
       "id": "ca",
@@ -1304,7 +1306,8 @@
       "default": 10,
       "recover": {
         "rest": "longo"
-      }
+      },
+      "color": "vermelho"
     },
     {
       "id": "dados_vida",
@@ -1322,7 +1325,8 @@
       "recover": {
         "rest": "longo",
         "amount": "metade"
-      }
+      },
+      "color": "ambar"
     },
     {
       "id": "sucessos_morte",
@@ -2033,23 +2037,8 @@
           }
         ],
         "tab": "Principal",
-        "display": "compacto"
-      },
-      {
-        "kind": "section",
-        "title": "Geral",
-        "columns": 2,
-        "children": [
-          {
-            "kind": "field",
-            "fieldId": "bonus_prof"
-          },
-          {
-            "kind": "field",
-            "fieldId": "inspiracao"
-          }
-        ],
-        "display": "compacto"
+        "display": "circulo",
+        "width": "metade"
       },
       {
         "kind": "section",
@@ -2105,7 +2094,24 @@
             "fieldId": "salv_car"
           }
         ],
-        "display": "linhas"
+        "display": "linhas",
+        "width": "metade"
+      },
+      {
+        "kind": "section",
+        "title": "Geral",
+        "columns": 2,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "bonus_prof"
+          },
+          {
+            "kind": "field",
+            "fieldId": "inspiracao"
+          }
+        ],
+        "display": "compacto"
       },
       {
         "kind": "section",
