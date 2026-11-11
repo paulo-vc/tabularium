@@ -308,6 +308,11 @@ export const SystemTemplateSchema = z.object({
   bonusTab: z.string().trim().min(1).max(40).optional(),
   /** Ícone do sistema (imagem pequena, embutida), nas listas de sistemas, fichas e campanhas. */
   icon: SystemIconSchema.optional(),
+  /**
+   * Nos testes, o menor resultado é o melhor (rolar abaixo do valor, como no 1d100 do Chamado
+   * de Cthulhu): a vantagem fica com o menor dado, e o crítico é a face 1.
+   */
+  lowerIsBetter: z.boolean().optional(),
   /** Cor de destaque da ficha e da campanha (ex.: laranja na Ordem Paranormal). */
   accent: z.enum(SYSTEM_ACCENTS).optional(),
   /** Versão mínima do app capaz de abrir este template. */

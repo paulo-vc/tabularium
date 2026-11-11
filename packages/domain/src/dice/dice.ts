@@ -260,15 +260,19 @@ export function checkExpression(
   modifier: number,
   mode: RollMode = 'normal',
   count?: number,
+  /** O menor resultado é o melhor (`lowerIsBetter`): "fica o melhor" vira o menor dado. */
+  lowerIsBetter = false,
 ): string {
   const single = mode === 'normal' && count === undefined ? null : singleCheckDie(checkDice);
+  const best = lowerIsBetter ? 'kl1' : 'kh1';
+  const worst = lowerIsBetter ? 'kh1' : 'kl1';
   let base = checkDice;
   if (single && count !== undefined && Number.isFinite(count)) {
     const n = Math.trunc(count) + (mode === 'vantagem' ? 1 : mode === 'desvantagem' ? -1 : 0);
     const dice = Math.min(CHECK_DICE_MAX, n >= 1 ? n : 2 - n);
-    base = n === 1 ? `1d${single.sides}` : `${dice}d${single.sides}${n >= 1 ? 'kh1' : 'kl1'}`;
+    base = n === 1 ? `1d${single.sides}` : `${dice}d${single.sides}${n >= 1 ? best : worst}`;
   } else if (single && mode !== 'normal') {
-    base = `2d${single.sides}${mode === 'vantagem' ? 'kh1' : 'kl1'}`;
+    base = `2d${single.sides}${mode === 'vantagem' ? best : worst}`;
   }
   if (modifier === 0) return base;
   return `${base}${modifier > 0 ? '+' : '-'}${Math.abs(modifier)}`;
@@ -278,11 +282,12 @@ export function checkExpression(
  * Acerto crítico: no primeiro termo, um dado só valendo (o que ficou, com vantagem) e na face
  * máxima, como o 20 natural no d20. Dados do sistema e várias faces somadas não contam.
  */
-export function isCriticalRoll(result: RollResult): boolean {
+export function isCriticalRoll(result: RollResult, lowerIsBetter = false): boolean {
   const first = result.terms[0];
   if (!first || first.kind !== 'dados' || first.custom || first.sign !== 1) return false;
   const kept = first.results.filter((die) => !die.dropped);
-  return kept.length === 1 && first.sides > 1 && kept[0]?.value === first.sides;
+  const best = lowerIsBetter ? 1 : first.sides;
+  return kept.length === 1 && first.sides > 1 && kept[0]?.value === best;
 }
 
 /**

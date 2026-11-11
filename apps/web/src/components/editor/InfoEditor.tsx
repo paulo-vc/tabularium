@@ -12,6 +12,7 @@ import { toast } from 'sonner';
 import { useServices } from '@/app/services-context';
 import { SystemIcon } from '@/components/SystemIcon';
 import { Button } from '@/components/ui/button';
+import { Checkbox } from '@/components/ui/checkbox';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import {
@@ -157,6 +158,25 @@ export function InfoEditor({
           Botões, abas e destaques da ficha e da campanha deste sistema.
         </p>
       </div>
+      <label className="flex items-start gap-2 text-sm">
+        <Checkbox
+          className="mt-0.5"
+          checked={template.lowerIsBetter === true}
+          onCheckedChange={(checked) =>
+            apply((t) => {
+              const { lowerIsBetter: _lower, ...rest } = t;
+              return checked === true ? { ...rest, lowerIsBetter: true } : rest;
+            }, 'menor')
+          }
+        />
+        <span>
+          Nos testes, o menor resultado é o melhor
+          <span className="text-muted-foreground block text-xs">
+            Para rolar abaixo do valor (ex.: 1d100): a vantagem fica com o menor dado e o crítico é
+            o 1.
+          </span>
+        </span>
+      </label>
       <div className="grid gap-4 sm:grid-cols-2">
         <div className="space-y-1.5">
           <Label htmlFor={`${base}-nome`}>Nome do sistema</Label>

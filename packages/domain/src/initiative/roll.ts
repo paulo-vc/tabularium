@@ -32,6 +32,7 @@ export function initiativeExpression(
     Math.trunc(modifier),
     'normal',
     checkDiceCount(compiled, values, derived, fieldId),
+    compiled.template.lowerIsBetter === true,
   );
   return parseDice(expression, compiled.template.dice).ok ? expression : null;
 }

@@ -112,6 +112,14 @@ describe('rollDice', () => {
     expect(checkExpression('2d6', 1, 'normal', 3)).toBe('2d6+1');
   });
 
+  it('menor é melhor: a vantagem fica com o menor dado, e o crítico é a face 1', () => {
+    expect(checkExpression('1d100', 0, 'vantagem', undefined, true)).toBe('2d100kl1');
+    expect(checkExpression('1d100', 0, 'desvantagem', undefined, true)).toBe('2d100kh1');
+    expect(checkExpression('1d20', 0, 'normal', 3, true)).toBe('3d20kl1');
+    expect(isCriticalRoll(roll('1d100', sequence(1)), true)).toBe(true);
+    expect(isCriticalRoll(roll('1d100', sequence(100)), true)).toBe(false);
+  });
+
   it('crítico: o dado que vale na face máxima', () => {
     expect(isCriticalRoll(roll('1d20+5', sequence(20)))).toBe(true);
     expect(isCriticalRoll(roll('1d20+5', sequence(19)))).toBe(false);

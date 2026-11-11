@@ -31,6 +31,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { NumberInput, PrimitiveInput } from './fields';
 import { formatNumber, parseNumber } from './format';
 import { markCount, Marks } from './Marks';
+import { BonusContext } from './Bonuses';
 import { CheckButton, RollContext, RollModeBar } from './roll-context';
 
 /** Campos em destaque: os do card do Mestre (`gmSummary`) ou, sem ele, os recursos. */
@@ -526,6 +527,7 @@ export function SheetVitals({
               </Badge>
             ));
           })}
+          <ActiveBonuses compiled={compiled} />
           <RollModeBar className="ml-auto max-md:hidden" />
         </div>
       </section>
@@ -706,5 +708,41 @@ function ThumbBar({
         </button>
       )}
     </div>
+  );
+}
+
+/**
+ * Bônus ativos (itens, maldições, bênçãos) à vista junto das condições: o campo e o total,
+ * verde quando ajuda e vermelho quando atrapalha; de onde vem cada parte, ao passar o mouse.
+ */
+function ActiveBonuses({ compiled }: { compiled: CompiledTemplate }) {
+  const effects = useContext(BonusContext);
+  if (effects.size === 0) return null;
+  return (
+    <span className="flex flex-wrap gap-1" aria-label="Bônus ativos">
+      {[...effects].map(([fieldId, effect]) => {
+        const field = compiled.fieldsById.get(fieldId);
+        if (!field || effect.total === 0) return null;
+        const sign = effect.total > 0 ? '+' : '−';
+        return (
+          <Badge
+            key={fieldId}
+            variant="outline"
+            className={cn(
+              'font-normal tabular-nums',
+              effect.total > 0
+                ? 'border-emerald-500/40 text-emerald-700 dark:text-emerald-300'
+                : 'border-red-500/40 text-red-700 dark:text-red-300',
+            )}
+            title={effect.sources
+              .map((source) => `${source.name}: ${source.value > 0 ? '+' : ''}${source.value}`)
+              .join(' · ')}
+          >
+            {field.label} {sign}
+            {Math.abs(effect.total)}
+          </Badge>
+        );
+      })}
+    </span>
   );
 }
