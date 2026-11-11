@@ -241,22 +241,25 @@ function SheetEditor({ id, compiled }: { id: string; compiled: OpenedReady['comp
       <RollContext value={roller}>
         <BonusContext value={bonusEffects}>
           <BonusEditorContext value={bonusEditor}>
-            <SheetVitals
-              compiled={compiled}
-              values={values}
-              derived={derived}
-              onChange={onChange}
-              hiddenFieldIds={hidden}
-            />
-            <SheetLayout
-              compiled={compiled}
-              values={values}
-              derived={derived}
-              onChange={onChange}
-              newItemId={() => crypto.randomUUID()}
-              {...(hidden && { hiddenFieldIds: hidden })}
-              pinnedFieldIds={pinnedFieldIds(compiled, hidden)}
-            />
+            {/* Em telas largas, o painel vira uma coluna fixa à esquerda da ficha. */}
+            <div className="space-y-4 xl:grid xl:grid-cols-[18rem_minmax(0,1fr)] xl:items-start xl:gap-6 xl:space-y-0 xl:[&>:only-child]:col-span-2">
+              <SheetVitals
+                compiled={compiled}
+                values={values}
+                derived={derived}
+                onChange={onChange}
+                hiddenFieldIds={hidden}
+              />
+              <SheetLayout
+                compiled={compiled}
+                values={values}
+                derived={derived}
+                onChange={onChange}
+                newItemId={() => crypto.randomUUID()}
+                {...(hidden && { hiddenFieldIds: hidden })}
+                pinnedFieldIds={pinnedFieldIds(compiled, hidden)}
+              />
+            </div>
           </BonusEditorContext>
         </BonusContext>
       </RollContext>

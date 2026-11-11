@@ -89,3 +89,45 @@ describe('descanso na ficha', () => {
     });
   });
 });
+
+describe('painel da ficha', () => {
+  it('−1 e +1 mudam o recurso sem digitar, sem passar do máximo', async () => {
+    const { user, id } = await openSheet();
+    await user.click(await screen.findByRole('button', { name: 'Tirar 1 de PV' }));
+    await user.click(screen.getByRole('button', { name: 'Tirar 1 de PV' }));
+    await waitFor(async () =>
+      expect((await services.sheetRepository.get(id))?.values['pv']).toEqual({
+        current: 3,
+        max: 20,
+      }),
+    );
+    for (let i = 0; i < 4; i++) {
+      await user.click(screen.getByRole('button', { name: 'Somar 1 a Foco' }));
+    }
+    await waitFor(async () =>
+      expect((await services.sheetRepository.get(id))?.values['foco']).toEqual({
+        current: 3,
+        max: 3,
+      }),
+    );
+  });
+
+  it('a barra do celular rola um dado e ajusta o recurso', async () => {
+    const { user, id } = await openSheet();
+    const bar = await screen.findByRole('toolbar', { name: 'Ações rápidas' });
+    await user.click(within(bar).getByRole('button', { name: 'Rolar dados' }));
+    await user.click(await screen.findByRole('button', { name: 'd20' }));
+    await waitFor(() =>
+      expect(screen.getByRole('list', { name: 'Últimas rolagens' })).toHaveTextContent('d20'),
+    );
+    await user.click(within(bar).getByRole('button', { name: 'PV: ajustar' }));
+    const panel = await screen.findByRole('dialog');
+    await user.click(within(panel).getByRole('button', { name: 'Somar 1 a PV' }));
+    await waitFor(async () =>
+      expect((await services.sheetRepository.get(id))?.values['pv']).toEqual({
+        current: 6,
+        max: 20,
+      }),
+    );
+  });
+});

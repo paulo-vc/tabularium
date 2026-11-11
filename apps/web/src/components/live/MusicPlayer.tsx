@@ -122,7 +122,7 @@ export function MusicPlayer() {
         <div
           role="region"
           aria-label="Música da mesa"
-          className="bg-background fixed bottom-4 left-4 z-40 flex max-w-[calc(100vw-8rem)] items-center gap-1 rounded-full border py-1 pr-1 pl-3 text-sm shadow-lg"
+          className="bg-background fixed bottom-[calc(1rem+var(--barra-polegar,0px))] left-4 z-40 flex max-w-[calc(100vw-8rem)] items-center gap-1 rounded-full border py-1 pr-1 pl-3 text-sm shadow-lg"
         >
           {downloading ? (
             <LoaderCircleIcon className="text-muted-foreground size-4 shrink-0 animate-spin" />

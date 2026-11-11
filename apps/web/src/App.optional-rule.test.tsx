@@ -78,13 +78,14 @@ describe('regra opcional na ficha', () => {
     const user = userEvent.setup();
     render(<App services={services} />);
 
-    expect(await screen.findByText('Sanidade')).toBeInTheDocument();
+    // O painel e a barra do celular mostram os recursos.
+    expect((await screen.findAllByText('Sanidade')).length).toBeGreaterThan(0);
     expect(screen.getByLabelText('Sanidade extra')).toBeInTheDocument();
-    expect(screen.queryByText('Determinação')).not.toBeInTheDocument();
+    expect(screen.queryAllByText('Determinação')).toHaveLength(0);
 
     await user.click(screen.getByRole('checkbox', { name: 'Usar Determinação' }));
-    expect(await screen.findByText('Determinação')).toBeInTheDocument();
-    expect(screen.queryByText('Sanidade')).not.toBeInTheDocument();
+    expect((await screen.findAllByText('Determinação')).length).toBeGreaterThan(0);
+    expect(screen.queryAllByText('Sanidade')).toHaveLength(0);
     expect(screen.queryByLabelText('Sanidade extra')).not.toBeInTheDocument();
   });
 });
