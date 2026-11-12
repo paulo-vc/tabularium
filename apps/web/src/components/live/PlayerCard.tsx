@@ -19,6 +19,7 @@ import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { formatNumber } from '@/components/sheet/format';
 import { CharacterPortrait } from '@/components/sheet/Portrait';
+import { barColor } from '@/components/sheet/SheetVitals';
 import { describeConnection } from './connection';
 
 const okValue = (result: Result<number, EvaluationError> | undefined) =>
@@ -63,14 +64,15 @@ function ResourceSummary({
         aria-valuemin={0}
         aria-valuemax={100}
         aria-valuenow={Math.round(percent)}
-        className="bg-muted h-2 overflow-hidden rounded-full"
+        className="bg-muted relative h-2.5 overflow-hidden rounded-full"
       >
+        {/* Na cor do recurso, como na ficha (Vida vermelha, Sanidade violeta…). */}
         <div
-          className={cn(
-            'h-full transition-[width]',
-            percent > 50 ? 'bg-emerald-500' : percent > 25 ? 'bg-amber-500' : 'bg-red-500',
-          )}
-          style={{ width: `${percent}%` }}
+          className="absolute inset-0 origin-left transition-transform motion-reduce:transition-none"
+          style={{
+            transform: `scaleX(${percent / 100})`,
+            background: barColor(field.type === 'resource' ? field.color : undefined, percent),
+          }}
         />
       </div>
     </div>
