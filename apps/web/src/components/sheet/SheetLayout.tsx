@@ -113,6 +113,11 @@ export interface SheetLayoutProps {
   secretFieldIds?: ReadonlySet<string> | undefined;
   /** Campos que ficam no painel fixo (`pinnedFieldIds`) e por isso não se repetem aqui. */
   pinnedFieldIds?: ReadonlySet<string> | undefined;
+  /**
+   * Que parte desenhar: `lateral` (só as seções fixas, para o painel lateral), `principal` (as
+   * abas sem as fixas, que estão no painel) ou tudo (sem painel: as fixas acima das abas).
+   */
+  part?: 'lateral' | 'principal' | undefined;
 }
 
 export function SheetLayout({
@@ -124,6 +129,7 @@ export function SheetLayout({
   hiddenFieldIds,
   secretFieldIds,
   pinnedFieldIds,
+  part,
 }: SheetLayoutProps) {
   const base = useId();
   const [selected, setSelected] = useState(0);
@@ -182,10 +188,17 @@ export function SheetLayout({
     <div
       className={cn(
         'grid gap-2',
-        // Em meia página, quantos blocos couberem por linha (a grade fixa os espremeria).
-        section.width === 'metade'
-          ? 'grid-cols-[repeat(auto-fill,minmax(4.5rem,1fr))]'
-          : TILE_GRID[section.columns],
+        // No painel lateral, 3 por linha (atributos em 3 + 3) ou 2; em meia página, 3 por linha
+        // quando fecham linhas cheias, senão quantos couberem.
+        part === 'lateral'
+          ? section.children.length % 3 === 0 || section.children.length > 4
+            ? 'grid-cols-3'
+            : 'grid-cols-2'
+          : section.width === 'metade'
+            ? section.children.length % 3 === 0
+              ? 'grid-cols-3'
+              : 'grid-cols-[repeat(auto-fill,minmax(4.5rem,1fr))]'
+            : TILE_GRID[section.columns],
       )}
     >
       {section.children.map((node, index) => {
@@ -218,7 +231,7 @@ export function SheetLayout({
       const secondary = visible(node.secondary);
       return [{ main: propsOf(field), secondary: secondary ? propsOf(secondary) : undefined }];
     });
-    if (tiles.length < 3 || tiles.length > 8) return renderTiles(section);
+    if (tiles.length < 3 || tiles.length > 8 || part === 'lateral') return renderTiles(section);
     // Em tela estreita, valores embaixo de cada bloco (o 16 sob o +3) não cabem no círculo.
     if (!roomy && tiles.some((tile) => tile.secondary)) return renderTiles(section);
     return <CircleSection title={section.title} tiles={tiles} />;
@@ -414,9 +427,44 @@ export function SheetLayout({
     );
   }
 
-  const { full } = compiled.template.layouts;
+  const { full: wholeLayout, side: sideTitles = [] } = compiled.template.layouts;
+  // Seções sempre à vista (ex.: atributos): saem das abas. Se uma delas abria uma aba, a aba
+  // passa para a seção seguinte.
+  const sideNodes: SectionNode[] = [];
+  const full: LayoutNode[] = [];
+  let pendingTab: string | undefined;
+  for (const node of wholeLayout) {
+    if (node.kind === 'section' && sideTitles.includes(node.title)) {
+      sideNodes.push(node);
+      pendingTab ??= node.tab;
+      continue;
+    }
+    full.push(
+      pendingTab && node.kind === 'section' && !node.tab ? { ...node, tab: pendingTab } : node,
+    );
+    pendingTab = undefined;
+  }
+  // A meia página que perdeu o par (ele foi para o painel) ocupa a largura toda: numa
+  // sequência ímpar de meias páginas da mesma aba, a última se estica.
+  if (sideNodes.length > 0) {
+    let run: number[] = [];
+    const closeRun = () => {
+      const last = run.at(-1);
+      if (run.length % 2 === 1 && last !== undefined) {
+        const { width: _width, ...rest } = full[last] as SectionNode;
+        full[last] = rest;
+      }
+      run = [];
+    };
+    full.forEach((node, index) => {
+      if (node.kind === 'section' && node.tab) closeRun();
+      if (node.kind === 'section' && node.width === 'metade') run.push(index);
+      else closeRun();
+    });
+    closeRun();
+  }
   // Campos que o template não posicionou no layout continuam acessíveis.
-  const shown = new Set(layoutFieldIds(full));
+  const shown = new Set(layoutFieldIds(wholeLayout));
   const others = compiled.template.fields.filter(
     (field) => !shown.has(field.id) && !hiddenFieldIds?.has(field.id) && !byCondition.has(field.id),
   );
@@ -462,9 +510,29 @@ export function SheetLayout({
       </div>
     ) : null;
 
+  // Só o painel lateral: as seções fixas, uma embaixo da outra.
+  if (part === 'lateral') {
+    if (sideNodes.length === 0) return null;
+    return (
+      <div className="ficha space-y-4" aria-label="Sempre à vista">
+        {sideNodes
+          .filter((node) => hasContent([node]))
+          .map((node) => (
+            <div key={node.title}>{renderSection(node, 0)}</div>
+          ))}
+      </div>
+    );
+  }
+  // Sem painel lateral (tela menor), as seções fixas ficam acima das abas.
+  const fixedAbove =
+    part !== 'principal' && sideNodes.length > 0 ? (
+      <div className="ficha grid items-start gap-4 lg:grid-cols-2">{renderTop(sideNodes)}</div>
+    ) : null;
+
   if (tabs.length === 1) {
     return (
       <div className="ficha grid items-start gap-4 lg:grid-cols-2">
+        {fixedAbove && <div className="lg:col-span-2">{fixedAbove}</div>}
         {rollModeHere && <RollModeBar className="justify-self-end lg:col-span-2" />}
         {renderTop(tabs[0]?.nodes ?? [])}
         {withBonuses(tabs[0]?.name)}
@@ -474,6 +542,7 @@ export function SheetLayout({
 
   return (
     <div className="ficha space-y-4">
+      {fixedAbove}
       <div className="flex flex-wrap-reverse items-end gap-x-2 gap-y-1 border-b">
         <div
           role="tablist"

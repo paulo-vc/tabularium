@@ -1,6 +1,6 @@
 {
   "default": "icone.svg",
-  "bg_color": "#0b1124",
+  "bg_color": "#141210",
   "android_bg": "android-fundo.svg",
   "android_fg": "android-frente.svg",
   "android_fg_scale": 100,

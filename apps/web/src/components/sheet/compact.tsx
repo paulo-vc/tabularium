@@ -222,7 +222,7 @@ function CircleTile({
   const current = currentOf(field, main.value);
   return (
     <div className="flex flex-col items-center gap-0.5 text-center">
-      <div className="border-primary/70 bg-card flex aspect-square w-[78%] max-w-24 flex-col items-center justify-center rounded-full border-2 shadow-[0_0_0_4px_var(--color-background)]">
+      <div className="border-primary/70 bg-card relative flex aspect-square w-[78%] max-w-24 flex-col items-center justify-center rounded-full border-2 shadow-[0_0_0_4px_var(--color-background)]">
         {field.type === 'computed' ? (
           <BigComputed field={field} derived={main.derived} />
         ) : field.type === 'number' ? (
@@ -237,14 +237,25 @@ function CircleTile({
         ) : (
           <FieldControl {...main} />
         )}
+        {/* O valor secundário (o 16 do +3) num selo na borda de baixo, como na ficha impressa:
+            o bloco não cresce e não invade o vizinho. */}
+        {secondary && (
+          <div className="absolute top-full left-1/2 -translate-x-1/2 -translate-y-1/2 [&_.w-16]:w-12 [&_input]:h-6 [&_input]:rounded-full [&_input]:!bg-card [&_input]:px-1 [&_input]:text-center [&_input]:text-xs">
+            <SecondaryValue {...secondary} />
+          </div>
+        )}
       </div>
-      <span className="text-muted-foreground mt-1 text-[11px] font-medium tracking-wide uppercase">
+      <span
+        className={cn(
+          'text-muted-foreground mt-1 text-[11px] font-medium tracking-wide uppercase',
+          secondary && 'mt-3.5',
+        )}
+      >
         {title}
       </span>
       {field.type === 'number' && field.rollsDice && (
         <CheckButton label={field.label} modifier={0} fieldId={field.id} />
       )}
-      {secondary && <SecondaryValue {...secondary} />}
     </div>
   );
 }

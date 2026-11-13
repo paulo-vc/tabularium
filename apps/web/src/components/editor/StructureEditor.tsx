@@ -33,6 +33,7 @@ import {
   pathOfField,
   removeField,
   removeSection,
+  setSectionSide,
   updateSection,
   type Columns,
   type FieldDef,
@@ -310,6 +311,7 @@ export function StructureEditor({
             node={node}
             path={path}
             tabs={tabsOf(template.layouts.full)}
+            side={path.length === 1 && (template.layouts.side ?? []).includes(node.title)}
             isFirst={index === 0}
             isLast={index === nodes.length - 1}
             apply={apply}
@@ -568,6 +570,7 @@ function SectionCard({
   node,
   path,
   tabs,
+  side,
   isFirst,
   isLast,
   apply,
@@ -577,6 +580,7 @@ function SectionCard({
   node: LayoutNode & { kind: 'section' };
   path: NodePath;
   tabs: string[];
+  side: boolean;
   isFirst: boolean;
   isLast: boolean;
   apply: Apply;
@@ -713,6 +717,18 @@ function SectionCard({
               }
             />
             Meia página
+          </label>
+        )}
+        {!nested && (
+          <label
+            className="text-muted-foreground flex h-8 items-center gap-1.5 text-sm"
+            title="Em telas largas, fica fixa ao lado da ficha, junto de PV e defesa, fora das abas."
+          >
+            <Checkbox
+              checked={side}
+              onCheckedChange={(checked) => apply((t) => setSectionSide(t, path, checked === true))}
+            />
+            Sempre à vista
           </label>
         )}
         <Select

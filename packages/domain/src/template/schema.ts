@@ -179,6 +179,11 @@ const ListFieldSchema = z.object({
    * o dano. Com isso, cada item ganha "Atacar" (o dado dos testes + o bônus) e "Ataque e dano".
    */
   attack: z.object({ bonus: IdSchema, damage: IdSchema.optional() }).optional(),
+  /**
+   * `cartoes`: cada item é um cartão com os textos longos sempre abertos (habilidades, poderes,
+   * rituais com descrição). Sem isso, o texto longo abre por item e a linha fica curta.
+   */
+  display: z.enum(['cartoes']).optional(),
 });
 
 export const FieldDefSchema = z.discriminatedUnion('type', [
@@ -267,6 +272,15 @@ const LayoutSchema = z.array(LayoutNodeSchema).max(LIMITS.layoutNodes);
 
 // ---------- Template ----------
 
+/** Estilos de ficha: o visual do tipo de jogo (medieval, terror). */
+export const SHEET_STYLES = ['medieval', 'sombrio'] as const;
+export type SheetStyle = (typeof SHEET_STYLES)[number];
+export const SHEET_STYLE_LABELS: Record<SheetStyle | 'liso', string> = {
+  liso: 'Liso (o do app)',
+  medieval: 'Medieval (molduras e ornamentos)',
+  sombrio: 'Sombrio (terror, dossiê)',
+};
+
 /** Fonte dos títulos na ficha do sistema: a condensada do app, uma serifada ou de máquina. */
 export const HEADING_FONTS = ['condensada', 'serifa', 'maquina'] as const;
 export type HeadingFont = (typeof HEADING_FONTS)[number];
@@ -350,6 +364,11 @@ export const SystemTemplateSchema = z.object({
   accent: z.enum(SYSTEM_ACCENTS).optional(),
   /** Fonte dos títulos da ficha e da campanha (ex.: máquina de escrever no Chamado de Cthulhu). */
   headingFont: z.enum(HEADING_FONTS).optional(),
+  /**
+   * Estilo da ficha e da campanha: `medieval` (molduras douradas, ornamentos, como pergaminho)
+   * ou `sombrio` (granulado e sombras, como um dossiê de terror). Sem isso, o painel liso.
+   */
+  style: z.enum(SHEET_STYLES).optional(),
   /** Versão mínima do app capaz de abrir este template. */
   minAppVersion: SemVerSchema.optional(),
   /** Códice: páginas de consulta (habilidades, regras, itens…), lidas por toda a mesa. */
@@ -366,6 +385,11 @@ export const SystemTemplateSchema = z.object({
     compact: LayoutSchema.optional(),
     /** Campos exibidos no card do jogador no painel do Mestre (HP, mana, condições…). */
     gmSummary: z.array(IdSchema).max(LIMITS.gmSummary).optional(),
+    /**
+     * Seções (pelo título) sempre à vista no painel lateral da ficha, junto de PV e defesa
+     * (ex.: os atributos). Em telas menores, ficam acima das abas.
+     */
+    side: z.array(LabelSchema).max(6).optional(),
   }),
 });
 

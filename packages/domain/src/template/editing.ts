@@ -456,7 +456,8 @@ export function updateSection(
     width?: 'metade' | undefined;
   },
 ): SystemTemplate {
-  return withFull(
+  const before = nodeAt(template.layouts.full, path);
+  const updated = withFull(
     template,
     updateNode(template.layouts.full, path, (node) => {
       if (node.kind !== 'section') return node;
@@ -468,6 +469,36 @@ export function updateSection(
       return next;
     }),
   );
+  // Renomear uma seção sempre à vista não a tira do painel.
+  const side = template.layouts.side;
+  const renamed = change.title;
+  if (renamed === undefined || before?.kind !== 'section' || !side?.includes(before.title)) {
+    return updated;
+  }
+  return {
+    ...updated,
+    layouts: {
+      ...updated.layouts,
+      side: side.map((title) => (title === before.title ? renamed : title)),
+    },
+  };
+}
+
+/**
+ * Liga ou desliga "sempre à vista" numa seção do primeiro nível: em telas largas ela fica no
+ * painel fixo ao lado da ficha (como PV e defesa), fora das abas.
+ */
+export function setSectionSide(
+  template: SystemTemplate,
+  path: NodePath,
+  side: boolean,
+): SystemTemplate {
+  const node = nodeAt(template.layouts.full, path);
+  if (node?.kind !== 'section' || path.length !== 1) return template;
+  const current = (template.layouts.side ?? []).filter((title) => title !== node.title);
+  const next = side ? [...current, node.title].slice(-6) : current;
+  const { side: _side, ...layouts } = template.layouts;
+  return { ...template, layouts: next.length > 0 ? { ...layouts, side: next } : layouts };
 }
 
 /** Remove uma seção vazia. Seções com campos não são removidas (os campos sumiriam da ficha). */

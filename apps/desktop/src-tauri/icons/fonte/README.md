@@ -1,6 +1,6 @@
 # Fonte do ícone
 
-O ícone "Vinte" (o d20 sobre o azul-tinta do app) sai destes arquivos. Os PNG, `.ico` e `.icns` da pasta de cima e os ícones da web (`apps/web/public/icon*.png` e `icon.svg`) são gerados a partir deles.
+O ícone "Vinte" (o d20 em ouro velho sobre o carvão do app) sai destes arquivos. Os PNG, `.ico` e `.icns` da pasta de cima e os ícones da web (`apps/web/public/icon*.png` e `icon.svg`) são gerados a partir deles.
 
 - `icone.svg`: o ícone com cantos arredondados (computador e app).
 - `android-fundo.svg` e `android-frente.svg`: as camadas do ícone adaptável do Android. O aparelho mostra só os 2/3 centrais e corta no próprio formato (círculo ou quadrado arredondado), por isso o fundo não tem cantos e o d20 fica dentro da zona segura.
