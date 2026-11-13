@@ -339,10 +339,12 @@ function ResourceVital({
 function Tile({
   label,
   emblem,
+  wide = false,
   children,
 }: {
   label: string;
   emblem?: 'escudo' | undefined;
+  wide?: boolean;
   children: ReactNode;
 }) {
   if (emblem === 'escudo') {
@@ -358,7 +360,12 @@ function Tile({
     );
   }
   return (
-    <div className="flex min-w-16 shrink-0 flex-col items-center gap-0.5 rounded-md border px-2.5 py-1">
+    <div
+      className={cn(
+        'flex min-w-16 shrink-0 flex-col items-center gap-0.5 rounded-md border px-2.5 py-1',
+        wide && 'xl:col-span-2',
+      )}
+    >
       <span
         className="text-muted-foreground line-clamp-2 max-w-24 text-center text-[11px] leading-tight xl:max-w-none"
         title={label}
@@ -557,7 +564,14 @@ export function SheetVitals({
             não pode tomar a tela. */}
           <div className="-mx-1 flex max-w-full gap-2 overflow-x-auto px-1 pb-1 sm:flex-wrap sm:overflow-visible sm:pb-0 xl:mx-0 xl:grid xl:grid-cols-2 xl:px-0 xl:[&>*]:min-w-0">
             {tiles.map((field) => (
-              <Tile key={field.id} label={field.label} emblem={field.emblem}>
+              <Tile
+                key={field.id}
+                label={field.label}
+                emblem={field.emblem}
+                // Marcadores (Exaustão, testes contra a morte) ocupam a linha toda da coluna:
+                // as bolinhas cabem numa fileira só.
+                wide={'display' in field && field.display === 'marcadores'}
+              >
                 {tile(field)}
               </Tile>
             ))}
