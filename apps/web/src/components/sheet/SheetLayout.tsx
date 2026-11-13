@@ -444,24 +444,27 @@ export function SheetLayout({
     );
     pendingTab = undefined;
   }
-  // A meia página que perdeu o par (ele foi para o painel) ocupa a largura toda: numa
-  // sequência ímpar de meias páginas da mesma aba, a última se estica.
+  // A meia página que perdeu o par (ele foi para o painel, ou ficou nas abas) ocupa a largura
+  // toda: numa sequência ímpar de meias páginas da mesma aba, a última se estica. Vale para as
+  // abas e para as seções fixas desenhadas acima delas.
   if (sideNodes.length > 0) {
-    let run: number[] = [];
-    const closeRun = () => {
-      const last = run.at(-1);
-      if (run.length % 2 === 1 && last !== undefined) {
-        const { width: _width, ...rest } = full[last] as SectionNode;
-        full[last] = rest;
-      }
-      run = [];
-    };
-    full.forEach((node, index) => {
-      if (node.kind === 'section' && node.tab) closeRun();
-      if (node.kind === 'section' && node.width === 'metade') run.push(index);
-      else closeRun();
-    });
-    closeRun();
+    for (const nodes of [full, sideNodes] as LayoutNode[][]) {
+      let run: number[] = [];
+      const closeRun = () => {
+        const last = run.at(-1);
+        if (run.length % 2 === 1 && last !== undefined) {
+          const { width: _width, ...rest } = nodes[last] as SectionNode;
+          nodes[last] = rest;
+        }
+        run = [];
+      };
+      nodes.forEach((node, index) => {
+        if (node.kind === 'section' && node.tab) closeRun();
+        if (node.kind === 'section' && node.width === 'metade') run.push(index);
+        else closeRun();
+      });
+      closeRun();
+    }
   }
   // Campos que o template não posicionou no layout continuam acessíveis.
   const shown = new Set(layoutFieldIds(wholeLayout));

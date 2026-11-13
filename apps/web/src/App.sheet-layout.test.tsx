@@ -165,7 +165,10 @@ describe('seções sempre à vista', () => {
     expect(tabPanel()).not.toContainElement(attributes());
     await user.click(screen.getByRole('tab', { name: 'Combate' }));
     expect(attributes()).toBeInTheDocument();
-    expect(screen.getByRole('heading', { name: 'Testes de resistência' })).toBeInTheDocument();
+    // Só os atributos: os testes de resistência ficam na aba Principal.
+    expect(
+      screen.queryByRole('heading', { name: 'Testes de resistência' }),
+    ).not.toBeInTheDocument();
     // A aba que começava nos atributos passa para a seção seguinte (Perícias).
     await user.click(screen.getByRole('tab', { name: 'Principal' }));
     expect(within(tabPanel()).getByRole('heading', { name: 'Perícias' })).toBeInTheDocument();
