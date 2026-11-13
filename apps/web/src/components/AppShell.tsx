@@ -44,8 +44,12 @@ function NavLink({ href, also, children }: { href: string; also?: string; childr
       href={href}
       aria-current={active ? 'page' : undefined}
       className={cn(
-        'rounded-md px-1.5 py-1.5 text-sm font-medium transition-colors pointer-coarse:py-2.5 sm:px-3',
-        active ? 'bg-secondary text-foreground' : 'text-muted-foreground hover:text-foreground',
+        // Aba ativa: texto em ouro e um traço dourado embaixo, colado no filete do cabeçalho.
+        'relative px-1.5 py-1.5 text-sm font-medium tracking-wide transition-colors pointer-coarse:py-2.5 sm:px-3',
+        'after:absolute after:inset-x-2 after:-bottom-[calc(0.75rem+1px)] after:h-0.5 after:rounded-full after:transition-opacity',
+        active
+          ? 'text-primary after:bg-primary after:opacity-100 after:shadow-[0_0_10px_var(--primary)]'
+          : 'text-muted-foreground hover:text-foreground after:opacity-0',
       )}
     >
       {children}
@@ -58,16 +62,20 @@ export function AppShell({ children }: { children: ReactNode }) {
   const inSession = useLiveSession().kind !== 'nenhuma';
   return (
     <div className="bg-background text-foreground min-h-dvh print:bg-white">
-      <header className="bg-background/95 sticky top-0 z-10 border-b backdrop-blur print:hidden">
-        <div className="mx-auto flex h-14 max-w-6xl items-center gap-1.5 px-4 sm:gap-4">
+      <header className="cabecalho sticky top-0 z-10 backdrop-blur print:hidden">
+        <div className="mx-auto flex h-14 max-w-7xl items-center gap-1.5 px-4 sm:gap-5">
           <Link
             href="/"
             aria-label="Tabularium RPG"
-            className="flex shrink-0 items-center gap-2 font-semibold"
+            className="group flex shrink-0 items-center gap-2.5 font-semibold"
           >
-            <img src="icon.svg" alt="" className="size-6" />
+            <img
+              src="icon.svg"
+              alt=""
+              className="size-8 rounded-lg shadow-[0_0_14px_-2px_color-mix(in_oklch,var(--primary)_45%,transparent)] transition-transform group-hover:rotate-[-8deg]"
+            />
             {/* Em telas estreitas, só o ícone: o menu e o indicador de sessão precisam do espaço. */}
-            <span className="font-brand hidden text-xl font-bold tracking-[0.14em] uppercase sm:inline">
+            <span className="font-brand marca hidden text-2xl leading-none font-bold tracking-[0.14em] uppercase sm:inline">
               Tabularium RPG
             </span>
           </Link>
@@ -88,10 +96,10 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-6xl px-4 py-6 print:max-w-none print:p-0">{children}</main>
+      <main className="mx-auto max-w-7xl px-4 py-6 print:max-w-none print:p-0">{children}</main>
       <footer
         className={cn(
-          'text-muted-foreground mx-auto flex max-w-6xl flex-wrap gap-x-4 gap-y-1 px-4 pb-6 text-xs print:hidden',
+          'text-muted-foreground mx-auto flex max-w-7xl flex-wrap gap-x-4 gap-y-1 px-4 pb-6 text-xs print:hidden',
           inSession && 'pb-20',
         )}
       >

@@ -717,6 +717,20 @@ export function FieldProperties({
         </div>
       );
     case 'list':
-      return <ItemFieldsEditor field={field} onChange={onChange} />;
+      return (
+        <div className="space-y-3">
+          <CheckRow
+            id={`${base}-cartoes`}
+            checked={field.display === 'cartoes'}
+            onChange={(cards) =>
+              onChange(set(field, 'display', cards ? ('cartoes' as const) : undefined))
+            }
+          >
+            Mostrar cada item como um cartão, com o texto longo sempre aberto (poderes, magias,
+            rituais)
+          </CheckRow>
+          <ItemFieldsEditor field={field} onChange={onChange} />
+        </div>
+      );
   }
 }

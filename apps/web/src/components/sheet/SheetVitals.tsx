@@ -347,9 +347,10 @@ function Tile({
 }) {
   if (emblem === 'escudo') {
     return (
-      <div className="relative flex min-w-20 shrink-0 flex-col items-center gap-0.5 px-3 pt-1 pb-3">
+      <div className="relative flex min-w-20 shrink-0 flex-col items-center gap-0.5 px-3 pt-3 pb-4">
         <Shield />
-        <span className="text-muted-foreground relative line-clamp-2 max-w-24 text-center text-[11px] leading-tight">
+        {/* O rótulo desce para dentro do escudo (a ponta de cima não o corta). */}
+        <span className="text-muted-foreground relative line-clamp-2 max-w-20 text-center text-[11px] leading-tight xl:max-w-28">
           {label}
         </span>
         <div className="relative">{children}</div>
@@ -359,7 +360,7 @@ function Tile({
   return (
     <div className="flex min-w-16 shrink-0 flex-col items-center gap-0.5 rounded-md border px-2.5 py-1">
       <span
-        className="text-muted-foreground line-clamp-2 max-w-24 text-center text-[11px] leading-tight"
+        className="text-muted-foreground line-clamp-2 max-w-24 text-center text-[11px] leading-tight xl:max-w-none"
         title={label}
       >
         {label}
@@ -536,7 +537,7 @@ export function SheetVitals({
     <>
       <section
         aria-label="Resumo do personagem"
-        className="bg-background/95 z-[5] -mx-4 border-b px-4 py-3 backdrop-blur md:sticky md:top-14 xl:top-20 xl:mx-0 xl:max-h-[calc(100dvh-6rem)] xl:overflow-y-auto xl:rounded-xl xl:border xl:p-4"
+        className="painel-ficha bg-background/95 z-[5] -mx-4 border-b px-4 py-3 backdrop-blur md:sticky md:top-14 xl:static xl:mx-0 xl:rounded-xl xl:border xl:p-4"
       >
         <div className="flex flex-wrap items-center gap-x-4 gap-y-3 xl:flex-col xl:items-stretch">
           {bars.map((field, index) => {

@@ -169,6 +169,21 @@ describe('criador de sistemas', () => {
 });
 
 describe('criador de sistemas: refinamentos', () => {
+  it('estilo da ficha e seção sempre à vista', async () => {
+    const { user, draft } = await openBlankEditor();
+    await user.click(screen.getByRole('checkbox', { name: 'Sempre à vista' }));
+    await waitFor(async () =>
+      expect((await services.editor.get(draft.id))?.template.layouts.side).toEqual(['Personagem']),
+    );
+
+    await user.click(screen.getByRole('tab', { name: 'Informações' }));
+    await user.click(screen.getByRole('combobox', { name: 'Estilo da ficha' }));
+    await user.click(await screen.findByRole('option', { name: /Sombrio/ }));
+    await waitFor(async () =>
+      expect((await services.editor.get(draft.id))?.template.style).toBe('sombrio'),
+    );
+  });
+
   it('duplica um campo e abre a cópia para edição', async () => {
     const { user } = await openBlankEditor();
     await user.click(screen.getByRole('button', { name: 'Mais ações para Nome' }));

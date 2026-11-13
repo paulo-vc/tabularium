@@ -28,6 +28,7 @@ import {
   templateIdFromName,
   uniqueName,
   updateField,
+  setSectionSide,
   updateSection,
   withType,
 } from './editing';
@@ -506,5 +507,17 @@ describe('nova ficha: abas, exibição e campo secundário', () => {
     template = updateSection(template, [0], { tab: '  ', display: 'padrao' });
     expect(template.layouts.full[0]).not.toHaveProperty('tab');
     expect(template.layouts.full[0]).not.toHaveProperty('display');
+  });
+});
+
+describe('seções sempre à vista', () => {
+  it('liga, acompanha a troca de nome e desliga', () => {
+    let template = updateSection(blank(), [0], { title: 'A' });
+    template = setSectionSide(template, [0], true);
+    expect(template.layouts.side).toEqual(['A']);
+    template = updateSection(template, [0], { title: 'Atributos' });
+    expect(template.layouts.side).toEqual(['Atributos']);
+    template = setSectionSide(template, [0], false);
+    expect(template.layouts.side).toBeUndefined();
   });
 });

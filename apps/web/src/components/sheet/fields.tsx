@@ -471,15 +471,20 @@ function ListControl({
     <div className="space-y-2">
       <ul className="space-y-2 empty:hidden">
         {items.map((item, index) => {
-          const expanded = open.has(item.id);
+          // Em cartões (habilidades, rituais), o texto longo fica sempre aberto.
+          const cards = field.display === 'cartoes';
+          const expanded = cards || open.has(item.id);
           const hasText = details.some((f) => {
             const value = listItemValue(f, item);
             return typeof value === 'string' && value.trim() !== '';
           });
           return (
-            <li key={item.id} className="rounded-md border p-2">
-              <div className="flex flex-wrap items-end gap-2 sm:flex-nowrap">
-                {inline.map((itemField) => (
+            <li
+              key={item.id}
+              className={cn('rounded-md border p-2', cards && 'bg-card/60 space-y-1 p-3')}
+            >
+              <div className={cn('flex flex-wrap items-end gap-2', !cards && 'sm:flex-nowrap')}>
+                {inline.map((itemField, column) => (
                   <div
                     key={itemField.id}
                     className={cn(
@@ -487,11 +492,17 @@ function ListControl({
                       itemField.type === 'boolean'
                         ? 'flex flex-col items-center gap-2 pb-2'
                         : itemField.type === 'number'
-                          ? 'w-20 shrink-0'
-                          : 'min-w-32 flex-1',
+                          ? 'w-16 shrink-0'
+                          : // Encolhe até 5rem: uma lista de ataques (seis colunas e os botões)
+                            // cabe na linha sem estourar o bloco. O nome (1ª coluna) leva mais.
+                            column === 0
+                            ? 'min-w-28 flex-[2]'
+                            : cards
+                              ? 'min-w-28 flex-1'
+                              : 'min-w-20 flex-1',
                     )}
                   >
-                    {index === 0 && (
+                    {(index === 0 || cards) && (
                       <span className="text-muted-foreground mb-1 block text-xs">
                         {itemField.label}
                       </span>
@@ -506,7 +517,7 @@ function ListControl({
                   </div>
                 ))}
                 <AttackButtons field={field} item={item} name={itemName(item, index)} />
-                {details.length > 0 && (
+                {details.length > 0 && !cards && (
                   <Button
                     type="button"
                     size="icon"
@@ -534,7 +545,7 @@ function ListControl({
                 </Button>
               </div>
               {expanded && (
-                <div className="mt-2 space-y-2 border-t pt-2">
+                <div className={cn('mt-2 space-y-2', !cards && 'border-t pt-2')}>
                   {details.map((itemField) => (
                     <div key={itemField.id} className="space-y-1">
                       <span className="text-muted-foreground block text-xs">{itemField.label}</span>

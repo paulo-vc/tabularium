@@ -4,6 +4,9 @@ import {
   HEADING_FONT_LABELS,
   HEADING_FONTS,
   type HeadingFont,
+  SHEET_STYLE_LABELS,
+  SHEET_STYLES,
+  type SheetStyle,
   SYSTEM_ACCENTS,
   type SystemAccent,
   type SystemTemplate,
@@ -185,6 +188,33 @@ export function InfoEditor({
         </Select>
         <p className="text-muted-foreground text-xs">
           Com a cor, dá a cara do sistema à ficha e à campanha, como na ficha impressa dele.
+        </p>
+      </div>
+      <div className="space-y-1.5">
+        <Label htmlFor={`${base}-estilo`}>Estilo da ficha</Label>
+        <Select
+          value={template.style ?? 'liso'}
+          onValueChange={(value) =>
+            apply((t) => {
+              const { style: _style, ...rest } = t;
+              return value === 'liso' ? rest : { ...rest, style: value as SheetStyle };
+            }, 'estilo')
+          }
+        >
+          <SelectTrigger id={`${base}-estilo`} className="w-full sm:w-64">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            {(['liso', ...SHEET_STYLES] as const).map((style) => (
+              <SelectItem key={style} value={style}>
+                {SHEET_STYLE_LABELS[style]}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+        <p className="text-muted-foreground text-xs">
+          A moldura dos blocos: medieval (pergaminho emoldurado) para fantasia, sombrio para terror
+          e investigação.
         </p>
       </div>
       <label className="flex items-start gap-2 text-sm">

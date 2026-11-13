@@ -131,7 +131,7 @@ describe('blocos e linhas', () => {
     expect(screen.getByRole('button', { name: 'Rolar Atletismo (For)' })).toBeInTheDocument();
   });
 
-  it('habilidade com descrição longa, que abre por item', async () => {
+  it('habilidade em cartão, com a descrição longa sempre aberta', async () => {
     const { user, sheet } = await openSheet();
     await user.click(screen.getByRole('tab', { name: 'Personagem' }));
     const abilities = screen.getByRole('group', { name: 'Habilidades e talentos' });
@@ -139,8 +139,10 @@ describe('blocos e linhas', () => {
       within(abilities).getByRole('button', { name: 'Adicionar em Habilidades e talentos' }),
     );
     await user.type(within(abilities).getByLabelText('Habilidade (item 1)'), 'Fúria');
-
-    await user.click(within(abilities).getByRole('button', { name: 'Abrir descrição de Fúria' }));
+    // Em cartões, não há botão de abrir: a caixa do texto já está ali.
+    expect(
+      within(abilities).queryByRole('button', { name: /descrição de Fúria/ }),
+    ).not.toBeInTheDocument();
     await user.type(
       within(abilities).getByLabelText('Descrição de Fúria'),
       'Vantagem em testes de Força.',
@@ -152,8 +154,23 @@ describe('blocos e linhas', () => {
         descricao: 'Vantagem em testes de Força.',
       });
     });
-    await user.click(within(abilities).getByRole('button', { name: 'Fechar descrição de Fúria' }));
-    expect(within(abilities).queryByLabelText('Descrição de Fúria')).not.toBeInTheDocument();
+  });
+});
+
+describe('seções sempre à vista', () => {
+  it('os atributos do D&D ficam fora das abas: continuam à vista em qualquer aba', async () => {
+    const { user } = await openSheet();
+    const tabPanel = () => screen.getByRole('tabpanel');
+    const attributes = () => screen.getByRole('heading', { name: 'Atributos' });
+    expect(tabPanel()).not.toContainElement(attributes());
+    await user.click(screen.getByRole('tab', { name: 'Combate' }));
+    expect(attributes()).toBeInTheDocument();
+    expect(screen.getByRole('heading', { name: 'Testes de resistência' })).toBeInTheDocument();
+    // A aba que começava nos atributos passa para a seção seguinte (Perícias).
+    await user.click(screen.getByRole('tab', { name: 'Principal' }));
+    expect(within(tabPanel()).getByRole('heading', { name: 'Perícias' })).toBeInTheDocument();
+    // A ficha do D&D usa o estilo medieval do sistema (molduras e ornamentos).
+    expect(tabPanel().closest('[data-estilo]')).toHaveAttribute('data-estilo', 'medieval');
   });
 });
 

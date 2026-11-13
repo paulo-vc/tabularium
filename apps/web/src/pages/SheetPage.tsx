@@ -28,6 +28,7 @@ import {
 } from '@/components/sheet/Bonuses';
 import { RollContext } from '@/components/sheet/roll-context';
 import { useRoller } from '@/components/live/use-roller';
+import { useMediaQuery } from '@/components/use-media-query';
 import { systemTheme } from '@/components/use-system-accent';
 import { useDeviceId } from '@/components/use-device';
 import {
@@ -139,6 +140,8 @@ function SheetEditor({ id, compiled }: { id: string; compiled: OpenedReady['comp
   );
   const bonusEffects = useBonusEffects(sheet?.bonuses);
   const roller = useRoller(compiled, { values, derived });
+  // Telas largas: coluna fixa à esquerda com o painel e as seções sempre à vista.
+  const wide = useMediaQuery('(min-width: 80rem)');
   // Ficha de jogador numa campanha: os campos secretos são do Mestre. Escondidos também
   // enquanto a consulta carrega, para não piscarem na tela.
   const deviceId = useDeviceId();
@@ -243,15 +246,31 @@ function SheetEditor({ id, compiled }: { id: string; compiled: OpenedReady['comp
         <BonusContext value={bonusEffects}>
           <BonusEditorContext value={bonusEditor}>
             {/* Em telas largas, o painel vira uma coluna fixa à esquerda da ficha. */}
-            <div className="space-y-4 xl:grid xl:grid-cols-[18rem_minmax(0,1fr)] xl:items-start xl:gap-6 xl:space-y-0 xl:[&>:only-child]:col-span-2">
-              <SheetVitals
-                compiled={compiled}
-                values={values}
-                derived={derived}
-                onChange={onChange}
-                hiddenFieldIds={hidden}
-              />
+            <div className="space-y-4 xl:grid xl:grid-cols-[22rem_minmax(0,1fr)] xl:items-start xl:gap-6 xl:space-y-0 xl:has-[>:first-child:empty]:grid-cols-1">
+              {/* Em telas largas, a coluna da esquerda é fixa: PV, defesa e as seções sempre à vista. */}
+              <div className="space-y-4 empty:hidden xl:sticky xl:top-20 xl:max-h-[calc(100dvh-6rem)] xl:overflow-y-auto">
+                <SheetVitals
+                  compiled={compiled}
+                  values={values}
+                  derived={derived}
+                  onChange={onChange}
+                  hiddenFieldIds={hidden}
+                />
+                {wide && (
+                  <SheetLayout
+                    part="lateral"
+                    compiled={compiled}
+                    values={values}
+                    derived={derived}
+                    onChange={onChange}
+                    newItemId={() => crypto.randomUUID()}
+                    {...(hidden && { hiddenFieldIds: hidden })}
+                    pinnedFieldIds={pinnedFieldIds(compiled, hidden)}
+                  />
+                )}
+              </div>
               <SheetLayout
+                part={wide ? 'principal' : undefined}
                 compiled={compiled}
                 values={values}
                 derived={derived}

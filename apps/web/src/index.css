@@ -57,17 +57,17 @@
   color-scheme: light;
   /* Claro: papel quente e o dourado envelhecido mais escuro, para contraste. */
   --background: oklch(0.965 0.006 85);
-  --foreground: oklch(0.22 0.012 260);
+  --foreground: oklch(0.22 0.014 60);
   --card: oklch(0.99 0.004 85);
-  --card-foreground: oklch(0.22 0.012 260);
+  --card-foreground: oklch(0.22 0.014 60);
   --popover: oklch(0.99 0.004 85);
-  --popover-foreground: oklch(0.22 0.012 260);
+  --popover-foreground: oklch(0.22 0.014 60);
   --primary: oklch(0.52 0.1 80);
   --primary-foreground: oklch(0.99 0.004 85);
   --secondary: oklch(0.93 0.008 85);
-  --secondary-foreground: oklch(0.26 0.015 260);
+  --secondary-foreground: oklch(0.26 0.016 60);
   --muted: oklch(0.93 0.008 85);
-  --muted-foreground: oklch(0.5 0.012 260);
+  --muted-foreground: oklch(0.48 0.016 60);
   --accent: oklch(0.92 0.03 85);
   --accent-foreground: oklch(0.3 0.06 80);
   --destructive: oklch(0.56 0.21 25);
@@ -94,40 +94,39 @@
 .dark {
   color-scheme: dark;
   /*
-   * Escuro (o padrão): grafite, como uma mesa de jogo à noite, e um único destaque, o dourado
-   * envelhecido (#d4af37), no que é interativo e importante. Superfícies em #1a1d24, bordas
-   * em #2c323f.
+   * Escuro (o padrão): carvão quente, como madeira escura de mesa à luz de vela (nada de azul),
+   * e um único destaque, o dourado envelhecido (#d4af37), no que é interativo e importante.
    */
-  --background: #121419;
-  --foreground: #e8e4d8;
-  --card: #1a1d24;
-  --card-foreground: #e8e4d8;
-  --popover: #20242c;
-  --popover-foreground: #e8e4d8;
+  --background: #12100d;
+  --foreground: #ece4d2;
+  --card: #1b1814;
+  --card-foreground: #ece4d2;
+  --popover: #221e19;
+  --popover-foreground: #ece4d2;
   --primary: #d4af37;
-  --primary-foreground: #1a1d24;
-  --secondary: #22262e;
-  --secondary-foreground: #e8e4d8;
-  --muted: #22262e;
-  --muted-foreground: #959aa5;
-  --accent: #272b34;
-  --accent-foreground: #f1ead2;
+  --primary-foreground: #1b1814;
+  --secondary: #26211b;
+  --secondary-foreground: #ece4d2;
+  --muted: #221e19;
+  --muted-foreground: #a69d8c;
+  --accent: #2c261e;
+  --accent-foreground: #f3e9cc;
   --destructive: oklch(0.66 0.19 25);
-  --border: #2c323f;
-  --input: #343b4a;
+  --border: #352e25;
+  --input: #3f372c;
   --ring: #d4af37;
   --chart-1: oklch(0.87 0 0);
   --chart-2: oklch(0.556 0 0);
   --chart-3: oklch(0.439 0 0);
   --chart-4: oklch(0.371 0 0);
   --chart-5: oklch(0.269 0 0);
-  --sidebar: #1a1d24;
-  --sidebar-foreground: #e8e4d8;
+  --sidebar: #1b1814;
+  --sidebar-foreground: #ece4d2;
   --sidebar-primary: #d4af37;
-  --sidebar-primary-foreground: #1a1d24;
-  --sidebar-accent: #272b34;
-  --sidebar-accent-foreground: #e8e4d8;
-  --sidebar-border: #2c323f;
+  --sidebar-primary-foreground: #1b1814;
+  --sidebar-accent: #2c261e;
+  --sidebar-accent-foreground: #ece4d2;
+  --sidebar-border: #352e25;
   --sidebar-ring: #d4af37;
 }
 
@@ -288,5 +287,187 @@ html {
 @media (min-width: 48rem) and (max-width: 79.99rem) {
   html:has([aria-label='Resumo do personagem']) {
     scroll-padding-top: 15rem;
+  }
+}
+
+/*
+ * Cabeçalho do app: uma faixa de carvão com um filete dourado que se apaga nas pontas, e o
+ * nome em ouro.
+ */
+.cabecalho {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklch, var(--card) 92%, transparent),
+    color-mix(in oklch, var(--background) 92%, transparent)
+  );
+  box-shadow: 0 6px 24px -14px oklch(0 0 0 / 55%);
+}
+.cabecalho::after {
+  content: '';
+  position: absolute;
+  inset: auto 0 -1px;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    color-mix(in oklch, var(--primary) 70%, transparent) 20%,
+    var(--primary) 50%,
+    color-mix(in oklch, var(--primary) 70%, transparent) 80%,
+    transparent
+  );
+}
+.marca {
+  background: linear-gradient(180deg, #f3dc8a, #d4af37 55%, #a8842a);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+:root:not(.dark) .marca {
+  background: linear-gradient(180deg, #a8842a, #7a5f17);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/*
+ * Estilo do sistema (`style` no arquivo do sistema). Só a moldura muda; o conteúdo, os
+ * controles e as cores de leitura continuam os mesmos.
+ *
+ * Medieval: blocos como pergaminho emoldurado — moldura dupla, cantos marcados na cor do
+ * sistema e o título entre losangos.
+ */
+[data-estilo='medieval'] [data-slot='card'] {
+  /* Cantos quase retos: os cantos marcados ficam dentro da moldura. */
+  border-radius: 0.25rem;
+  border-top-width: 1px;
+  border-color: color-mix(in oklch, var(--primary) 32%, var(--border));
+  background-image:
+    linear-gradient(var(--primary), var(--primary)),
+    linear-gradient(var(--primary), var(--primary)),
+    linear-gradient(var(--primary), var(--primary)),
+    linear-gradient(var(--primary), var(--primary)),
+    linear-gradient(var(--primary), var(--primary)),
+    linear-gradient(var(--primary), var(--primary)),
+    linear-gradient(var(--primary), var(--primary)),
+    linear-gradient(var(--primary), var(--primary)),
+    radial-gradient(
+      120% 80% at 50% 0%,
+      color-mix(in oklch, var(--primary) 7%, transparent),
+      transparent 70%
+    );
+  background-size:
+    10px 2px,
+    2px 10px,
+    10px 2px,
+    2px 10px,
+    10px 2px,
+    2px 10px,
+    10px 2px,
+    2px 10px,
+    100% 100%;
+  background-position:
+    3px 3px,
+    3px 3px,
+    calc(100% - 3px) 3px,
+    calc(100% - 3px) 3px,
+    3px calc(100% - 3px),
+    3px calc(100% - 3px),
+    calc(100% - 3px) calc(100% - 3px),
+    calc(100% - 3px) calc(100% - 3px),
+    0 0;
+  background-repeat: no-repeat;
+  box-shadow: 0 10px 30px -18px oklch(0 0 0 / 70%);
+}
+[data-estilo='medieval'] [data-slot='card-title'] {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  letter-spacing: 0.06em;
+  font-variant: small-caps;
+}
+/* O título entre dois losangos, como num brasão. */
+[data-estilo='medieval'] [data-slot='card-title']::before,
+[data-estilo='medieval'] [data-slot='card-title']::after {
+  content: '';
+  width: 0.4rem;
+  height: 0.4rem;
+  flex: none;
+  rotate: 45deg;
+  background: currentColor;
+  opacity: 0.75;
+}
+
+/*
+ * Sombrio (terror, investigação): blocos quase pretos, com uma luz baixa na cor do sistema
+ * vazando do canto, filete fino e título espaçado e esmaecido, como papel de arquivo velho.
+ */
+[data-estilo='sombrio'] [data-slot='card'] {
+  border-top: 1px solid color-mix(in oklch, var(--primary) 45%, transparent);
+  border-color: color-mix(in oklch, var(--primary) 16%, var(--border));
+  background:
+    radial-gradient(
+      90% 60% at 0% 0%,
+      color-mix(in oklch, var(--primary) 10%, transparent),
+      transparent 65%
+    ),
+    linear-gradient(180deg, color-mix(in oklch, var(--card) 85%, black), var(--card));
+  box-shadow:
+    inset 0 0 40px -10px oklch(0 0 0 / 55%),
+    0 12px 32px -20px oklch(0 0 0 / 80%);
+}
+:root:not(.dark) [data-estilo='sombrio'] [data-slot='card'] {
+  background:
+    radial-gradient(
+      90% 60% at 0% 0%,
+      color-mix(in oklch, var(--primary) 8%, transparent),
+      transparent 65%
+    ),
+    var(--card);
+  box-shadow: none;
+}
+[data-estilo='sombrio'] [data-slot='card-title'] {
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  text-shadow: 0 0 14px color-mix(in oklch, var(--primary) 45%, transparent);
+}
+[data-estilo='sombrio'] [data-slot='card-title']::after {
+  content: '';
+  display: block;
+  margin-top: 0.4rem;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    color-mix(in oklch, var(--primary) 60%, transparent),
+    transparent
+  );
+}
+/* O fundo da tela também escurece nas bordas, como luz de lanterna. */
+.dark [data-estilo='sombrio']::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  z-index: -1;
+  pointer-events: none;
+  background: radial-gradient(ellipse at 50% 30%, transparent 40%, oklch(0 0 0 / 45%) 100%);
+}
+@media print {
+  [data-estilo] [data-slot='card'] {
+    background: none;
+    box-shadow: none;
+  }
+  [data-estilo]::before {
+    display: none;
+  }
+}
+
+/* O painel lateral da ficha (tela larga) ganha a borda na cor do sistema, como os blocos. */
+@media (min-width: 80rem) {
+  [data-estilo] .painel-ficha {
+    border-color: color-mix(in oklch, var(--primary) 30%, var(--border));
+    background: linear-gradient(
+      180deg,
+      color-mix(in oklch, var(--primary) 6%, var(--card)),
+      var(--card)
+    );
+    box-shadow: 0 10px 30px -18px oklch(0 0 0 / 70%);
   }
 }
