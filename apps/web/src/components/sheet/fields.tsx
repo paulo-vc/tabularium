@@ -497,7 +497,8 @@ function ListControl({
                             // cabe na linha sem estourar o bloco. O nome (1ª coluna) leva mais.
                             column === 0
                             ? 'min-w-28 flex-[2]'
-                            : cards
+                            : // O dado (1d8+3) tem o botão de rolar ao lado: precisa de mais.
+                              cards || itemField.type === 'dice'
                               ? 'min-w-28 flex-1'
                               : 'min-w-20 flex-1',
                     )}

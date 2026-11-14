@@ -1,19 +1,21 @@
 {
   "id": "dualidade",
-  "version": "1.3.0",
-  "minAppVersion": "1.0.0",
+  "version": "1.7.0",
   "name": "Dualidade",
   "description": "Ficha compatível com o sistema Daggerheart™: traços, Evasão, limiares de dano, Esperança, Estresse, armas e cartas de domínio. Ficha não oficial da comunidade. This product includes materials from the Daggerheart System Reference Document 1.0, © Critical Role, LLC, under the terms of the Darrington Press Community Gaming License. More information at www.daggerheart.com. Darrington Press™ and the Darrington Press authorized work logo are trademarks of Critical Role, LLC and used with permission.",
   "author": "Tabularium",
+  "accent": "ambar",
+  "headingFont": "serifa",
+  "style": "medieval",
   "license": "DPCGL",
   "language": "pt-BR",
   "tags": ["fantasia", "narrativo", "compatível com Daggerheart"],
   "source": "community",
+  "checkDice": "1dEsperanca+1dMedo",
   "dice": [
     {
       "id": "Esperanca",
       "name": "Esperança",
-      "color": "#d4a017",
       "faces": [
         {
           "label": "1",
@@ -64,6 +66,7 @@
           "value": 12
         }
       ],
+      "color": "#d4a017",
       "duel": {
         "against": "Medo",
         "win": "com Esperança",
@@ -73,7 +76,6 @@
     {
       "id": "Medo",
       "name": "Medo",
-      "color": "#5b21b6",
       "faces": [
         {
           "label": "1",
@@ -124,6 +126,7 @@
           "value": 12
         }
       ],
+      "color": "#5b21b6",
       "duel": {
         "against": "Esperanca",
         "win": "com Medo",
@@ -131,7 +134,7 @@
       }
     }
   ],
-  "checkDice": "1dEsperanca+1dMedo",
+  "minAppVersion": "1.0.0",
   "fields": [
     {
       "id": "nome",
@@ -183,20 +186,20 @@
       "id": "patamar",
       "key": "patamar",
       "label": "Patamar",
+      "description": "1 no nível 1; 2 nos níveis 2–4; 3 nos 5–7; 4 nos 8–10.",
       "type": "computed",
-      "formula": "if(@nivel >= 8, 4, if(@nivel >= 5, 3, if(@nivel >= 2, 2, 1)))",
-      "description": "1 no nível 1; 2 nos níveis 2–4; 3 nos 5–7; 4 nos 8–10."
+      "formula": "if(@nivel >= 8, 4, if(@nivel >= 5, 3, if(@nivel >= 2, 2, 1)))"
     },
     {
       "id": "proficiencia",
       "key": "proficiencia",
       "label": "Proficiência",
+      "description": "Quantos dados de dano a arma rola.",
       "type": "number",
       "default": 1,
       "min": 1,
       "max": 6,
-      "integer": true,
-      "description": "Quantos dados de dano a arma rola."
+      "integer": true
     },
     {
       "id": "agilidade_base",
@@ -310,9 +313,10 @@
       "id": "evasao",
       "key": "evasao",
       "label": "Evasão",
+      "description": "A CD dos ataques contra você.",
       "type": "computed",
       "formula": "@evasao_base + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"evasao\"))",
-      "description": "A CD dos ataques contra você."
+      "emblem": "escudo"
     },
     {
       "id": "evasao_base",
@@ -343,27 +347,27 @@
       "id": "espacos_armadura",
       "key": "espacos_armadura",
       "label": "Espaços de armadura",
-      "type": "resource",
-      "default": 0,
-      "max": "@armadura",
       "description": "Marque um para reduzir a gravidade de um dano.",
+      "type": "resource",
+      "max": "@armadura",
+      "default": 0,
       "display": "marcadores"
     },
     {
       "id": "limiar_maior",
       "key": "limiar_maior",
       "label": "Limiar maior",
+      "description": "Dano a partir deste valor marca 2 PV.",
       "type": "computed",
-      "formula": "@limiar_maior_base + @nivel + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"limiares\"))",
-      "description": "Dano a partir deste valor marca 2 PV."
+      "formula": "@limiar_maior_base + @nivel + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"limiares\"))"
     },
     {
       "id": "limiar_grave",
       "key": "limiar_grave",
       "label": "Limiar grave",
+      "description": "Dano a partir deste valor marca 3 PV.",
       "type": "computed",
-      "formula": "@limiar_grave_base + @nivel + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"limiares\"))",
-      "description": "Dano a partir deste valor marca 3 PV."
+      "formula": "@limiar_grave_base + @nivel + sum(@efeitos.valor * @efeitos.ativo * is(@efeitos.alvo, \"limiares\"))"
     },
     {
       "id": "limiar_maior_base",
@@ -387,11 +391,12 @@
       "id": "pv",
       "key": "pv",
       "label": "Pontos de Vida",
-      "type": "resource",
-      "default": 6,
-      "max": "@pv_max",
       "description": "Na Dualidade os PV são marcados: o atual é quanto ainda resta.",
-      "display": "marcadores"
+      "type": "resource",
+      "max": "@pv_max",
+      "default": 6,
+      "display": "marcadores",
+      "color": "vermelho"
     },
     {
       "id": "pv_max",
@@ -408,9 +413,10 @@
       "key": "estresse",
       "label": "Estresse",
       "type": "resource",
-      "default": 0,
       "max": "@estresse_max",
-      "display": "marcadores"
+      "default": 0,
+      "display": "marcadores",
+      "color": "violeta"
     },
     {
       "id": "estresse_max",
@@ -427,16 +433,16 @@
       "key": "esperanca",
       "label": "Esperança",
       "type": "resource",
-      "default": 2,
       "max": "6",
-      "display": "marcadores"
+      "default": 2,
+      "display": "marcadores",
+      "color": "ambar"
     },
     {
       "id": "condicoes",
       "key": "condicoes",
       "label": "Condições",
       "type": "select",
-      "multiple": true,
       "options": [
         {
           "value": "escondido",
@@ -450,7 +456,8 @@
           "value": "vulneravel",
           "label": "Vulnerável"
         }
-      ]
+      ],
+      "multiple": true
     },
     {
       "id": "experiencias",
@@ -485,6 +492,27 @@
           "key": "nome",
           "label": "Arma",
           "type": "text"
+        },
+        {
+          "id": "uso",
+          "key": "uso",
+          "label": "Uso",
+          "type": "select",
+          "options": [
+            {
+              "value": "primaria",
+              "label": "Primária"
+            },
+            {
+              "value": "secundaria",
+              "label": "Secundária"
+            },
+            {
+              "value": "inventario",
+              "label": "No inventário"
+            }
+          ],
+          "default": "primaria"
         },
         {
           "id": "traco",
@@ -583,6 +611,7 @@
       "id": "cartas",
       "key": "cartas",
       "label": "Cartas de domínio",
+      "description": "Até 5 cartas ativas; as demais ficam no cofre.",
       "type": "list",
       "itemFields": [
         {
@@ -667,7 +696,14 @@
           "type": "longtext"
         }
       ],
-      "description": "Até 5 cartas ativas; as demais ficam no cofre."
+      "display": "cartoes"
+    },
+    {
+      "id": "habilidades_classe",
+      "key": "habilidades_classe",
+      "label": "Habilidades de classe e de Esperança",
+      "type": "longtext",
+      "description": "A habilidade de Esperança e as habilidades da sua classe e subclasse."
     },
     {
       "id": "efeitos",
@@ -831,8 +867,20 @@
             "secondary": "conhecimento_base"
           }
         ],
-        "tab": "Principal",
-        "display": "compacto"
+        "display": "circulo",
+        "width": "metade"
+      },
+      {
+        "kind": "section",
+        "title": "Armas",
+        "tab": "Ficha",
+        "columns": 1,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "armas"
+          }
+        ]
       },
       {
         "kind": "section",
@@ -848,7 +896,7 @@
       {
         "kind": "section",
         "title": "Defesa",
-        "columns": 3,
+        "columns": 2,
         "children": [
           {
             "kind": "field",
@@ -887,7 +935,7 @@
             "fieldId": "limiar_grave_base"
           }
         ],
-        "tab": "Combate"
+        "width": "metade"
       },
       {
         "kind": "section",
@@ -923,17 +971,6 @@
       },
       {
         "kind": "section",
-        "title": "Armas",
-        "columns": 1,
-        "children": [
-          {
-            "kind": "field",
-            "fieldId": "armas"
-          }
-        ]
-      },
-      {
-        "kind": "section",
         "title": "Efeitos temporários",
         "columns": 1,
         "children": [
@@ -946,18 +983,23 @@
       {
         "kind": "section",
         "title": "Cartas de domínio",
+        "tab": "Cartas de domínio",
         "columns": 1,
         "children": [
           {
             "kind": "field",
+            "fieldId": "habilidades_classe"
+          },
+          {
+            "kind": "field",
             "fieldId": "cartas"
           }
-        ],
-        "tab": "Cartas"
+        ]
       },
       {
         "kind": "section",
         "title": "Inventário e ouro",
+        "tab": "Inventário e personagem",
         "columns": 3,
         "children": [
           {
@@ -977,8 +1019,7 @@
             "kind": "field",
             "fieldId": "bau"
           }
-        ],
-        "tab": "Inventário"
+        ]
       },
       {
         "kind": "section",
@@ -1022,8 +1063,7 @@
             "kind": "field",
             "fieldId": "proficiencia"
           }
-        ],
-        "tab": "Personagem"
+        ]
       },
       {
         "kind": "section",
@@ -1050,8 +1090,7 @@
             "fieldId": "anotacoes",
             "span": 2
           }
-        ],
-        "tab": "Anotações"
+        ]
       }
     ],
     "gmSummary": [
@@ -1063,6 +1102,7 @@
       "limiar_maior",
       "limiar_grave",
       "condicoes"
-    ]
+    ],
+    "side": ["Traços"]
   }
 }

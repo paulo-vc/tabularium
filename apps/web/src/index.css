@@ -414,6 +414,9 @@ html {
     inset 0 0 40px -10px oklch(0 0 0 / 55%),
     0 12px 32px -20px oklch(0 0 0 / 80%);
 }
+:root:not(.dark) [data-estilo='sombrio'] [data-slot='card-title'] {
+  text-shadow: none;
+}
 :root:not(.dark) [data-estilo='sombrio'] [data-slot='card'] {
   background:
     radial-gradient(

@@ -1,16 +1,19 @@
 {
   "id": "lendas-d20-orc",
-  "version": "1.6.0",
-  "minAppVersion": "1.0.0",
+  "version": "1.10.0",
   "name": "Pathfinder 2e (fã)",
   "description": "Ficha de personagem para Pathfinder 2ª edição (Remaster): atributos como modificadores, graus de proficiência (destreinado a lendário) que somam o nível, salvaguardas, Percepção, CA com limite de Destreza e escudo, PV por ancestralidade e classe, magia, condições e Volume. Ficha não oficial feita por fãs. Use com o livro de regras. Pathfinder 2e (fã) uses trademarks and/or copyrights owned by Paizo Inc., used under Paizo's Community Use Policy (paizo.com/licenses/communityuse). We are expressly prohibited from charging you to use or access this content. Pathfinder 2e (fã) is not published, endorsed, or specifically approved by Paizo. For more information about Paizo Inc. and Paizo products, visit paizo.com. ORC Notice: This product is licensed under the ORC License held in the Library of Congress at TX 9-307-067 and available online at various locations including www.azoralaw.com/orclicense, www.gencon.com/orclicense and others. All warranties are disclaimed as set forth therein. Attribution: This product is based on the following Licensed Material: Player Core © 2023 Paizo Inc., Designed by Logan Bonner, Jason Bulmahn, Stephen Radney-MacFarland, and Mark Seifter. Expressed Material: esta ficha (layout e textos) não é material licenciado.",
   "author": "Tabularium",
+  "accent": "ciano",
+  "headingFont": "serifa",
+  "style": "medieval",
   "license": "Fan-made (não oficial): Paizo Community Use Policy e ORC",
   "language": "pt-BR",
   "tags": ["fantasia", "d20", "pathfinder"],
   "source": "community",
   "initiative": "percepcao",
   "bonusTab": "Combate",
+  "minAppVersion": "1.0.0",
   "fields": [
     {
       "id": "nome",
@@ -103,22 +106,23 @@
       "id": "px",
       "key": "px",
       "label": "Pontos de experiência",
+      "description": "Ao chegar a 1000, suba de nível e subtraia 1000.",
       "type": "number",
       "default": 0,
       "min": 0,
       "max": 999,
-      "integer": true,
-      "description": "Ao chegar a 1000, suba de nível e subtraia 1000."
+      "integer": true
     },
     {
       "id": "heroismo",
       "key": "heroismo",
       "label": "Pontos de Heroísmo",
-      "type": "resource",
-      "default": 1,
-      "max": "3",
       "description": "Gaste para rolar de novo ou para evitar a morte.",
-      "display": "marcadores"
+      "type": "resource",
+      "max": "3",
+      "default": 1,
+      "display": "marcadores",
+      "color": "ambar"
     },
     {
       "id": "idiomas",
@@ -136,67 +140,67 @@
       "id": "for",
       "key": "for",
       "label": "Força",
+      "description": "Modificador de atributo (o Remaster não usa valores).",
       "type": "number",
       "default": 0,
       "min": -5,
       "max": 10,
-      "integer": true,
-      "description": "Modificador de atributo (o Remaster não usa valores)."
+      "integer": true
     },
     {
       "id": "des",
       "key": "des",
       "label": "Destreza",
+      "description": "Modificador de atributo (o Remaster não usa valores).",
       "type": "number",
       "default": 0,
       "min": -5,
       "max": 10,
-      "integer": true,
-      "description": "Modificador de atributo (o Remaster não usa valores)."
+      "integer": true
     },
     {
       "id": "con",
       "key": "con",
       "label": "Constituição",
+      "description": "Modificador de atributo (o Remaster não usa valores).",
       "type": "number",
       "default": 0,
       "min": -5,
       "max": 10,
-      "integer": true,
-      "description": "Modificador de atributo (o Remaster não usa valores)."
+      "integer": true
     },
     {
       "id": "int",
       "key": "int",
       "label": "Inteligência",
+      "description": "Modificador de atributo (o Remaster não usa valores).",
       "type": "number",
       "default": 0,
       "min": -5,
       "max": 10,
-      "integer": true,
-      "description": "Modificador de atributo (o Remaster não usa valores)."
+      "integer": true
     },
     {
       "id": "sab",
       "key": "sab",
       "label": "Sabedoria",
+      "description": "Modificador de atributo (o Remaster não usa valores).",
       "type": "number",
       "default": 0,
       "min": -5,
       "max": 10,
-      "integer": true,
-      "description": "Modificador de atributo (o Remaster não usa valores)."
+      "integer": true
     },
     {
       "id": "car",
       "key": "car",
       "label": "Carisma",
+      "description": "Modificador de atributo (o Remaster não usa valores).",
       "type": "number",
       "default": 0,
       "min": -5,
       "max": 10,
-      "integer": true,
-      "description": "Modificador de atributo (o Remaster não usa valores)."
+      "integer": true
     },
     {
       "id": "atributo_chave",
@@ -411,9 +415,10 @@
       "id": "ca",
       "key": "ca",
       "label": "Classe de Armadura",
+      "description": "10 + Destreza (até o limite da armadura) + proficiência + armadura + escudo erguido + efeitos.",
       "type": "computed",
       "formula": "10 + min(@des, @limite_des) + if(@prof_armadura > 0, @prof_armadura + @nivel, 0) + @bonus_armadura + @escudo_erguido * @escudo_ca",
-      "description": "10 + Destreza (até o limite da armadura) + proficiência + armadura + escudo erguido + efeitos."
+      "emblem": "escudo"
     },
     {
       "id": "prof_armadura",
@@ -462,19 +467,20 @@
       "id": "limite_des",
       "key": "limite_des",
       "label": "Limite de Destreza",
+      "description": "Da armadura vestida. Sem armadura, deixe alto.",
       "type": "number",
       "default": 10,
       "min": 0,
-      "integer": true,
-      "description": "Da armadura vestida. Sem armadura, deixe alto."
+      "integer": true
     },
     {
       "id": "pv",
       "key": "pv",
       "label": "Pontos de Vida",
       "type": "resource",
+      "max": "@pv_ancestralidade + (@pv_classe + @con) * @nivel",
       "default": 10,
-      "max": "@pv_ancestralidade + (@pv_classe + @con) * @nivel"
+      "color": "vermelho"
     },
     {
       "id": "pv_temp",
@@ -507,10 +513,10 @@
       "id": "moribundo",
       "key": "moribundo",
       "label": "Moribundo",
-      "type": "resource",
-      "default": 0,
-      "max": "4 - @ferido",
       "description": "Chegar ao máximo é a morte. Ferido diminui o limite.",
+      "type": "resource",
+      "max": "4 - @ferido",
+      "default": 0,
       "display": "marcadores"
     },
     {
@@ -576,7 +582,6 @@
       "key": "condicoes",
       "label": "Condições",
       "type": "select",
-      "multiple": true,
       "options": [
         {
           "value": "agarrado",
@@ -654,7 +659,8 @@
           "value": "surdo",
           "label": "Surdo"
         }
-      ]
+      ],
+      "multiple": true
     },
     {
       "id": "escudo_erguido",
@@ -1565,9 +1571,10 @@
       "key": "foco",
       "label": "Pontos de Foco",
       "type": "resource",
-      "default": 0,
       "max": "3",
-      "display": "marcadores"
+      "default": 0,
+      "display": "marcadores",
+      "color": "ciano"
     },
     {
       "id": "magias",
@@ -1585,12 +1592,12 @@
           "id": "nivel",
           "key": "nivel",
           "label": "Grau",
+          "description": "0 para truques.",
           "type": "number",
           "default": 1,
           "min": 0,
           "max": 10,
-          "integer": true,
-          "description": "0 para truques."
+          "integer": true
         },
         {
           "id": "preparada",
@@ -1610,7 +1617,8 @@
           "label": "Descrição",
           "type": "longtext"
         }
-      ]
+      ],
+      "display": "cartoes"
     },
     {
       "id": "talentos",
@@ -1672,7 +1680,8 @@
           "label": "Descrição",
           "type": "longtext"
         }
-      ]
+      ],
+      "display": "cartoes"
     },
     {
       "id": "equipamento",
@@ -1699,10 +1708,10 @@
           "id": "volume",
           "key": "volume",
           "label": "Volume",
+          "description": "L (leve) conta 0,1.",
           "type": "number",
           "default": 0,
-          "min": 0,
-          "description": "L (leve) conta 0,1."
+          "min": 0
         },
         {
           "id": "investido",
@@ -1729,17 +1738,17 @@
       "id": "limite_volume",
       "key": "limite_volume",
       "label": "Limite de volume",
+      "description": "Acima disso, fica sobrecarregado.",
       "type": "computed",
-      "formula": "5 + @for",
-      "description": "Acima disso, fica sobrecarregado."
+      "formula": "5 + @for"
     },
     {
       "id": "investidos",
       "key": "investidos",
       "label": "Itens investidos",
+      "description": "Máximo de 10.",
       "type": "computed",
-      "formula": "count(@equipamento.investido)",
-      "description": "Máximo de 10."
+      "formula": "count(@equipamento.investido)"
     },
     {
       "id": "po",
@@ -1813,21 +1822,18 @@
             "fieldId": "car"
           }
         ],
-        "tab": "Principal",
-        "display": "compacto"
+        "display": "circulo",
+        "width": "metade"
       },
       {
         "kind": "section",
-        "title": "Atributo-chave",
-        "columns": 2,
+        "title": "Golpes",
+        "tab": "Combate",
+        "columns": 1,
         "children": [
           {
             "kind": "field",
-            "fieldId": "atributo_chave"
-          },
-          {
-            "kind": "field",
-            "fieldId": "mod_chave"
+            "fieldId": "ataques"
           }
         ]
       },
@@ -1873,7 +1879,96 @@
       },
       {
         "kind": "section",
+        "title": "Escudo",
+        "columns": 4,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "escudo_erguido"
+          },
+          {
+            "kind": "field",
+            "fieldId": "escudo_ca"
+          },
+          {
+            "kind": "field",
+            "fieldId": "escudo_dureza"
+          },
+          {
+            "kind": "field",
+            "fieldId": "escudo_pv"
+          }
+        ]
+      },
+      {
+        "kind": "section",
+        "title": "Combate",
+        "columns": 4,
+        "children": [
+          {
+            "kind": "field",
+            "fieldId": "ca"
+          },
+          {
+            "kind": "field",
+            "fieldId": "prof_armadura"
+          },
+          {
+            "kind": "field",
+            "fieldId": "bonus_armadura"
+          },
+          {
+            "kind": "field",
+            "fieldId": "limite_des"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pv"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pv_temp"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pv_ancestralidade"
+          },
+          {
+            "kind": "field",
+            "fieldId": "pv_classe"
+          },
+          {
+            "kind": "field",
+            "fieldId": "moribundo"
+          },
+          {
+            "kind": "field",
+            "fieldId": "ferido"
+          },
+          {
+            "kind": "field",
+            "fieldId": "prof_classe"
+          },
+          {
+            "kind": "field",
+            "fieldId": "cd_classe"
+          },
+          {
+            "kind": "field",
+            "fieldId": "resistencias_dano",
+            "span": 4
+          },
+          {
+            "kind": "field",
+            "fieldId": "condicoes",
+            "span": 4
+          }
+        ]
+      },
+      {
+        "kind": "section",
         "title": "Perícias",
+        "tab": "Perícias",
         "columns": 2,
         "children": [
           {
@@ -2020,101 +2115,13 @@
       },
       {
         "kind": "section",
-        "title": "Combate",
-        "columns": 4,
-        "children": [
-          {
-            "kind": "field",
-            "fieldId": "ca"
-          },
-          {
-            "kind": "field",
-            "fieldId": "prof_armadura"
-          },
-          {
-            "kind": "field",
-            "fieldId": "bonus_armadura"
-          },
-          {
-            "kind": "field",
-            "fieldId": "limite_des"
-          },
-          {
-            "kind": "field",
-            "fieldId": "pv"
-          },
-          {
-            "kind": "field",
-            "fieldId": "pv_temp"
-          },
-          {
-            "kind": "field",
-            "fieldId": "pv_ancestralidade"
-          },
-          {
-            "kind": "field",
-            "fieldId": "pv_classe"
-          },
-          {
-            "kind": "field",
-            "fieldId": "moribundo"
-          },
-          {
-            "kind": "field",
-            "fieldId": "ferido"
-          },
-          {
-            "kind": "field",
-            "fieldId": "prof_classe"
-          },
-          {
-            "kind": "field",
-            "fieldId": "cd_classe"
-          },
-          {
-            "kind": "field",
-            "fieldId": "resistencias_dano",
-            "span": 4
-          },
-          {
-            "kind": "field",
-            "fieldId": "condicoes",
-            "span": 4
-          }
-        ],
-        "tab": "Combate"
-      },
-      {
-        "kind": "section",
-        "title": "Escudo",
-        "columns": 4,
-        "children": [
-          {
-            "kind": "field",
-            "fieldId": "escudo_erguido"
-          },
-          {
-            "kind": "field",
-            "fieldId": "escudo_ca"
-          },
-          {
-            "kind": "field",
-            "fieldId": "escudo_dureza"
-          },
-          {
-            "kind": "field",
-            "fieldId": "escudo_pv"
-          }
-        ]
-      },
-      {
-        "kind": "section",
-        "title": "Golpes",
+        "title": "Talentos e habilidades",
+        "tab": "Talentos e magia",
         "columns": 1,
         "children": [
           {
             "kind": "field",
-            "fieldId": "ataques"
+            "fieldId": "talentos"
           }
         ]
       },
@@ -2156,12 +2163,12 @@
             "fieldId": "magias",
             "span": 3
           }
-        ],
-        "tab": "Magias"
+        ]
       },
       {
         "kind": "section",
         "title": "Equipamento",
+        "tab": "Equipamento",
         "columns": 3,
         "children": [
           {
@@ -2193,12 +2200,12 @@
             "kind": "field",
             "fieldId": "pc"
           }
-        ],
-        "tab": "Inventário"
+        ]
       },
       {
         "kind": "section",
         "title": "Personagem",
+        "tab": "Personagem",
         "columns": 4,
         "children": [
           {
@@ -2256,19 +2263,23 @@
             "fieldId": "tracos",
             "span": 2
           }
-        ],
-        "tab": "Personagem"
+        ]
       },
       {
         "kind": "section",
-        "title": "Talentos e habilidades",
+        "title": "Atributo-chave",
         "columns": 1,
         "children": [
           {
             "kind": "field",
-            "fieldId": "talentos"
+            "fieldId": "atributo_chave"
+          },
+          {
+            "kind": "field",
+            "fieldId": "mod_chave"
           }
-        ]
+        ],
+        "width": "metade"
       },
       {
         "kind": "section",
@@ -2290,8 +2301,7 @@
             "kind": "field",
             "fieldId": "anotacoes"
           }
-        ],
-        "tab": "Anotações"
+        ]
       }
     ],
     "gmSummary": [
@@ -2304,6 +2314,7 @@
       "condicoes",
       "heroismo",
       "moribundo"
-    ]
+    ],
+    "side": ["Atributos"]
   }
 }
