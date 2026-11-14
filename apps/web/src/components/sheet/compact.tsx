@@ -353,8 +353,28 @@ const columnName = (label: string) => {
   return text.charAt(0).toUpperCase() + text.slice(1);
 };
 
+/** Abreviações de coluna de marcador; as outras ficam com as 4 primeiras letras. */
+const SHORT: Record<string, string> = {
+  proficiência: 'Prof.',
+  especialização: 'Esp.',
+  especialista: 'Esp.',
+  treinada: 'Trein.',
+  treinado: 'Trein.',
+  marcada: 'Marc.',
+};
+const shortColumnName = (label: string) => {
+  const name = columnName(label);
+  return SHORT[name.toLowerCase()] ?? (name.length > 5 ? `${name.slice(0, 4)}.` : name);
+};
+
 /** Cabeçalho das colunas de uma seção em linhas, a partir da primeira linha. */
-export function FieldLineHeader({ cells }: { cells: CompactFieldProps[] }) {
+export function FieldLineHeader({
+  cells,
+  name = 'Perícia',
+}: {
+  cells: CompactFieldProps[];
+  name?: string;
+}) {
   const { main, toggles, others } = lineParts(cells);
   return (
     <div
@@ -362,11 +382,12 @@ export function FieldLineHeader({ cells }: { cells: CompactFieldProps[] }) {
       className="text-muted-foreground flex items-center gap-2 border-b pb-1 text-[11px] tracking-wide uppercase"
     >
       {toggles.map((cell) => (
-        <span key={cell.field.id} className="w-5 truncate" title={cell.field.label}>
-          {columnName(cell.field.label).slice(0, 3)}
+        // Mesma largura do marcador na linha: a abreviação inteira, sem reticências.
+        <span key={cell.field.id} className="w-10 shrink-0 text-center tracking-normal">
+          {shortColumnName(cell.field.label)}
         </span>
       ))}
-      <span className="min-w-0 flex-1">Perícia</span>
+      <span className="min-w-0 flex-1">{name}</span>
       {others.map((cell) => (
         <span key={cell.field.id} className={cn(cell.field.type === 'select' ? 'w-36' : 'w-16')}>
           {columnName(cell.field.label)}
@@ -385,7 +406,9 @@ export function FieldLine({ cells }: { cells: CompactFieldProps[] }) {
   return (
     <div className="flex min-h-9 items-center gap-2 border-b py-1 last:border-b-0">
       {toggles.map((cell) => (
-        <Toggle key={cell.field.id} {...cell} />
+        <span key={cell.field.id} className="flex w-10 shrink-0 justify-center">
+          <Toggle {...cell} />
+        </span>
       ))}
       <span
         className={cn('min-w-0 flex-1 truncate text-sm', trained && 'text-primary font-medium')}

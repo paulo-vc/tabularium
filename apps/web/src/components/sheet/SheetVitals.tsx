@@ -246,7 +246,7 @@ function ResourceVital({
         ) : null}
       </div>
       {/* A barra é o controle: « −5, ‹ −1, o valor (abre o ajuste exato), › +1, » +5. */}
-      <div className="bg-muted relative flex h-8 items-center overflow-hidden rounded-md border pointer-coarse:h-11">
+      <div className="bg-foreground/55 dark:bg-muted relative flex h-8 items-center overflow-hidden rounded-md border pointer-coarse:h-11">
         {/* O medidor fica só no preenchimento: dentro de um meter, os botões sumiriam do leitor de tela. */}
         <div
           role="meter"

@@ -264,18 +264,20 @@ export function SheetLayout({
     const wide = rows[0]?.some((cell) => cell.field.type === 'select') ?? false;
     // Em meia página também não cabem duas colunas: uma só, ocupando a seção.
     const single = wide || section.width === 'metade';
+    // Nome da coluna: "Perícia" nas perícias; nas outras (resistências, defesas), "Teste".
+    const nameColumn = /per[íi]cia/i.test(section.title) ? 'Perícia' : 'Teste';
     return (
       <div className="space-y-3">
         {rows[0] &&
           (single ? (
             <div className={cn(wide && 'max-w-2xl')}>
-              <FieldLineHeader cells={rows[0]} />
+              <FieldLineHeader cells={rows[0]} name={nameColumn} />
             </div>
           ) : (
             <div className="sm:grid sm:grid-cols-2 sm:gap-6">
-              <FieldLineHeader cells={rows[0]} />
+              <FieldLineHeader cells={rows[0]} name={nameColumn} />
               <div className="max-sm:hidden">
-                <FieldLineHeader cells={rows[0]} />
+                <FieldLineHeader cells={rows[0]} name={nameColumn} />
               </div>
             </div>
           ))}
