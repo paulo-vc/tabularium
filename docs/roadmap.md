@@ -31,7 +31,7 @@ O que está em andamento e as ideias para depois. As fases já entregues ficam e
 
 ### Depois da 1.0
 
-Na próxima versão: textura dos dados, resultado da dualidade, códice do sistema e bestiário (com as regras e criaturas do SRD no D&D 5e) e condições no combate, com duração.
+Entregue na v1.1.0: textura dos dados, resultado da dualidade, códice do sistema e bestiário (com as regras e criaturas do SRD no D&D 5e), condições no combate com duração, descanso, vantagem e crítico, e o visual novo (carvão e dourado, cada sistema com a sua cara, fichas que abrem no combate).
 
 ### Decisões tomadas
 
