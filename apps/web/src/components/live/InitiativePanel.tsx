@@ -329,7 +329,12 @@ export function GameMasterInitiative({
               <ChevronLeftIcon />
             </Button>
           )}
-          <Button variant="ghost" className="ml-auto" onClick={() => change(() => null)}>
+          <Button
+            variant="outline"
+            size="sm"
+            className="ml-auto"
+            onClick={() => change(() => null)}
+          >
             Encerrar combate
           </Button>
         </div>
@@ -492,10 +497,10 @@ export function GameMasterInitiative({
 
         <form
           onSubmit={(event) => void add(event)}
-          className="flex flex-wrap items-end gap-2 border-t pt-3"
+          className="grid grid-cols-3 items-end gap-2 border-t pt-3 [&>*]:min-w-0"
         >
           {hasBestiary && (
-            <div className="w-full space-y-1">
+            <div className="col-span-3 space-y-1">
               <Label htmlFor={`${base}-bestiario`} className="text-xs">
                 Do bestiário
               </Label>
@@ -532,7 +537,7 @@ export function GameMasterInitiative({
               </Select>
             </div>
           )}
-          <div className="min-w-32 flex-1 space-y-1">
+          <div className="col-span-3 space-y-1">
             <Label htmlFor={`${base}-nome`} className="text-xs">
               Criatura
             </Label>
@@ -557,7 +562,7 @@ export function GameMasterInitiative({
               title={`Um número (15), um modificador (+2 rola ${checkDice}+2) ou uma rolagem (2d6+1)`}
               aria-describedby={`${base}-ini-ajuda`}
               aria-invalid={initiative.trim() !== '' && !parsedInitiative}
-              className="h-8 w-24 text-center font-mono"
+              className="h-8 w-full text-center font-mono"
               onChange={(event) => setInitiative(event.target.value)}
             />
           </div>
@@ -572,7 +577,7 @@ export function GameMasterInitiative({
               placeholder="—"
               title="Pontos de vida (opcional): com eles, dano e cura pelo combate"
               aria-invalid={!validHp}
-              className="h-8 w-14 text-center tabular-nums"
+              className="h-8 w-full text-center tabular-nums"
               onChange={(event) => setHpText(event.target.value)}
             />
           </div>
@@ -585,11 +590,11 @@ export function GameMasterInitiative({
               inputMode="numeric"
               value={quantity}
               aria-invalid={!validCount}
-              className="h-8 w-12 text-center"
+              className="h-8 w-full text-center"
               onChange={(event) => setQuantity(event.target.value)}
             />
           </div>
-          <div className="flex h-8 items-center gap-1.5">
+          <div className="col-span-2 flex h-8 items-center gap-1.5">
             <Checkbox
               id={`${base}-oculto`}
               checked={hidden}
@@ -607,7 +612,7 @@ export function GameMasterInitiative({
           >
             <PlusIcon /> Adicionar
           </Button>
-          <p id={`${base}-ini-ajuda`} className="text-muted-foreground w-full text-xs">
+          <p id={`${base}-ini-ajuda`} className="text-muted-foreground col-span-3 text-xs">
             Iniciativa: um número (<span className="font-mono">15</span>), um modificador (
             <span className="font-mono">+2</span> rola{' '}
             <span className="font-mono">{checkDice}+2</span>) ou uma rolagem (

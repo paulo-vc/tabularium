@@ -93,6 +93,8 @@ describe('bônus de itens, maldições e bênçãos', () => {
     await waitFor(() =>
       expect(screen.getByRole('status', { name: 'Mod. Força' })).toHaveTextContent('+1'),
     );
+    // Em tela estreita (a dos testes), o valor de baixo dos atributos abre por este botão.
+    await user.click(screen.getByRole('button', { name: 'Editar valores' }));
     expect(screen.getByRole('button', { name: /^Força com bônus: 12/ })).toBeInTheDocument();
 
     // Desligar o bônus volta ao valor de antes.

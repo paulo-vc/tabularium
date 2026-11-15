@@ -2,6 +2,16 @@
 
 As mudanças de cada versão, para quem usa o Tabularium RPG. Detalhes técnicos ficam nos PRs e em [`docs/`](docs/).
 
+## Próxima versão
+
+- **Celular: atributos enxutos.** Na ficha, os atributos mostram só o modificador e o botão de rolar, e as abas aparecem sem rolar a tela; "Editar valores" abre os números de baixo.
+- **Lista de fichas mais informativa:** cada cartão mostra a barra de PV (e o segundo recurso do sistema, como PE) e um filete na cor do sistema.
+- **Só o que existe:** recursos ainda zerados em sequência, como os espaços de magia de quem não conjura, mostram só o primeiro, para preencher; os próximos surgem conforme os anteriores ganham valor.
+- **Campanha do Mestre:** em telas largas, a primeira aba vira "Mesa" e traz o diário e as notas no centro (os jogadores já têm a coluna deles). No combate, o formulário de criatura ficou alinhado em grade, e "Encerrar combate" é um botão.
+- **Configurações com índice:** no computador, uma lista à esquerda pula até cada seção.
+- **Movimento:** a aba da ficha entra com uma transição curta, e o número de uma barra pulsa ao levar dano ou cura (desligado para quem pede menos movimento no sistema).
+- **Acertos:** as colunas das listas (como Qtd. e Peso do inventário) ficam alinhadas entre a primeira linha e as outras; botões e etiquetas dentro de um título não pegam mais a letra do título; os losangos do estilo medieval ficam só nos títulos de texto; o rodapé fica no fim da janela nas páginas curtas; os blocos do painel da ficha ficam centrados e sem a caixinha no Deslocamento; e os controles de cada seção, no criador de sistemas, cabem numa linha.
+
 ## v1.1.0
 
 A mesa ganha as regras à mão e cada sistema ganha a sua cara: códice, bestiário e condições no combate; descanso, vantagem e crítico na ficha; e fichas que abrem no que se usa em jogo, com o estilo do sistema (medieval ou sombrio), num app novo em carvão e dourado.

@@ -490,7 +490,9 @@ function ListControl({
                     className={cn(
                       'min-w-0',
                       itemField.type === 'boolean'
-                        ? 'flex flex-col items-center gap-2 pb-2'
+                        ? // Largura fixa: com ou sem o rótulo (só a 1ª linha o mostra), as
+                          // colunas ficam alinhadas entre as linhas.
+                          'flex w-16 shrink-0 flex-col items-center gap-2 pb-2 [&>span]:max-w-full [&>span]:truncate'
                         : itemField.type === 'number'
                           ? 'w-16 shrink-0'
                           : // Encolhe até 5rem: uma lista de ataques (seis colunas e os botões)

@@ -1,6 +1,14 @@
+import {
+  compileTemplate,
+  computeDerived,
+  conditionallyHidden,
+  type CharacterSheet,
+  type ResourceValue,
+  type SystemTemplate,
+} from '@tabula/domain';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { FileUpIcon, ScrollTextIcon, UsersIcon, SparklesIcon } from 'lucide-react';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import { Link, useLocation } from 'wouter';
 import { Welcome, welcomeSeen } from './Welcome';
 import { useServices } from '@/app/services-context';
@@ -11,6 +19,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { BackupReminder } from '@/components/BackupSection';
 import { SystemIcon } from '@/components/SystemIcon';
+import { ResourceSummary } from '@/components/live/PlayerCard';
 
 /** Cria a ficha de exemplo e a abre. */
 function ExampleButton() {
@@ -25,6 +34,49 @@ function ExampleButton() {
     >
       <SparklesIcon /> Ver uma ficha de exemplo
     </Button>
+  );
+}
+
+/** Os dois primeiros recursos da ficha (PV, PE…) em barras finas, na cor de cada um. */
+function SheetCardVitals({
+  sheet,
+  template,
+}: {
+  sheet: CharacterSheet;
+  template: SystemTemplate | undefined;
+}) {
+  const compiled = useMemo(() => {
+    const result = template ? compileTemplate(template) : undefined;
+    return result?.ok ? result.value : undefined;
+  }, [template]);
+  const derived = useMemo(
+    () => (compiled ? computeDerived(compiled, sheet.values, sheet.bonuses) : undefined),
+    [compiled, sheet.values, sheet.bonuses],
+  );
+  if (!compiled || !derived) return null;
+  const hidden = conditionallyHidden(compiled, sheet.values);
+  // Os recursos que o sistema põe no resumo do Mestre (PV, PE…); sem resumo, o primeiro.
+  const summary = compiled.template.layouts.gmSummary;
+  const all = compiled.template.fields.filter(
+    (field) => field.type === 'resource' && !hidden.has(field.id),
+  );
+  const resources = (
+    summary?.length ? all.filter((field) => summary.includes(field.id)) : all.slice(0, 1)
+  ).slice(0, 2);
+  if (resources.length === 0) return null;
+  return (
+    <div className="grid grid-cols-2 gap-x-4 gap-y-2 px-4 pb-4">
+      {resources.map((field) => {
+        const value = sheet.values[field.id] as ResourceValue | undefined;
+        const max = derived.resourceMax[field.id];
+        if (!value || typeof value !== 'object' || !('current' in value)) return null;
+        return (
+          <div key={field.id} className={resources.length === 1 ? 'col-span-2' : 'grid'}>
+            <ResourceSummary field={field} value={value} max={max?.ok ? max.value : value.max} />
+          </div>
+        );
+      })}
+    </div>
   );
 }
 
@@ -85,9 +137,10 @@ export function HomePage() {
 
       <ul className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {sheets?.map((sheet) => (
-          <li key={sheet.id}>
+          <li key={sheet.id} data-destaque={templateOf(sheet.templateRef.id)?.accent}>
             <Link href={`/fichas/${sheet.id}`} className="block rounded-xl focus-visible:outline-2">
-              <Card className="hover:border-primary/50 h-full transition-colors">
+              {/* Um filete na cor do sistema, à esquerda. */}
+              <Card className="hover:border-primary/50 border-l-primary/70 h-full border-l-2 transition-colors">
                 <CardHeader>
                   <CardTitle className="flex items-center gap-3">
                     <CharacterPortrait
@@ -109,6 +162,7 @@ export function HomePage() {
                     Alterada em {dateFormat.format(sheet.updatedAt)}
                   </CardDescription>
                 </CardHeader>
+                <SheetCardVitals sheet={sheet} template={templateOf(sheet.templateRef.id)} />
               </Card>
             </Link>
           </li>

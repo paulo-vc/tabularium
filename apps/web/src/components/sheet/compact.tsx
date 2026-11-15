@@ -63,12 +63,15 @@ const currentOf = (field: FieldDef, value: FieldValue | undefined) => value ?? d
 export function StatTile({
   main,
   secondary,
+  label,
 }: {
   main: CompactFieldProps;
   secondary?: CompactFieldProps | undefined;
+  /** Título do bloco quando o secundário (que dá o nome: "Força") está recolhido. */
+  label?: string | undefined;
 }) {
   const id = useId();
-  const title = secondary?.field.label ?? main.field.label;
+  const title = label ?? secondary?.field.label ?? main.field.label;
   const { field } = main;
 
   const body = (() => {

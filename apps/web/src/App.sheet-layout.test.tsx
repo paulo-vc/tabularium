@@ -115,6 +115,8 @@ describe('abas', () => {
 describe('blocos e linhas', () => {
   it('atributo: modificador em destaque, valor pequeno e editável embaixo', async () => {
     const { user, sheet } = await openSheet();
+    // Em tela estreita (a dos testes), o valor de baixo dos atributos abre por este botão.
+    await user.click(screen.getByRole('button', { name: 'Editar valores' }));
     const strength = screen.getByRole('textbox', { name: 'Força' });
     await user.clear(strength);
     await user.type(strength, '16');
@@ -174,6 +176,15 @@ describe('seções sempre à vista', () => {
     expect(within(tabPanel()).getByRole('heading', { name: 'Perícias' })).toBeInTheDocument();
     // A ficha do D&D usa o estilo medieval do sistema (molduras e ornamentos).
     expect(tabPanel().closest('[data-estilo]')).toHaveAttribute('data-estilo', 'medieval');
+  });
+});
+
+describe('recursos ainda vazios', () => {
+  it('espaços de magia: só o primeiro nível sem espaços aparece, para preencher', async () => {
+    const { user } = await openSheet();
+    await user.click(screen.getByRole('tab', { name: 'Magias' }));
+    expect(screen.getByText('Espaços de magia de 1º nível')).toBeInTheDocument();
+    expect(screen.queryByText('Espaços de magia de 2º nível')).not.toBeInTheDocument();
   });
 });
 

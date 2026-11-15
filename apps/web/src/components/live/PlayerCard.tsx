@@ -36,7 +36,7 @@ function summaryFields(compiled: CompiledTemplate, values: SheetValues): FieldDe
   return fields.filter((f) => !hidden.has(f.id)).slice(0, ids?.length ? undefined : 4);
 }
 
-function ResourceSummary({
+export function ResourceSummary({
   field,
   value,
   max,
