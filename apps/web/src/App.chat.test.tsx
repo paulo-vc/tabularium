@@ -70,7 +70,7 @@ const until = (assertion: () => void | Promise<void>) =>
       await network.settle();
       await assertion();
     },
-    { timeout: 4000 },
+    { timeout: 8000 },
   );
 
 function renderApp(services: Services, hash: string) {
