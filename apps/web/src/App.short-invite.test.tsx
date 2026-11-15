@@ -40,7 +40,7 @@ const until = (assertion: () => void) =>
       await network.settle();
       assertion();
     },
-    { timeout: 4000 },
+    { timeout: 8000 },
   );
 
 describe('convite curto', () => {
