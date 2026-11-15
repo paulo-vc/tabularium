@@ -280,7 +280,10 @@ function ResourceVital({
               title="Ajustar valores"
               className="relative flex-1 self-stretch font-mono text-sm font-semibold text-white tabular-nums [text-shadow:0_1px_2px_rgb(0_0_0/0.6)] outline-none focus-visible:ring-2 focus-visible:ring-white/70"
             >
-              {formatNumber(value.current)}
+              {/* A chave refaz o elemento a cada mudança: o número pulsa ao levar dano ou cura. */}
+              <span key={value.current} className="valor-mudou inline-block">
+                {formatNumber(value.current)}
+              </span>
               {max !== undefined && (
                 <span className="font-normal opacity-80"> / {formatNumber(max)}</span>
               )}
@@ -362,7 +365,7 @@ function Tile({
   return (
     <div
       className={cn(
-        'flex min-w-16 shrink-0 flex-col items-center gap-0.5 rounded-md border px-2.5 py-1',
+        'flex min-w-16 shrink-0 flex-col items-center justify-center gap-0.5 rounded-md border px-2.5 py-1',
         wide && 'xl:col-span-2',
       )}
     >
@@ -515,7 +518,7 @@ export function SheetVitals({
           );
         }
         return (
-          <div className="w-14 [&_input]:h-7 [&_input]:border-transparent [&_input]:bg-transparent [&_input]:text-center [&_input]:text-lg [&_input]:font-semibold [&_input]:shadow-none [&_input:hover]:border-input [&_input:focus]:border-input">
+          <div className="w-14 [&_input]:h-7 [&_input]:!bg-transparent [&_input]:text-center [&_input:not(:hover):not(:focus)]:!border-transparent [&_input]:text-lg [&_input]:font-semibold [&_input]:shadow-none [&_input:hover]:border-input [&_input:focus]:border-input">
             <NumberInput
               compact
               field={field}

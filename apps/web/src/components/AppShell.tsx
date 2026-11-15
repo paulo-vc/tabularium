@@ -61,7 +61,7 @@ export function AppShell({ children }: { children: ReactNode }) {
   // Na sessão, o botão do chat fica fixo no canto: o rodapé ganha espaço para não ficar embaixo dele.
   const inSession = useLiveSession().kind !== 'nenhuma';
   return (
-    <div className="bg-background text-foreground min-h-dvh print:bg-white">
+    <div className="bg-background text-foreground flex min-h-dvh flex-col print:block print:bg-white">
       <header className="cabecalho sticky top-0 z-10 backdrop-blur print:hidden">
         <div className="mx-auto flex h-14 max-w-7xl items-center gap-1.5 px-4 sm:gap-5">
           <Link
@@ -96,10 +96,12 @@ export function AppShell({ children }: { children: ReactNode }) {
           </div>
         </div>
       </header>
-      <main className="mx-auto max-w-7xl px-4 py-6 print:max-w-none print:p-0">{children}</main>
+      <main className="mx-auto w-full max-w-7xl flex-1 px-4 py-6 print:max-w-none print:p-0">
+        {children}
+      </main>
       <footer
         className={cn(
-          'text-muted-foreground mx-auto flex max-w-7xl flex-wrap gap-x-4 gap-y-1 px-4 pb-6 text-xs print:hidden',
+          'text-muted-foreground mx-auto flex w-full max-w-7xl flex-wrap gap-x-4 gap-y-1 px-4 pb-6 text-xs print:hidden',
           inSession && 'pb-20',
         )}
       >

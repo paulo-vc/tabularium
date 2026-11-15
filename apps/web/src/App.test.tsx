@@ -70,6 +70,8 @@ describe('lista de fichas', () => {
 describe('ficha', () => {
   it('recalcula campos derivados ao editar e grava o valor', async () => {
     const { user, sheet } = await openNewSheet();
+    // Em tela estreita (a dos testes), o valor de baixo dos atributos abre por este botão.
+    await user.click(screen.getByRole('button', { name: 'Editar valores' }));
     const strength = screen.getByLabelText('Força');
     expect(screen.getByRole('status', { name: 'Mod. Força' })).toHaveTextContent('0');
 

@@ -49,22 +49,53 @@ const megabytes = (bytes: number) =>
   `${(bytes / (1024 * 1024)).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} MB`;
 
 /** Preferências deste aparelho, num lugar só. Nada daqui sai do aparelho (só a cor dos dados). */
+/** As seções, na ordem da página: o índice lateral (telas largas) pula até cada uma. */
+const SECTIONS: readonly { id: string; label: string; body: () => ReactNode }[] = [
+  { id: 'voce', label: 'Você', body: () => <ProfileSection /> },
+  { id: 'copia', label: 'Cópia de segurança', body: () => <BackupSection /> },
+  { id: 'aparencia', label: 'Aparência', body: () => <ThemeSection /> },
+  { id: 'sons', label: 'Sons e avisos', body: () => <SoundSection /> },
+  { id: 'dados', label: 'Dados 3D', body: () => <DiceSection /> },
+  { id: 'musica', label: 'Música da mesa', body: () => <MusicSection /> },
+  { id: 'conexao', label: 'Conexão', body: () => <NetworkSection /> },
+  { id: 'armazenamento', label: 'Armazenamento', body: () => <StorageSection /> },
+  { id: 'privacidade', label: 'Privacidade', body: () => <PrivacySection /> },
+];
+
 export function SettingsPage() {
   return (
-    <div className="mx-auto max-w-2xl space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight">Configurações</h1>
-        <p className="text-muted-foreground text-sm">Valem só neste aparelho.</p>
+    <div className="mx-auto max-w-2xl lg:grid lg:max-w-4xl lg:grid-cols-[11rem_minmax(0,1fr)] lg:items-start lg:gap-8">
+      {/* O endereço do app já usa "#": o índice rola até a seção em vez de mudar o endereço. */}
+      <nav
+        aria-label="Seções das configurações"
+        className="sticky top-20 hidden flex-col gap-0.5 lg:flex"
+      >
+        {SECTIONS.map((section) => (
+          <button
+            key={section.id}
+            type="button"
+            className="text-muted-foreground hover:bg-accent hover:text-foreground rounded-md px-2.5 py-1.5 text-left text-sm transition-colors"
+            onClick={() =>
+              document
+                .getElementById(`config-${section.id}`)
+                ?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }
+          >
+            {section.label}
+          </button>
+        ))}
+      </nav>
+      <div className="space-y-6">
+        <div>
+          <h1 className="text-2xl font-bold tracking-tight">Configurações</h1>
+          <p className="text-muted-foreground text-sm">Valem só neste aparelho.</p>
+        </div>
+        {SECTIONS.map((section) => (
+          <div key={section.id} id={`config-${section.id}`} className="scroll-mt-20">
+            {section.body()}
+          </div>
+        ))}
       </div>
-      <ProfileSection />
-      <BackupSection />
-      <ThemeSection />
-      <SoundSection />
-      <DiceSection />
-      <MusicSection />
-      <NetworkSection />
-      <StorageSection />
-      <PrivacySection />
     </div>
   );
 }

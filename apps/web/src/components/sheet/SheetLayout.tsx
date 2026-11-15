@@ -134,6 +134,8 @@ export function SheetLayout({
   const base = useId();
   const [selected, setSelected] = useState(0);
   const roomy = useMediaQuery('(min-width: 40rem)');
+  /** No celular, as seções sempre à vista mostram só o essencial; este botão abre o resto. */
+  const [sideOpen, setSideOpen] = useState(false);
   /** Seções em linhas (perícias) mostrando só as treinadas, pelo título. */
   const [onlyTrained, setOnlyTrained] = useState<ReadonlySet<string>>(new Set());
   const trained = (cells: readonly CompactFieldProps[]) => isTrainedRow(cells) !== false;
@@ -210,10 +212,15 @@ export function SheetLayout({
           ) : null;
         const field = visible(node.fieldId);
         if (!field) return null;
-        const secondary = visible(node.secondary);
+        // Celular: nas seções sempre à vista, o valor de baixo (o 16 do +3) fica recolhido,
+        // para as abas aparecerem sem rolar.
+        const slim = !roomy && !part && !sideOpen && sideTitles.includes(section.title);
+        const below = visible(node.secondary);
+        const secondary = slim ? undefined : below;
         return (
           <StatTile
             key={field.id}
+            label={below?.label}
             main={propsOf(field)}
             secondary={secondary ? propsOf(secondary) : undefined}
           />
@@ -298,49 +305,78 @@ export function SheetLayout({
     );
   };
 
-  const renderGrid = (nodes: readonly LayoutNode[], columns: Columns, depth: number) => (
-    // `ficha-linhas`: os campos viram linhas de ficha de papel (ver index.css).
-    <div className={cn('ficha-linhas grid gap-x-4 gap-y-3', GRID[columns])}>
-      {nodes.map((node, index) => {
-        if (node.kind === 'section') {
-          return hasContent(node.children) ? (
-            <div key={index} className="col-span-full">
-              {renderSection(node, depth + 1)}
-            </div>
-          ) : null;
-        }
-        const field = visible(node.fieldId);
-        if (!field) return null;
-        const secret = secretFieldIds?.has(field.id) ?? false;
-        const isWide = field.type === 'list' || field.type === 'longtext';
-        const span = node.span ?? (isWide ? columns : 1);
-        const secondary = visible(node.secondary);
-        return (
-          <div
-            key={field.id}
-            className={cn(
-              'min-w-0',
-              spanClass(columns, span),
-              secret && 'rounded-md border border-dashed border-violet-500/50 p-2',
-            )}
-          >
-            {secret && (
-              <p className="mb-1 flex items-center gap-1 text-xs text-violet-600 dark:text-violet-400">
-                <EyeOffIcon className="size-3" /> Só o Mestre vê
-              </p>
-            )}
-            <FieldControl {...propsOf(field)} />
-            {secondary && (
-              <div className="mt-1 flex items-center gap-2">
-                <span className="text-muted-foreground text-xs">{secondary.label}</span>
-                <SecondaryValue {...propsOf(secondary)} />
+  /**
+   * Recursos com máximo digitado ainda em 0 (ex.: espaços de magia de quem não conjura): de
+   * uma sequência deles, só o primeiro aparece, para preencher; os outros surgem conforme os
+   * anteriores ganham valor.
+   */
+  const emptyRunHidden = (nodes: readonly LayoutNode[]): ReadonlySet<string> => {
+    const hidden = new Set<string>();
+    let inRun = false;
+    for (const node of nodes) {
+      const field = node.kind === 'field' ? visible(node.fieldId) : undefined;
+      if (node.kind === 'field' && !field) continue;
+      const value = field ? (values[field.id] ?? defaultValue(field)) : undefined;
+      const empty =
+        field?.type === 'resource' &&
+        field.max === undefined &&
+        typeof value === 'object' &&
+        value !== null &&
+        'current' in value &&
+        value.current === 0 &&
+        (value.max ?? 0) === 0;
+      if (empty && inRun && field) hidden.add(field.id);
+      inRun = empty;
+    }
+    return hidden;
+  };
+
+  const renderGrid = (nodes: readonly LayoutNode[], columns: Columns, depth: number) => {
+    const emptyHidden = emptyRunHidden(nodes);
+    return (
+      // `ficha-linhas`: os campos viram linhas de ficha de papel (ver index.css).
+      <div className={cn('ficha-linhas grid gap-x-4 gap-y-3', GRID[columns])}>
+        {nodes.map((node, index) => {
+          if (node.kind === 'section') {
+            return hasContent(node.children) ? (
+              <div key={index} className="col-span-full">
+                {renderSection(node, depth + 1)}
               </div>
-            )}
-          </div>
-        );
-      })}
-    </div>
-  );
+            ) : null;
+          }
+          const field = visible(node.fieldId);
+          if (!field || emptyHidden.has(field.id)) return null;
+          const secret = secretFieldIds?.has(field.id) ?? false;
+          const isWide = field.type === 'list' || field.type === 'longtext';
+          const span = node.span ?? (isWide ? columns : 1);
+          const secondary = visible(node.secondary);
+          return (
+            <div
+              key={field.id}
+              className={cn(
+                'min-w-0',
+                spanClass(columns, span),
+                secret && 'rounded-md border border-dashed border-violet-500/50 p-2',
+              )}
+            >
+              {secret && (
+                <p className="mb-1 flex items-center gap-1 text-xs text-violet-600 dark:text-violet-400">
+                  <EyeOffIcon className="size-3" /> Só o Mestre vê
+                </p>
+              )}
+              <FieldControl {...propsOf(field)} />
+              {secondary && (
+                <div className="mt-1 flex items-center gap-2">
+                  <span className="text-muted-foreground text-xs">{secondary.label}</span>
+                  <SecondaryValue {...propsOf(secondary)} />
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    );
+  };
 
   function renderSection(section: SectionNode, depth: number) {
     if (!hasContent(section.children)) return null;
@@ -531,7 +567,24 @@ export function SheetLayout({
   // Sem painel lateral (tela menor), as seções fixas ficam acima das abas.
   const fixedAbove =
     part !== 'principal' && sideNodes.length > 0 ? (
-      <div className="ficha grid items-start gap-4 lg:grid-cols-2">{renderTop(sideNodes)}</div>
+      <div className="ficha grid items-start gap-4 lg:grid-cols-2">
+        {renderTop(sideNodes)}
+        {!roomy &&
+          sideNodes.some((node) =>
+            node.children.some((child) => child.kind === 'field' && visible(child.secondary)),
+          ) && (
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              className="text-muted-foreground -mt-2 justify-self-center"
+              aria-expanded={sideOpen}
+              onClick={() => setSideOpen((open) => !open)}
+            >
+              {sideOpen ? 'Recolher valores' : 'Editar valores'}
+            </Button>
+          )}
+      </div>
     ) : null;
 
   if (tabs.length === 1) {
@@ -589,7 +642,9 @@ export function SheetLayout({
         id={`${base}-painel`}
         role="tabpanel"
         aria-labelledby={`${base}-aba-${active}`}
-        className="grid items-start gap-4 lg:grid-cols-2"
+        // A chave por aba refaz o painel: o conteúdo entra com uma transição curta.
+        key={active}
+        className="aba-entra grid items-start gap-4 lg:grid-cols-2"
       >
         {renderTop(tabs[active]?.nodes ?? [])}
         {withBonuses(tabs[active]?.name)}

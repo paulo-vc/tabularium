@@ -78,15 +78,25 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
   const inCombat = active && live.initiative !== null;
   const side = SIDE.includes(tab);
   // No computador, as abas da direita não existem: o painel da esquerda mostra os jogadores.
-  const main: Tab = side ? 'jogadores' : tab;
+  // Em telas largas, os jogadores têm a coluna deles: a primeira aba vira a "Mesa" e leva o
+  // diário (as notas do Mestre), em vez de ficar quase vazia; a aba Diário some.
+  const main: Tab = side || (wide && tab === 'diario') ? 'jogadores' : tab;
 
   const tabs: TabItem<Tab>[] = [
     {
       id: 'jogadores',
       label: (
         <>
-          <UsersIcon className="size-4" /> Jogadores
-          {online > 0 && <Badge variant="secondary">{online}</Badge>}
+          {wide ? (
+            <>
+              <BookOpenIcon className="size-4" /> Mesa
+            </>
+          ) : (
+            <>
+              <UsersIcon className="size-4" /> Jogadores
+              {online > 0 && <Badge variant="secondary">{online}</Badge>}
+            </>
+          )}
         </>
       ),
     },
@@ -146,6 +156,7 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
     },
     {
       id: 'diario',
+      className: 'xl:hidden',
       label: (
         <>
           <BookOpenIcon className="size-4" /> Diário
@@ -192,7 +203,11 @@ export function GameMasterView({ campaign }: { campaign: Campaign }) {
                 </p>
               </Tip>
               <InviteCard campaign={campaign} compact={online > 0} />
-              {!wide && <GameMasterPlayers campaign={campaign} />}
+              {wide ? (
+                <GameMasterJournal campaignId={campaign.id} />
+              ) : (
+                <GameMasterPlayers campaign={campaign} />
+              )}
             </>
           )}
           {main === 'bestiario' && <CampaignBestiary campaign={campaign} template={template} />}

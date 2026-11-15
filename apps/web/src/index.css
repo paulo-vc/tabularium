@@ -384,9 +384,12 @@ html {
   letter-spacing: 0.06em;
   font-variant: small-caps;
 }
-/* O título entre dois losangos, como num brasão. */
-[data-estilo='medieval'] [data-slot='card-title']::before,
-[data-estilo='medieval'] [data-slot='card-title']::after {
+/* O título entre dois losangos, como num brasão; só nos títulos de texto puro (com ícone,
+   etiqueta ou botão dentro, os losangos sobram). */
+[data-estilo='medieval']
+  [data-slot='card-title']:not(:has(svg, button, span, [data-slot='badge']))::before,
+[data-estilo='medieval']
+  [data-slot='card-title']:not(:has(svg, button, span, [data-slot='badge']))::after {
   content: '';
   width: 0.4rem;
   height: 0.4rem;
@@ -472,5 +475,35 @@ html {
       var(--card)
     );
     box-shadow: 0 10px 30px -18px oklch(0 0 0 / 70%);
+  }
+}
+
+/* Botões e etiquetas dentro de um título não herdam a letra do título do estilo. */
+[data-estilo] [data-slot='card-title'] :is(button, a, [data-slot='badge']) {
+  font-variant: normal;
+  letter-spacing: normal;
+  text-transform: none;
+  text-shadow: none;
+  font-family: var(--font-sans);
+}
+
+/* Movimento curto: a aba que entra e o número que acabou de mudar. */
+@keyframes aba-entra {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+}
+@keyframes valor-mudou {
+  from {
+    transform: scale(1.35);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .aba-entra {
+    animation: aba-entra 160ms ease-out;
+  }
+  .valor-mudou {
+    animation: valor-mudou 260ms ease-out;
   }
 }

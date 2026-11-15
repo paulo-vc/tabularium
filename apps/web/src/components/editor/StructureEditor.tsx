@@ -689,7 +689,7 @@ function SectionCard({
               aria-label="Aba da seção"
               placeholder="Aba (ex.: Combate)"
               list={`${base}-abas`}
-              className="h-8 w-44"
+              className="h-8 min-w-24 flex-1"
               value={node.tab ?? ''}
               maxLength={40}
               onChange={(event) =>
@@ -737,7 +737,7 @@ function SectionCard({
             apply((t) => updateSection(t, path, { display: value as SectionDisplay }))
           }
         >
-          <SelectTrigger aria-label="Exibição da seção" className="h-8 w-44">
+          <SelectTrigger aria-label="Exibição da seção" className="h-8 w-36">
             <SelectValue />
           </SelectTrigger>
           <SelectContent>
