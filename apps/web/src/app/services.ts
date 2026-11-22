@@ -17,6 +17,7 @@ import {
 import type { DieRoller } from '@tabula/domain';
 import { generateGmKeyPair, type GmKeyPair } from '@tabula/sync';
 import { BUILTIN_TEMPLATES, RETIRED_TEMPLATES } from '@tabula/templates';
+import { ONE_SHOT_PACKS, type OneShotPack } from '@/oneshot/pacote';
 import { CampaignService } from './campaigns';
 import { TemplateEditorService } from './editor';
 import { TemplateCatalog } from './catalog';
@@ -52,6 +53,8 @@ export const cryptoDie: DieRoller = (sides) => {
 /** Raiz de composição: liga as portas do domínio às implementações concretas. */
 export interface Services {
   catalog: TemplateCatalog;
+  /** One-shots com personagens prontos deste build (pasta `oneshot/pacotes`, fora do Git). */
+  oneShots: readonly OneShotPack[];
   sheets: SheetService;
   files: FileService;
   campaigns: CampaignService;
@@ -93,6 +96,7 @@ export interface ServiceOptions {
   appVersion?: string;
   /** Dados: criptográficos no app; previsíveis nos testes. */
   dieRoller?: DieRoller;
+  oneShots?: readonly OneShotPack[];
 }
 
 export function createServices(
@@ -112,13 +116,19 @@ export function createServices(
     sha256 = webSha256,
     appVersion = __APP_VERSION__,
     dieRoller = cryptoDie,
+    // Nos testes, só os pacotes que o teste passar: o resultado não depende da pasta local.
+    oneShots = import.meta.env.MODE === 'test' ? [] : ONE_SHOT_PACKS,
   }: ServiceOptions = {},
 ): Services {
   const sheetRepository = new DexieSheetRepository(db);
   const templateRepository = new DexieTemplateRepository(db);
   const device = new DexieDeviceRepository(db, ids.newId);
   const campaignRepository = new DexieCampaignRepository(db);
-  const catalog = new TemplateCatalog(templateRepository, BUILTIN_TEMPLATES, RETIRED_TEMPLATES);
+  const catalog = new TemplateCatalog(
+    templateRepository,
+    [...BUILTIN_TEMPLATES, ...oneShots.map((pack) => pack.template)],
+    RETIRED_TEMPLATES,
+  );
   const sheets = new SheetService(sheetRepository, catalog, device, clock, ids, processImage);
   const sessionStates = new DexieSessionStateRepository(db);
   const secrets = new DexieSecretValuesRepository(db);
@@ -151,6 +161,7 @@ export function createServices(
   );
   return {
     catalog,
+    oneShots,
     device,
     sheetRepository,
     campaignRepository,

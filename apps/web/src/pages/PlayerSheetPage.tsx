@@ -1,4 +1,6 @@
 import { defaultValue, type CompiledTemplate, type FieldValue } from '@tabula/domain';
+import { OneShotPage } from '@/oneshot/OneShotPage';
+import { oneShotPack } from '@/oneshot/pacote';
 import type { HostPlayer } from '@tabula/sync';
 import { useLiveQuery } from 'dexie-react-hooks';
 import { ArrowLeftIcon, EyeOffIcon } from 'lucide-react';
@@ -87,7 +89,7 @@ function PlayerSheet({
   compiled: CompiledTemplate;
   back: string;
 }) {
-  const { session } = useServices();
+  const { session, oneShots } = useServices();
   const { sheetId } = player;
   const secrets = useLiveQuery(
     () => session.secretValues(campaignId, sheetId),
@@ -150,6 +152,21 @@ function PlayerSheet({
     }),
     [roller, player.sheet.name],
   );
+
+  // One-shot: o Mestre vê a mesma ficha em imagem do jogador (e pode mexer no PV e no PD).
+  const pack = oneShotPack(compiled.template.id, oneShots);
+  if (pack) {
+    return (
+      <OneShotPage
+        pack={pack}
+        values={values}
+        onChange={onChange}
+        back={back}
+        backLabel="Voltar à campanha"
+        subtitle={player.displayName}
+      />
+    );
+  }
 
   return (
     <div className="space-y-4" {...systemTheme(compiled.template)}>

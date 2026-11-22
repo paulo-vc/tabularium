@@ -5,6 +5,8 @@ import {
   roleOf,
   type Campaign,
 } from '@tabula/domain';
+import { CharacterPicker } from '@/oneshot/CharacterPicker';
+import { oneShotPack } from '@/oneshot/pacote';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   ArrowLeftIcon,
@@ -18,7 +20,7 @@ import {
 } from 'lucide-react';
 import { useMemo, useState, type FormEvent } from 'react';
 import { toast } from 'sonner';
-import { Link } from 'wouter';
+import { Link, useLocation } from 'wouter';
 import { useServices } from '@/app/services-context';
 import { systemTheme } from '@/components/use-system-accent';
 import { useDeviceId } from '@/components/use-device';
@@ -99,7 +101,10 @@ export function CampaignPage({ id }: { id: string }) {
 }
 
 function PlayerView({ campaign, userId }: { campaign: Campaign; userId: string }) {
-  const { campaigns, catalog, sheetRepository } = useServices();
+  const { campaigns, catalog, sheetRepository, sheets, oneShots } = useServices();
+  const [, navigate] = useLocation();
+  // One-shot com personagens prontos: o jogador escolhe um deles em vez de criar a ficha.
+  const pack = oneShotPack(campaign.templateRef.id, oneShots);
   const sheetId = linkedSheetId(campaign, userId);
   const linked = useLiveQuery(
     async () => (sheetId ? ((await sheetRepository.get(sheetId)) ?? null) : null),
@@ -201,7 +206,27 @@ function PlayerView({ campaign, userId }: { campaign: Campaign; userId: string }
               </p>
             )}
 
-            {showChooser && (
+            {showChooser && pack && (
+              <CharacterPicker
+                pack={pack}
+                onPick={async (character) => {
+                  const created = await campaigns.createLinkedSheet(campaign.id, character.nome);
+                  if (!created.ok) {
+                    toast.error('Não foi possível escolher', {
+                      description: created.error.message,
+                    });
+                    return;
+                  }
+                  const id = created.value.id;
+                  await sheets.setValue(id, 'personagem', character.id);
+                  await sheets.setValue(id, 'pv', { current: character.pv, max: character.pv });
+                  await sheets.setValue(id, 'pd', { current: character.pd, max: character.pd });
+                  setChoosing(false);
+                  navigate(`/fichas/${id}`);
+                }}
+              />
+            )}
+            {showChooser && !pack && (
               <SheetChooser
                 campaign={campaign}
                 compatible={compatible ?? []}
