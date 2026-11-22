@@ -25,7 +25,11 @@ export interface OneShotCharacter {
   retrato: string;
   pv: number;
   pd: number;
-  quadrados: { pv: readonly Square[]; pd: readonly Square[] };
+  /**
+   * Quadradinhos de PV e PD na imagem e, se o personagem tiver (o Executor), os espaços da
+   * barra de Ímpeto, que ele preenche ao falhar num teste.
+   */
+  quadrados: { pv: readonly Square[]; pd: readonly Square[]; impeto?: readonly Square[] };
 }
 
 export interface OneShotPack {
@@ -50,7 +54,7 @@ const PREFIX = 'oneshot-';
 export function packTemplate(pack: Omit<OneShotPack, 'template'>): SystemTemplate {
   return {
     id: `${PREFIX}${pack.id}`,
-    version: '1.0.0',
+    version: '1.1.0',
     name: pack.nome,
     description: pack.descricao,
     author: 'Mesa local',
@@ -68,6 +72,8 @@ export function packTemplate(pack: Omit<OneShotPack, 'template'>): SystemTemplat
       },
       { id: 'pv', key: 'pv', label: 'PV', type: 'resource', default: 10, color: 'vermelho' },
       { id: 'pd', key: 'pd', label: 'PD', type: 'resource', default: 10, color: 'cobalto' },
+      // Espaços preenchidos da barra de Ímpeto (só quem tem a barra usa).
+      { id: 'impeto', key: 'impeto', label: 'Ímpeto', type: 'number', default: 0, min: 0, max: 3 },
     ],
     layouts: {
       full: [
@@ -79,10 +85,11 @@ export function packTemplate(pack: Omit<OneShotPack, 'template'>): SystemTemplat
             { kind: 'field', fieldId: 'personagem' },
             { kind: 'field', fieldId: 'pv' },
             { kind: 'field', fieldId: 'pd' },
+            { kind: 'field', fieldId: 'impeto' },
           ],
         },
       ],
-      gmSummary: ['personagem', 'pv', 'pd'],
+      gmSummary: ['personagem', 'pv', 'pd', 'impeto'],
     },
   };
 }

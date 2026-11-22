@@ -48,6 +48,7 @@ export function OneShotSheet({
 }) {
   const [page, setPage] = useState<'ficha' | 'historico'>('ficha');
   const style = { '--os-cor': character.cor } as CSSProperties;
+  const impeto = typeof values['impeto'] === 'number' ? values['impeto'] : 0;
   const tracks = (['pv', 'pd'] as const).map((track) => {
     const max = character[track];
     return { track, max, value: resource(values, track, max) };
@@ -94,6 +95,15 @@ export function OneShotSheet({
           className={cn('block w-full select-none', page === 'historico' && 'os-revela')}
           draggable={false}
         />
+        {page === 'ficha' && character.quadrados.impeto && (
+          <SquareOverlay
+            squares={character.quadrados.impeto}
+            label="Ímpeto"
+            spent={impeto}
+            variant="impeto"
+            onClick={(index) => onChange('impeto', fillTo(impeto, index))}
+          />
+        )}
         {page === 'ficha' &&
           tracks.map(({ track, max, value }) => (
             <SquareOverlay
@@ -107,7 +117,12 @@ export function OneShotSheet({
         <div aria-hidden className="os-varredura pointer-events-none absolute inset-0" />
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div
+        className={cn(
+          'grid gap-3 sm:grid-cols-2',
+          character.quadrados.impeto && 'lg:grid-cols-[1fr_1fr_auto]',
+        )}
+      >
         {tracks.map(({ track, max, value }) => (
           <Tracker
             key={track}
@@ -117,9 +132,24 @@ export function OneShotSheet({
             onClick={(index) => onChange(track, clickSquare(value, max, index))}
           />
         ))}
+        {character.quadrados.impeto && (
+          <ImpetoTracker
+            spaces={character.quadrados.impeto.length}
+            filled={impeto}
+            onClick={(index) => onChange('impeto', fillTo(impeto, index))}
+          />
+        )}
       </div>
     </div>
   );
+}
+
+/**
+ * Espaços que se preenchem do primeiro em diante (o Ímpeto): clicar num vazio preenche até
+ * ele; num preenchido, esvazia dele em diante.
+ */
+export function fillTo(filled: number, index: number): number {
+  return index < filled ? index : index + 1;
 }
 
 /** Os quadradinhos da própria imagem, clicáveis. */
@@ -127,11 +157,14 @@ function SquareOverlay({
   squares,
   label,
   spent,
+  variant = 'perda',
   onClick,
 }: {
   squares: readonly Square[];
   label: string;
   spent: number;
+  /** `perda`: marcado com um X (ponto perdido); `impeto`: o espaço se enche na cor. */
+  variant?: 'perda' | 'impeto';
   onClick: (index: number) => void;
 }) {
   return (
@@ -144,7 +177,10 @@ function SquareOverlay({
           tabIndex={-1}
           aria-hidden
           title={`${label} ${index + 1}`}
-          className={cn('os-quadrado absolute', index < spent && 'os-quadrado-marcado')}
+          className={cn(
+            'os-quadrado absolute',
+            index < spent && (variant === 'impeto' ? 'os-impeto-cheio' : 'os-quadrado-marcado'),
+          )}
           style={{
             left: `${x * 100}%`,
             top: `${y * 100}%`,
@@ -196,6 +232,46 @@ function Tracker({
             className={cn(
               'os-quadrado-grande size-7 rounded-sm pointer-coarse:size-9',
               index < spent && 'os-quadrado-marcado',
+            )}
+            onClick={() => onClick(index)}
+          />
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** A barra de Ímpeto (Executor): três espaços que se enchem ao falhar num teste. */
+function ImpetoTracker({
+  spaces,
+  filled,
+  onClick,
+}: {
+  spaces: number;
+  filled: number;
+  onClick: (index: number) => void;
+}) {
+  return (
+    <div className="os-contador rounded-lg border p-3">
+      <div className="mb-2 flex items-baseline justify-between gap-6">
+        <span className="font-heading text-lg tracking-widest uppercase">Ímpeto</span>
+        <span className="font-mono text-sm">
+          <span key={filled} className="valor-mudou inline-block text-base font-semibold">
+            {filled}
+          </span>{' '}
+          / {spaces}
+        </span>
+      </div>
+      <div className="flex gap-1.5" role="group" aria-label={`Ímpeto: ${filled} de ${spaces}`}>
+        {Array.from({ length: spaces }, (_, index) => (
+          <button
+            key={index}
+            type="button"
+            aria-label={`Ímpeto ${index + 1}${index < filled ? ' (preenchido)' : ''}`}
+            aria-pressed={index < filled}
+            className={cn(
+              'os-quadrado-grande h-7 w-12 rounded-full pointer-coarse:h-9',
+              index < filled && 'os-impeto-cheio',
             )}
             onClick={() => onClick(index)}
           />

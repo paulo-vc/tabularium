@@ -38,6 +38,11 @@ const pack = buildPack(
             [0.32, 0.1, 0.01, 0.01],
             [0.34, 0.1, 0.01, 0.01],
           ],
+          impeto: [
+            [0.5, 0.2, 0.02, 0.01],
+            [0.53, 0.2, 0.02, 0.01],
+            [0.56, 0.2, 0.02, 0.01],
+          ],
         },
       },
       {
@@ -109,6 +114,17 @@ describe('one-shot com personagens prontos', () => {
       }),
     );
     expect(screen.getByRole('group', { name: 'PV: 2 de 4' })).toBeInTheDocument();
+
+    // O Ímpeto se enche do primeiro em diante; clicar num cheio esvazia dele em diante.
+    await user.click(screen.getByRole('button', { name: 'Ímpeto 2' }));
+    await waitFor(async () =>
+      expect((await db.sheets.get(sheet.id))?.values).toMatchObject({ impeto: 2 }),
+    );
+    expect(screen.getByRole('group', { name: 'Ímpeto: 2 de 3' })).toBeInTheDocument();
+    await user.click(screen.getByRole('button', { name: 'Ímpeto 1 (preenchido)' }));
+    await waitFor(async () =>
+      expect((await db.sheets.get(sheet.id))?.values).toMatchObject({ impeto: 0 }),
+    );
 
     await user.click(screen.getByRole('tab', { name: 'Histórico' }));
     expect(screen.getByRole('img', { name: 'Histórico de Ana' })).toBeInTheDocument();
