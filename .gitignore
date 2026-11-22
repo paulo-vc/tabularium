@@ -22,3 +22,8 @@ Thumbs.db
 dist-e2e/
 test-results/
 playwright-report/
+
+# Pacotes de one-shot com material de terceiros: ficam só no PC de quem monta a mesa e entram
+# apenas nos builds feitos ali (ver apps/web/src/oneshot/pacotes/README.md).
+apps/web/src/oneshot/pacotes/*
+!apps/web/src/oneshot/pacotes/README.md

@@ -1,4 +1,6 @@
 import type { FieldValue } from '@tabula/domain';
+import { OneShotPage } from '@/oneshot/OneShotPage';
+import { oneShotPack } from '@/oneshot/pacote';
 import { useLiveQuery } from 'dexie-react-hooks';
 import {
   ArrowLeftIcon,
@@ -171,6 +173,26 @@ function SheetEditor({ id, compiled }: { id: string; compiled: OpenedReady['comp
   const [confirmDelete, setConfirmDelete] = useState(false);
 
   if (!sheet) return null;
+  // One-shot com personagens prontos: a ficha é a imagem do personagem.
+  const pack = oneShotPack(compiled.template.id, services.oneShots);
+  if (pack) {
+    return (
+      <OneShotPage
+        pack={pack}
+        values={values}
+        onChange={onChange}
+        back={playerCampaign ? `/campanhas/${playerCampaign.id}` : '/'}
+        backLabel={playerCampaign ? 'Voltar à campanha' : 'Voltar às fichas'}
+        onPick={async (character) => {
+          // Em sequência: cada gravação lê a ficha inteira, e em paralelo uma apagaria a outra.
+          await services.sheets.rename(id, character.nome);
+          await services.sheets.setValue(id, 'personagem', character.id);
+          await services.sheets.setValue(id, 'pv', { current: character.pv, max: character.pv });
+          await services.sheets.setValue(id, 'pd', { current: character.pd, max: character.pd });
+        }}
+      />
+    );
+  }
   const { template } = compiled;
   const bonusEditor: BonusEditor = {
     compiled,

@@ -507,3 +507,223 @@ html {
     animation: valor-mudou 260ms ease-out;
   }
 }
+
+/*
+ * One-shot com personagens prontos (`oneshot/`): escuro, granulado e com falhas de sinal, na
+ * cor de cada personagem (`--os-cor`). Tudo some para quem pede menos movimento.
+ */
+.os-nome {
+  position: relative;
+  color: var(--os-cor, var(--primary));
+  text-shadow: 0 0 18px color-mix(in oklch, var(--os-cor, var(--primary)) 45%, transparent);
+}
+.os-aba-ativa {
+  color: var(--os-cor, var(--primary));
+  background: color-mix(in oklch, var(--os-cor, var(--primary)) 16%, transparent);
+  box-shadow: inset 0 -2px 0 var(--os-cor, var(--primary));
+}
+.os-palco {
+  background: black;
+  box-shadow:
+    0 0 0 1px color-mix(in oklch, var(--os-cor) 40%, transparent),
+    0 20px 60px -24px color-mix(in oklch, var(--os-cor) 60%, black);
+}
+.os-varredura {
+  background:
+    repeating-linear-gradient(0deg, oklch(0 0 0 / 14%) 0 1px, transparent 1px 3px),
+    radial-gradient(ellipse at 50% 45%, transparent 55%, oklch(0 0 0 / 45%) 100%);
+  mix-blend-mode: multiply;
+}
+/* Quadradinho da imagem: invisível até o mouse passar; marcado, ganha um X na cor. */
+.os-quadrado {
+  border-radius: 2px;
+  cursor: pointer;
+  transition:
+    background-color 160ms,
+    box-shadow 160ms;
+}
+.os-quadrado:hover {
+  box-shadow: 0 0 0 2px var(--os-cor);
+}
+.os-quadrado-grande {
+  background: #ece4d2;
+  transition:
+    background-color 160ms,
+    transform 160ms;
+}
+.os-quadrado-grande:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 0 0 2px var(--os-cor);
+}
+.os-quadrado-marcado {
+  background:
+    linear-gradient(45deg, transparent 42%, var(--os-cor) 42% 58%, transparent 58%),
+    linear-gradient(-45deg, transparent 42%, var(--os-cor) 42% 58%, transparent 58%), #1b1814;
+  box-shadow: inset 0 0 0 1px var(--os-cor);
+}
+.os-contador {
+  border-color: color-mix(in oklch, var(--os-cor) 35%, var(--border));
+  background: linear-gradient(
+    180deg,
+    color-mix(in oklch, var(--os-cor) 8%, var(--card)),
+    var(--card)
+  );
+}
+.os-carta {
+  border-color: color-mix(in oklch, var(--os-cor) 30%, var(--border));
+  background: black;
+  transition:
+    transform 260ms cubic-bezier(0.2, 0.8, 0.2, 1),
+    box-shadow 260ms,
+    border-color 260ms,
+    opacity 400ms,
+    filter 400ms;
+}
+.os-carta-retrato {
+  filter: grayscale(0.85) brightness(0.7);
+  transition:
+    filter 300ms,
+    transform 600ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.os-carta-nome {
+  color: var(--os-cor);
+}
+.os-carta:not(:disabled):hover,
+.os-carta:not(:disabled):focus-visible {
+  transform: translateY(-6px);
+  border-color: var(--os-cor);
+  box-shadow: 0 18px 40px -16px var(--os-cor);
+}
+.os-carta:not(:disabled):hover .os-carta-retrato,
+.os-carta:not(:disabled):focus-visible .os-carta-retrato,
+.os-carta-escolhida .os-carta-retrato {
+  filter: none;
+  transform: scale(1.04);
+}
+.os-carta-escolhida {
+  border-color: var(--os-cor);
+  box-shadow:
+    0 0 0 2px var(--os-cor),
+    0 0 60px -10px var(--os-cor);
+}
+.os-carta-some {
+  opacity: 0.15;
+  filter: blur(2px) grayscale(1);
+}
+.os-revelacao {
+  background: radial-gradient(
+    circle,
+    color-mix(in oklch, var(--os-cor) 22%, transparent),
+    oklch(0 0 0 / 85%) 70%
+  );
+}
+
+@keyframes os-surge {
+  from {
+    opacity: 0;
+    transform: scale(1.02);
+    filter: brightness(2.2) contrast(1.4);
+  }
+  35% {
+    opacity: 1;
+  }
+}
+@keyframes os-revela {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+@keyframes os-carta-entra {
+  from {
+    opacity: 0;
+    transform: translateY(18px) scale(0.97);
+    filter: blur(4px);
+  }
+}
+@keyframes os-tremula {
+  0%,
+  92%,
+  100% {
+    opacity: 1;
+  }
+  93% {
+    opacity: 0.55;
+  }
+  95% {
+    opacity: 0.9;
+  }
+  96% {
+    opacity: 0.4;
+  }
+}
+@keyframes os-falha {
+  0%,
+  86%,
+  100% {
+    text-shadow: 0 0 18px color-mix(in oklch, var(--os-cor, var(--primary)) 45%, transparent);
+    transform: none;
+  }
+  88% {
+    text-shadow:
+      3px 0 0 color-mix(in oklch, var(--os-cor, var(--primary)) 80%, white),
+      -3px 0 0 oklch(0.6 0.2 25 / 70%);
+    transform: translateX(1px) skewX(-4deg);
+  }
+  90% {
+    text-shadow:
+      -2px 0 0 color-mix(in oklch, var(--os-cor, var(--primary)) 80%, white),
+      2px 0 0 oklch(0.6 0.15 250 / 70%);
+    transform: translateX(-2px);
+  }
+}
+@keyframes os-revelacao {
+  from {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+}
+@keyframes os-nome-revelado {
+  from {
+    letter-spacing: 0.6em;
+    opacity: 0;
+    filter: blur(8px);
+  }
+}
+@keyframes os-marca {
+  from {
+    transform: scale(1.4);
+  }
+}
+@media (prefers-reduced-motion: no-preference) {
+  .os-palco {
+    animation: os-surge 700ms ease-out;
+  }
+  .os-revela {
+    animation: os-revela 1600ms cubic-bezier(0.3, 0.6, 0.2, 1);
+  }
+  .os-varredura {
+    animation: os-tremula 7s infinite;
+  }
+  .os-nome {
+    animation: os-falha 5s infinite;
+  }
+  .os-carta-entra {
+    animation: os-carta-entra 600ms cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  }
+  .os-revelacao {
+    animation: os-revelacao 1400ms ease-out both;
+  }
+  .os-revelacao .os-nome {
+    animation:
+      os-nome-revelado 900ms cubic-bezier(0.2, 0.8, 0.2, 1) both,
+      os-falha 1.2s 700ms infinite;
+  }
+  .os-quadrado-marcado {
+    animation: os-marca 200ms ease-out;
+  }
+}
